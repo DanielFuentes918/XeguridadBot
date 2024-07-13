@@ -16,6 +16,7 @@ Numeros_telefonicos = ["50497338021"]
 def formateando_fecha(timestamp):
     return datetime.strptime(timestamp, "%Y%m%d%H%M%S")
 
+
 def obtener_unidades():
     # Realizar la solicitud para obtener todas las unidades
     params = {
@@ -46,12 +47,12 @@ def obtener_ultima_transmision(unidades):
         }
         response = requests.get(Xeguridad_API_URL, params=params)
         print(f"Estado de la respuesta: {response.status_code}")
-        print(f"Contenido de la respuesta: {response.text}")
+        #print(f"Contenido de la respuesta: {response.text}")
 
         if response.status_code == 200:
             try:
                 transmisiones = response.json()
-                if transmisiones and 'datetime_utc' in transmisiones:
+                if transmisiones and 'datetime_utc' in transmisiones: #revisar variables, if no está entrando
                     ultima_transmision = transmisiones['datetime_utc']
                     # Imprimir la última transmisión obtenida
                     print(f"Unidad: {unidad['unitnumber']} - Última transmisión: {ultima_transmision}")
@@ -71,16 +72,19 @@ def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
     ahora = datetime.now(timezone.utc)
     
     for unidad, ultima_transmision in ultima_transmision_unidades:
+        print(unidad,"---**---", ultima_transmision)
         if ultima_transmision:
+            print("ULTIMA TRANS:",ultima_transmision)
             try:
                 ultima_transmision_dt = formateando_fecha(ultima_transmision)
                 diferencia = ahora - ultima_transmision_dt
                 if diferencia >= timedelta(hours=24):
+                    print("Diferencia:",diferencia, "--",str(timedelta(hours=24)))
                     unidades_no_transmitiendo.append(unidad)
             except Exception as e:
                 print(f"Error al calcular la diferencia para la unidad {unidad}: {e}")
-        else:
-            unidades_no_transmitiendo.append(unidad)
+        # else:
+        #     unidades_no_transmitiendo.append(unidad)
     print(f"Unidades sin transmitir: {unidades_no_transmitiendo}")
     return unidades_no_transmitiendo
 
