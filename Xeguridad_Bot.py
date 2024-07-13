@@ -13,6 +13,9 @@ Xeguridad_PASSWORD = "Dev345p1d4"
 # Números de teléfono a los que se enviarán los mensajes
 Numeros_telefonicos = ["50497338021"]
 
+def formateando_fecha(timestamp):
+    return datetime.strptime(timestamp, "%Y%m%d%H%M%S")
+
 def obtener_unidades():
     # Realizar la solicitud para obtener todas las unidades
     params = {
@@ -65,20 +68,20 @@ def obtener_ultima_transmision(unidades):
 
 def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
     unidades_no_transmitiendo = []
-    formato_fecha = "%Y%m%d%H%M%S"
-    ahora = datetime.now(timezone.utc).strftime(formato_fecha)
+    ahora = datetime.now(timezone.utc)
     
     for unidad, ultima_transmision in ultima_transmision_unidades:
         if ultima_transmision:
             try:
-                diferencia = datetime.strptime(ahora, formato_fecha) - datetime.strptime(ultima_transmision, formato_fecha)
+                ultima_transmision_dt = formateando_fecha(ultima_transmision)
+                diferencia = ahora - ultima_transmision_dt
                 if diferencia >= timedelta(hours=24):
                     unidades_no_transmitiendo.append(unidad)
             except Exception as e:
                 print(f"Error al calcular la diferencia para la unidad {unidad}: {e}")
         else:
             unidades_no_transmitiendo.append(unidad)
-    print(f"Unidad sin transmitir {unidades_no_transmitiendo}")
+    print(f"Unidades sin transmitir: {unidades_no_transmitiendo}")
     return unidades_no_transmitiendo
 
 def enviar_mensaje_whatsapp(numero, mensaje):
