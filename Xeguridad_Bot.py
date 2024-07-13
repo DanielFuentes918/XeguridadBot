@@ -50,8 +50,11 @@ def obtener_ultima_transmision(unidades):
                 transmisiones = response.json()
                 if transmisiones and 'datetime_utc' in transmisiones:
                     ultima_transmision = transmisiones['datetime_utc']
+                    # Imprimir la última transmisión obtenida
+                    print(f"Unidad: {unidad['unitnumber']} - Última transmisión: {ultima_transmision}")
                     ultima_transmision_unidades.append((unidad['unitnumber'], ultima_transmision))
                 else:
+                    print(f"Unidad: {unidad['unitnumber']} - No hay información de última transmisión")
                     ultima_transmision_unidades.append((unidad['unitnumber'], None))
             except ValueError as e:
                 print(f"Error al decodificar JSON: {e}")
@@ -67,9 +70,12 @@ def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
     
     for unidad, ultima_transmision in ultima_transmision_unidades:
         if ultima_transmision:
-            diferencia = datetime.strptime(ahora, formato_fecha) - datetime.strptime(ultima_transmision, formato_fecha)
-            if diferencia >= timedelta(hours=24):
-                unidades_no_transmitiendo.append(unidad)
+            try:
+                diferencia = datetime.strptime(ahora, formato_fecha) - datetime.strptime(ultima_transmision, formato_fecha)
+                if diferencia >= timedelta(hours=24):
+                    unidades_no_transmitiendo.append(unidad)
+            except Exception as e:
+                print(f"Error al calcular la diferencia para la unidad {unidad}: {e}")
         else:
             unidades_no_transmitiendo.append(unidad)
     print(f"Unidad sin transmitir {unidades_no_transmitiendo}")
