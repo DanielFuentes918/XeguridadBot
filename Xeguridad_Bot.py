@@ -1,4 +1,3 @@
-#Main Branch
 import requests
 from datetime import datetime, timedelta, timezone
 
@@ -18,6 +17,9 @@ Numeros_telefonicos = ["50497338021"]
 
 def formateando_fecha(timestamp):
     return datetime.strptime(timestamp, "%Y%m%d%H%M%S")
+
+def formatear_fecha_dd_mm_aaaa(fecha):
+    return fecha.strftime("%d/%m/%Y")
 
 def obtener_unidades():
     # Realizar la solicitud para obtener todas las unidades
@@ -87,13 +89,14 @@ def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
                 diferencia = ahora - ultima_transmision_dt
                 if diferencia >= timedelta(hours=24):
                     print("Diferencia:", diferencia, "--", str(timedelta(hours=24)))
+                    unidad['ultima_trans'] = formatear_fecha_dd_mm_aaaa(ultima_transmision_dt)
                     unidades_no_transmitiendo.append(unidad)
             except Exception as e:
                 print(f"Error al calcular la diferencia para la unidad {unidad}: {e}")
 
     return unidades_no_transmitiendo
 
-def enviar_mensaje_whatsapp(numero, unidad):
+def enviar_mensaje_whatsapp(numero, info_equipos):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
         'Content-Type': 'application/json'
@@ -113,9 +116,10 @@ def enviar_mensaje_whatsapp(numero, unidad):
                 {
                     'type': 'body',
                     'parameters': [
-                        {'type': 'text', 'text': unidad['unitnumber']},
-                        {'type': 'text', 'text': unidad['ultima_trans']},
-                        {'type': 'text', 'text': unidad['nombre']}
+                        {
+                            'type': 'text',
+                            'text': info_equipos  # Directamente como cadena de texto
+                        }
                     ]
                 }
             ]
@@ -128,25 +132,32 @@ def enviar_mensaje_whatsapp(numero, unidad):
     
     return response.status_code
 
+def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
+    mensajes = []
+    for i in range(0, len(unidades_no_transmitiendo), max_unidades):
+        chunk = unidades_no_transmitiendo[i:i + max_unidades]
+        info_equipos = ""
+        for unidad in chunk:
+            info_equipos += f"Unidad: {unidad['unitnumber']} | Ultima transmision: {unidad['ultima_trans']} | Datos: {unidad['nombre']} || "
+        mensajes.append(info_equipos)
+    return mensajes
+
 def main():
     unidades = obtener_unidades()
-    info_equipos = ""
     if unidades:
         ultima_transmision_unidades = obtener_ultima_transmision(unidades)
         print("ultima_transmision_unidades::", ultima_transmision_unidades)
         unidades_no_transmitiendo = obtener_unidades_no_transmitiendo(ultima_transmision_unidades)
         if unidades_no_transmitiendo:
-             for unidad in unidades_no_transmitiendo:
-                 # Variable para acumular todos los datos y enviarla en un solo mensaje.
-                 info_equipos += "Unidad:" + unidad['unitnumber'] + '\n' + "Ultima transmision:" + unidad['ultima_trans'] + '\n' + "Datos:" + unidad['nombre'] + '\n'
-                 status = enviar_mensaje_whatsapp(Numeros_telefonicos[0], unidad)
-                 if status == 200:
-                     print(f'Mensaje enviado a {Numeros_telefonicos[0]} para la unidad {unidad}')
-                 else:
-                     print(f'Error al enviar mensaje a {Numeros_telefonicos[0]} para la unidad {unidad}')
+            mensajes = dividir_en_mensajes(unidades_no_transmitiendo)
+            for mensaje in mensajes:
+                status = enviar_mensaje_whatsapp(Numeros_telefonicos[0], mensaje)
+                if status == 200:
+                    print(f'Mensaje enviado')
+                else:
+                    print(f'Error al enviar mensaje')
         else:
-             print("Todas las unidades GPS están transmitiendo correctamente.")
-        print(info_equipos)
+            print("Todas las unidades GPS están transmitiendo correctamente.")
     else:
         print("No se pudieron obtener las unidades GPS.")
 
