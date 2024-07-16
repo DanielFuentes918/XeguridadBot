@@ -62,23 +62,23 @@ def obtener_ultima_transmision(unidades):
                     ultima_transmision = data['datetime_utc']
                     # Imprimir la última transmisión obtenida
                     print(f"Unidad: {unidad['unitnumber']} - Última transmisión: {ultima_transmision}")
-                    ultima_transmision_unidades.append({'unitnumber':unidad['unitnumber'], 'ulltima_trans':ultima_transmision, 'nombre':data['name']})
+                    #creo un diccionario dentro del arreglo para poder acceder aultima_transmision_unidades[0]['unitnumber'] , ultima_transmision_unidades[0]['nombre'] etc...
+                    ultima_transmision_unidades.append({'unitnumber':unidad['unitnumber'], 'ultima_trans':ultima_transmision, 'nombre':data['name']})
                     print("ARRAY INFO:",ultima_transmision_unidades[0]['unitnumber'])
             except Exception as e:
                 print(f"Error al procesar las transmisiones: {e}")
 
-
+    
     return ultima_transmision_unidades
 
 def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
     unidades_no_transmitiendo = []
-    fechas_notransmitiendo = []
     ahora = datetime.now(timezone.utc)  # Asegurando que 'ahora' tiene información de zona horaria
     
     for unidad in ultima_transmision_unidades:
-        #print(unidad, "---**---", ultima_transmision)
+        print(unidad['ultima_trans'],"---**---")
         if unidad['ultima_trans']:
-            print("ULTIMA TRANS:", uunidad['ultima_trans'])
+            print("ULTIMA TRANS:", unidad['ultima_trans'])
             try:
                 ultima_transmision_dt = formateando_fecha(unidad['ultima_trans'])
                 
@@ -130,20 +130,23 @@ def enviar_mensaje_whatsapp(numero, unidad, ultima_transmision):
 
 def main():
     unidades = obtener_unidades()
+    info_equipos = ""
     if unidades:
         ultima_transmision_unidades = obtener_ultima_transmision(unidades)
         print("ultima_transmision_unidades::", ultima_transmision_unidades)
         unidades_no_transmitiendo = obtener_unidades_no_transmitiendo(ultima_transmision_unidades)
         if unidades_no_transmitiendo:
              for unidad in unidades_no_transmitiendo:
-                 print("Unidad:",unidad['unitnumenber'], "ultima transmision:",unidad['ultima_trans'])
+                 #Variable para acumular todos los datos y enviarla en un solo mensaje.
+                 info_equipos += "Unidad:"+unidad['unitnumber']+'\n'+"Ultima transmision:"+unidad['ultima_trans']+'\n'+"Datos:"+unidad['nombre']+'\n'
         #         status = enviar_mensaje_whatsapp(Numeros_telefonicos[0], unidad, ultima_transmision)
         #         if status == 200:
         #             print(f'Mensaje enviado a {Numeros_telefonicos[0]} para la unidad {unidad}')
         #         else:
         #             print(f'Error al enviar mensaje a {Numeros_telefonicos[0]} para la unidad {unidad}')
-        # else:
-        #     print("Todas las unidades GPS están transmitiendo correctamente.")
+        else:
+             print("Todas las unidades GPS están transmitiendo correctamente.")
+        print(info_equipos)
     else:
         print("No se pudieron obtener las unidades GPS.")
 
