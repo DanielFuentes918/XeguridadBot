@@ -7,6 +7,7 @@ WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8
 NAMESPACE = "Xeguridad"
 TEMPLATE_NAME = "notificacion_xeguridad"
 
+
 # Configuración de la API de dispositivos GPS
 Xeguridad_API_URL = "https://mongol.brono.com/mongol/api.php"
 Xeguridad_USERNAME = "developerexa"
@@ -17,6 +18,7 @@ Numeros_telefonicos = ["50497338021"]
 
 def formateando_fecha(timestamp):
     return datetime.strptime(timestamp, "%Y%m%d%H%M%S")
+
 
 def obtener_unidades():
     # Realizar la solicitud para obtener todas las unidades
@@ -53,18 +55,21 @@ def obtener_ultima_transmision(unidades):
         if response.status_code == 200:
             try:
                 transmisiones = response.json()
-                print("transmisiones::>", transmisiones)
+                print("transmisiones::>",transmisiones)
                 for data in transmisiones:
                     print(data['datetime_utc'])
-                    # Guardar la última transmisión
+            #     if transmisiones and 'datetime_utc' in transmisiones: #revisar variables, if no está entrando
                     ultima_transmision = data['datetime_utc']
                     # Imprimir la última transmisión obtenida
                     print(f"Unidad: {unidad['unitnumber']} - Última transmisión: {ultima_transmision}")
-                    # Creo un diccionario dentro del arreglo para poder acceder a ultima_transmision_unidades[0]['unitnumber'], ultima_transmision_unidades[0]['nombre'] etc...
-                    ultima_transmision_unidades.append({'unitnumber':unidad['unitnumber'], 'ultima_trans':ultima_transmision, 'nombre':data['name']})
-                    print("ARRAY INFO:", ultima_transmision_unidades[0]['unitnumber'])
-            except Exception as e:
-                print(f"Error al procesar las transmisiones: {e}")
+                    ultima_transmision_unidades.append((unidad['unitnumber'], ultima_transmision))
+            #     else:
+            #         print(f"Unidad: {unidad['unitnumber']} - No hay información de última transmisión")
+            #         ultima_transmision_unidades.append((unidad['unitnumber'], None))
+            except ValueError as e:
+                print(f"Error al decodificar JSON: {e}")
+        else:
+            print(f"Error al obtener la última transmisión para la unidad {unidad['unitnumber']}: {response.status_code}")
 
     return ultima_transmision_unidades
 
@@ -72,12 +77,12 @@ def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
     unidades_no_transmitiendo = []
     ahora = datetime.now(timezone.utc)  # Asegurando que 'ahora' tiene información de zona horaria
     
-    for unidad in ultima_transmision_unidades:
-        print(unidad['ultima_trans'], "---**---")
-        if unidad['ultima_trans']:
-            print("ULTIMA TRANS:", unidad['ultima_trans'])
+    for unidad, ultima_transmision in ultima_transmision_unidades:
+        print(unidad, "---**---", ultima_transmision)
+        if ultima_transmision:
+            print("ULTIMA TRANS:", ultima_transmision)
             try:
-                ultima_transmision_dt = formateando_fecha(unidad['ultima_trans'])
+                ultima_transmision_dt = formateando_fecha(ultima_transmision)
                 
                 # Si 'ultima_transmision_dt' no tiene información de zona horaria, añade una.
                 if ultima_transmision_dt.tzinfo is None:
@@ -90,33 +95,30 @@ def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
             except Exception as e:
                 print(f"Error al calcular la diferencia para la unidad {unidad}: {e}")
 
+    print(f"Unidades sin transmitir: {unidades_no_transmitiendo}")
     return unidades_no_transmitiendo
 
-def enviar_mensaje_whatsapp(numero, unidad):
+
+def enviar_mensaje_whatsapp(numero, unidad, ultima_transmision):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
         'Content-Type': 'application/json'
     }
     data = {
         'messaging_product': 'whatsapp',
-        'to': numero,
-        'type': 'template',
-        'template': {
+        'recipient': {
+            'whatsapp': f'{numero}'
+        },
+        'message': {
             'namespace': NAMESPACE,
-            'name': TEMPLATE_NAME,
+            'element_name': TEMPLATE_NAME,
             'language': {
                 'policy': 'deterministic',
                 'code': 'es'
             },
             'components': [
-                {
-                    'type': 'body',
-                    'parameters': [
-                        {'type': 'text', 'text': unidad['unitnumber']},
-                        {'type': 'text', 'text': unidad['ultima_trans']},
-                        {'type': 'text', 'text': unidad['nombre']}
-                    ]
-                }
+                {'type': 'BODY', 'text': unidad},
+                {'type': 'BODY', 'text': ultima_transmision},
             ]
         }
     }
@@ -127,28 +129,22 @@ def enviar_mensaje_whatsapp(numero, unidad):
     
     return response.status_code
 
+
+
 def main():
     unidades = obtener_unidades()
-    info_equipos = ""
     if unidades:
         ultima_transmision_unidades = obtener_ultima_transmision(unidades)
         print("ultima_transmision_unidades::", ultima_transmision_unidades)
         unidades_no_transmitiendo = obtener_unidades_no_transmitiendo(ultima_transmision_unidades)
         if unidades_no_transmitiendo:
              for unidad in unidades_no_transmitiendo:
-                 # Variable para acumular todos los datos y enviarla en un solo mensaje.
-                 info_equipos += "Unidad:" + unidad['unitnumber'] + '\n' + "Ultima transmision:" + unidad['ultima_trans'] + '\n' + "Datos:" + unidad['nombre'] + '\n'
-                 status = enviar_mensaje_whatsapp(Numeros_telefonicos[0], unidad)
-                 if status == 200:
-                     print(f'Mensaje enviado a {Numeros_telefonicos[0]} para la unidad {unidad}')
-                 else:
-                     print(f'Error al enviar mensaje a {Numeros_telefonicos[0]} para la unidad {unidad}')
-        else:
-             print("Todas las unidades GPS están transmitiendo correctamente.")
-        print(info_equipos)
+                 print("Unidad:",unidad,)
+
     else:
         print("No se pudieron obtener las unidades GPS.")
 
+
+
 if __name__ == "__main__":
     main()
-
