@@ -55,34 +55,32 @@ def obtener_ultima_transmision(unidades):
         if response.status_code == 200:
             try:
                 transmisiones = response.json()
-                print("transmisiones::>",transmisiones)
+                print("transmisiones::>", transmisiones)
                 for data in transmisiones:
                     print(data['datetime_utc'])
-            #     if transmisiones and 'datetime_utc' in transmisiones: #revisar variables, if no está entrando
+                    # Guardar la última transmisión
                     ultima_transmision = data['datetime_utc']
                     # Imprimir la última transmisión obtenida
                     print(f"Unidad: {unidad['unitnumber']} - Última transmisión: {ultima_transmision}")
-                    ultima_transmision_unidades.append((unidad['unitnumber'], ultima_transmision))
-            #     else:
-            #         print(f"Unidad: {unidad['unitnumber']} - No hay información de última transmisión")
-            #         ultima_transmision_unidades.append((unidad['unitnumber'], None))
-            except ValueError as e:
-                print(f"Error al decodificar JSON: {e}")
-        else:
-            print(f"Error al obtener la última transmisión para la unidad {unidad['unitnumber']}: {response.status_code}")
+                    ultima_transmision_unidades.append({'unitnumber':unidad['unitnumber'], 'ulltima_trans':ultima_transmision, 'nombre':data['name']})
+                    print("ARRAY INFO:",ultima_transmision_unidades[0]['unitnumber'])
+            except Exception as e:
+                print(f"Error al procesar las transmisiones: {e}")
+
 
     return ultima_transmision_unidades
 
 def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
     unidades_no_transmitiendo = []
+    fechas_notransmitiendo = []
     ahora = datetime.now(timezone.utc)  # Asegurando que 'ahora' tiene información de zona horaria
     
-    for unidad, ultima_transmision in ultima_transmision_unidades:
-        print(unidad, "---**---", ultima_transmision)
-        if ultima_transmision:
-            print("ULTIMA TRANS:", ultima_transmision)
+    for unidad in ultima_transmision_unidades:
+        #print(unidad, "---**---", ultima_transmision)
+        if unidad['ultima_trans']:
+            print("ULTIMA TRANS:", uunidad['ultima_trans'])
             try:
-                ultima_transmision_dt = formateando_fecha(ultima_transmision)
+                ultima_transmision_dt = formateando_fecha(unidad['ultima_trans'])
                 
                 # Si 'ultima_transmision_dt' no tiene información de zona horaria, añade una.
                 if ultima_transmision_dt.tzinfo is None:
@@ -95,7 +93,6 @@ def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
             except Exception as e:
                 print(f"Error al calcular la diferencia para la unidad {unidad}: {e}")
 
-    print(f"Unidades sin transmitir: {unidades_no_transmitiendo}")
     return unidades_no_transmitiendo
 
 
@@ -138,8 +135,8 @@ def main():
         print("ultima_transmision_unidades::", ultima_transmision_unidades)
         unidades_no_transmitiendo = obtener_unidades_no_transmitiendo(ultima_transmision_unidades)
         if unidades_no_transmitiendo:
-             for unidad, ultima_transmision in unidades_no_transmitiendo:
-                 print("Unidad:",unidad, "ultima transmision:",ultima_transmision)
+             for unidad in unidades_no_transmitiendo:
+                 print("Unidad:",unidad['unitnumenber'], "ultima transmision:",unidad['ultima_trans'])
         #         status = enviar_mensaje_whatsapp(Numeros_telefonicos[0], unidad, ultima_transmision)
         #         if status == 200:
         #             print(f'Mensaje enviado a {Numeros_telefonicos[0]} para la unidad {unidad}')
