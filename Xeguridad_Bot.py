@@ -132,7 +132,7 @@ def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
         for index, unidad in enumerate(chunk):
             key = f'var{index + 1}'
             placa = extraer_placa(unidad['nombre'])
-            variables[key] = f"{contador_global}) Unidad: {placa} con dispositivo: {unidad['unitnumber']} no transmite desde: {unidad['ultima_trans']}"
+            variables[key] = f"*{contador_global})* Unidad: {placa} con dispositivo: {unidad['unitnumber']} no transmite desde: {unidad['ultima_trans']}"
             contador_global += 1  # Incrementar el contador global
         
         # Añadir variables vacías si hay menos de 10 unidades en el último grupo
