@@ -6,7 +6,7 @@ import re
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
 NAMESPACE = "Xeguridad"
-TEMPLATE_NAME = "notificacion_xeguridad"
+TEMPLATE_NAME = "notificacion10u_xeguridad"
 
 # Configuración de la API de dispositivos GPS
 Xeguridad_API_URL = "https://mongol.brono.com/mongol/api.php"
@@ -89,70 +89,67 @@ def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
 
     return unidades_no_transmitiendo
 
-def enviar_mensaje_whatsapp(numero, info_equipos):
+def enviar_mensaje_whatsapp(numero, unidades):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
         'Content-Type': 'application/json'
     }
-    data = {
-        'messaging_product': 'whatsapp',
-        'to': numero,
-        'type': 'template',
-        'template': {
-            'namespace': NAMESPACE,
-            'name': TEMPLATE_NAME,
-            'language': {
-                'policy': 'deterministic',
-                'code': 'es'
-            },
-            'components': [
-                {
-                    'type': 'body',
-                    'parameters': [
-                        {
-                            'type': 'text',
-                            'text': info_equipos  # Directamente como cadena de texto
-                        }
-                    ]
-                }
-            ]
+    
+    partes_mensaje = []
+    
+    for i in range(0, len(unidades), 10):
+        chunk = unidades[i:i + 10]
+        
+        components = []
+        
+        for idx, unidad in enumerate(chunk):
+            placa = extraer_placa(unidad['nombre'])
+            components.append({
+                'type': 'text',
+                'text': f"Unidad {idx + 1}: Placa: {placa}, Número de Unidad: {unidad['unitnumber']}, Última transmisión: {unidad['ultima_trans']}"
+            })
+        
+        data = {
+            'messaging_product': 'whatsapp',
+            'to': numero,
+            'type': 'template',
+            'template': {
+                'namespace': NAMESPACE,
+                'name': TEMPLATE_NAME,
+                'language': {
+                    'policy': 'deterministic',
+                    'code': 'es'
+                },
+                'components': components  # Asegurar que los componentes estén correctamente estructurados
+            }
         }
-    }
-    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+        
+        partes_mensaje.append(data)
     
-    print(f"Estado de la respuesta: {response.status_code}")
-    print(f"Contenido de la respuesta: {response.text}")
-    
-    return response.status_code
+    for mensaje in partes_mensaje:
+        response = requests.post(WHATSAPP_API_URL, headers=headers, json=mensaje)
+        
+        print(f"Estado de la respuesta: {response.status_code}")
+        print(f"Contenido de la respuesta: {response.text}")
+        
+        if response.status_code == 200:
+            print(f'Mensaje enviado')
+        else:
+            print(f'Error al enviar mensaje')
 
 def extraer_placa(nombre):
     match = re.search(r'\b[A-Z]{3}\d{4}\b', nombre)
-    return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
-
-def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
-    mensajes = []
-    for i in range(0, len(unidades_no_transmitiendo), max_unidades):
-        chunk = unidades_no_transmitiendo[i:i + max_unidades]
-        info_equipos = ""
-        for unidad in chunk:
-            placa = extraer_placa(unidad['nombre'])
-            info_equipos += f"Unidad: {placa} con dispositivo: {unidad['unitnumber']} no transmite desde: {unidad['ultima_trans']}"
-        mensajes.append(info_equipos)
-    return mensajes
+    return match.group(0) if match else nombre
 
 def main():
     unidades = obtener_unidades()
+    
     if unidades:
         ultima_transmision_unidades = obtener_ultima_transmision(unidades)
         unidades_no_transmitiendo = obtener_unidades_no_transmitiendo(ultima_transmision_unidades)
+        
         if unidades_no_transmitiendo:
-            mensajes = dividir_en_mensajes(unidades_no_transmitiendo)
-            for mensaje in mensajes:
-                status = enviar_mensaje_whatsapp(Numeros_telefonicos[0], mensaje)
-                if status == 200:
-                    print(f'Mensaje enviado')
-                else:
-                    print(f'Error al enviar mensaje')
+            enviar_mensaje_whatsapp(Numeros_telefonicos[0], unidades_no_transmitiendo)
         else:
             print("Todas las unidades GPS están transmitiendo correctamente.")
     else:
