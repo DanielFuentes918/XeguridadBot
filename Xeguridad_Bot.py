@@ -89,67 +89,72 @@ def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
 
     return unidades_no_transmitiendo
 
-def enviar_mensaje_whatsapp(numero, unidades):
+def enviar_mensaje_whatsapp(numero, variables):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
         'Content-Type': 'application/json'
     }
-    
-    partes_mensaje = []
-    
-    for i in range(0, len(unidades), 10):
-        chunk = unidades[i:i + 10]
-        
-        components = []
-        
-        for idx, unidad in enumerate(chunk):
-            placa = extraer_placa(unidad['nombre'])
-            components.append({
-                'type': 'text',
-                'text': f"Unidad {idx + 1}: Placa: {placa}, Número de Unidad: {unidad['unitnumber']}, Última transmisión: {unidad['ultima_trans']}"
-            })
-        
-        data = {
-            'messaging_product': 'whatsapp',
-            'to': numero,
-            'type': 'template',
-            'template': {
-                'namespace': NAMESPACE,
-                'name': TEMPLATE_NAME,
-                'language': {
-                    'policy': 'deterministic',
-                    'code': 'es'
-                },
-                'components': components  # Asegurar que los componentes estén correctamente estructurados
-            }
+    components = {
+        'type': 'body',
+        'parameters': [{'type': 'text', 'text': variables[f'var{i}']} for i in range(1, 11)]
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': TEMPLATE_NAME,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': [components]
         }
-        
-        partes_mensaje.append(data)
+    }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
     
-    for mensaje in partes_mensaje:
-        response = requests.post(WHATSAPP_API_URL, headers=headers, json=mensaje)
-        
-        print(f"Estado de la respuesta: {response.status_code}")
-        print(f"Contenido de la respuesta: {response.text}")
-        
-        if response.status_code == 200:
-            print(f'Mensaje enviado')
-        else:
-            print(f'Error al enviar mensaje')
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    
+    return response.status_code
 
 def extraer_placa(nombre):
     match = re.search(r'\b[A-Z]{3}\d{4}\b', nombre)
-    return match.group(0) if match else nombre
+    return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
+
+def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
+    mensajes = []
+    contador_global = 1  # Iniciar el contador global
+    for i in range(0, len(unidades_no_transmitiendo), max_unidades):
+        chunk = unidades_no_transmitiendo[i:i + max_unidades]
+        variables = {}
+        for index, unidad in enumerate(chunk):
+            key = f'var{index + 1}'
+            placa = extraer_placa(unidad['nombre'])
+            variables[key] = f"{contador_global}) Unidad: {placa} con dispositivo: {unidad['unitnumber']} no transmite desde: {unidad['ultima_trans']}"
+            contador_global += 1  # Incrementar el contador global
+        
+        # Añadir variables vacías si hay menos de 10 unidades en el último grupo
+        for j in range(len(chunk), 10):
+            variables[f'var{j + 1}'] = "."
+
+        mensajes.append(variables)
+    return mensajes
 
 def main():
     unidades = obtener_unidades()
-    
     if unidades:
         ultima_transmision_unidades = obtener_ultima_transmision(unidades)
         unidades_no_transmitiendo = obtener_unidades_no_transmitiendo(ultima_transmision_unidades)
-        
         if unidades_no_transmitiendo:
-            enviar_mensaje_whatsapp(Numeros_telefonicos[0], unidades_no_transmitiendo)
+            mensajes = dividir_en_mensajes(unidades_no_transmitiendo)
+            for mensaje in mensajes:
+                status = enviar_mensaje_whatsapp(Numeros_telefonicos[0], mensaje)
+                if status == 200:
+                    print('Mensaje enviado')
+                else:
+                    print('Error al enviar mensaje')
         else:
             print("Todas las unidades GPS están transmitiendo correctamente.")
     else:
