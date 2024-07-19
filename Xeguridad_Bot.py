@@ -151,6 +151,7 @@ def main():
             mensajes = dividir_en_mensajes(unidades_no_transmitiendo)
             for mensaje in mensajes:
                 status = enviar_mensaje_whatsapp(Numeros_telefonicos[0], mensaje)
+                status = enviar_mensaje_whatsapp(Numeros_telefonicos[1], mensaje)
                 if status == 200:
                     print('Mensaje enviado')
                 else:
