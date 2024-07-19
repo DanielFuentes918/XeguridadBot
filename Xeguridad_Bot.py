@@ -10,11 +10,11 @@ TEMPLATE_NAME = "notificacion10u_xeguridad"
 
 # Configuración de la API de dispositivos GPS
 Xeguridad_API_URL = "https://mongol.brono.com/mongol/api.php"
-Xeguridad_USERNAME = "developerexa"
-Xeguridad_PASSWORD = "Dev345p1d4"
+Xeguridad_USERNAME = "dhnexasa"
+Xeguridad_PASSWORD = "dhnexasa2022/487-"
 
 # Números de teléfono a los que se enviarán los mensajes
-Numeros_telefonicos = ["50497338021"]
+Numeros_telefonicos = ["50497338021","50433909408"]
 
 def formateando_fecha(timestamp):
     return datetime.strptime(timestamp, "%Y%m%d%H%M%S")
