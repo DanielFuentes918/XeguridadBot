@@ -1,6 +1,9 @@
+from flask import Flask, jsonify, request
 import requests
 from datetime import datetime, timedelta, timezone
 import re
+
+app = Flask("Xeguridad_Bot_Fask")
 
 # Configuración de la API de WhatsApp
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
@@ -14,7 +17,7 @@ Xeguridad_USERNAME = "dhnexasa"
 Xeguridad_PASSWORD = "dhnexasa2022/487-"
 
 # Números de teléfono a los que se enviarán los mensajes
-Numeros_telefonicos = ["50497338021","50433909408"]
+Numeros_telefonicos = ["50497338021", "50433909408"]
 
 def formateando_fecha(timestamp):
     return datetime.strptime(timestamp, "%Y%m%d%H%M%S")
@@ -61,7 +64,9 @@ def obtener_ultima_transmision(unidades):
                     ultima_transmision = data['datetime_utc']
                     # Imprimir la última transmisión obtenida
                     print(f"Unidad: {unidad['unitnumber']} - Última transmisión: {ultima_transmision}")
-                    ultima_transmision_unidades.append({'unitnumber':unidad['unitnumber'], 'ultima_trans':ultima_transmision, 'nombre':data['name']})
+                    ultima_transmision_unidades.append(
+                        {'unitnumber': unidad['unitnumber'], 'ultima_trans': ultima_transmision,
+                         'nombre': data['name']})
             except Exception as e:
                 print(f"Error al procesar las transmisiones: {e}")
 
@@ -70,16 +75,16 @@ def obtener_ultima_transmision(unidades):
 def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
     unidades_no_transmitiendo = []
     ahora = datetime.now(timezone.utc)  # Asegurando que 'ahora' tiene información de zona horaria
-    
+
     for unidad in ultima_transmision_unidades:
         if unidad['ultima_trans']:
             try:
                 ultima_transmision_dt = formateando_fecha(unidad['ultima_trans'])
-                
+
                 # Si 'ultima_transmision_dt' no tiene información de zona horaria, añade una.
                 if ultima_transmision_dt.tzinfo is None:
                     ultima_transmision_dt = ultima_transmision_dt.replace(tzinfo=timezone.utc)
-                
+
                 diferencia = ahora - ultima_transmision_dt
                 if diferencia >= timedelta(hours=24):
                     unidad['ultima_trans'] = formatear_fecha_dd_mm_aaaa(ultima_transmision_dt)
@@ -113,10 +118,10 @@ def enviar_mensaje_whatsapp(numero, variables):
         }
     }
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
-    
+
     print(f"Estado de la respuesta: {response.status_code}")
     print(f"Contenido de la respuesta: {response.text}")
-    
+
     return response.status_code
 
 def extraer_placa(nombre):
@@ -134,7 +139,7 @@ def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
             placa = extraer_placa(unidad['nombre'])
             variables[key] = f"*{contador_global})* Unidad: {placa} con dispositivo: {unidad['unitnumber']} no transmite desde: {unidad['ultima_trans']}"
             contador_global += 1  # Incrementar el contador global
-        
+
         # Añadir variables vacías si hay menos de 10 unidades en el último grupo
         for j in range(len(chunk), 10):
             variables[f'var{j + 1}'] = "."
@@ -142,7 +147,11 @@ def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
         mensajes.append(variables)
     return mensajes
 
-def main():
+@app.route('/')
+
+
+@app.route('/enviar_mensajes', methods=['POST'])
+def enviar_mensajes():
     unidades = obtener_unidades()
     if unidades:
         ultima_transmision_unidades = obtener_ultima_transmision(unidades)
@@ -156,10 +165,11 @@ def main():
                     print('Mensaje enviado')
                 else:
                     print('Error al enviar mensaje')
+            return jsonify({'message': 'Mensajes enviados exitosamente'})
         else:
-            print("Todas las unidades GPS están transmitiendo correctamente.")
+            return jsonify({'message': 'Todas las unidades GPS están transmitiendo correctamente.'})
     else:
-        print("No se pudieron obtener las unidades GPS.")
+        return jsonify({'message': 'No se pudieron obtener las unidades GPS.'}), 500
 
 if __name__ == "__main__":
-    main()
+    app.run(host='0.0.0.0', port=5000)
