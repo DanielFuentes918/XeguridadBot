@@ -147,6 +147,10 @@ def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
         mensajes.append(variables)
     return mensajes
 
+@app.route('/')
+
+
+@app.route('/enviar_mensajes', methods=['POST'])
 def enviar_mensajes():
     unidades = obtener_unidades()
     if unidades:
@@ -167,4 +171,5 @@ def enviar_mensajes():
     else:
         return jsonify({'message': 'No se pudieron obtener las unidades GPS.'}), 500
 
-
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)
