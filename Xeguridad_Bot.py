@@ -147,10 +147,6 @@ def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
         mensajes.append(variables)
     return mensajes
 
-@app.route('/')
-
-
-@app.route('/enviar_mensajes', methods=['POST'])
 def enviar_mensajes():
     unidades = obtener_unidades()
     if unidades:
