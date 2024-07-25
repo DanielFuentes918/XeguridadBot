@@ -1,9 +1,6 @@
-from flask import Flask, jsonify, request
 import requests
 from datetime import datetime, timedelta, timezone
 import re
-
-app = Flask("Xeguridad_Bot_Fask")
 
 # Configuración de la API de WhatsApp
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
@@ -147,8 +144,7 @@ def dividir_en_mensajes(unidades_no_transmitiendo, max_unidades=10):
         mensajes.append(variables)
     return mensajes
 
-@app.route('/enviar_mensajes', methods=['POST'])
-def enviar_mensajes():
+def enviar_notificaciones():
     unidades = obtener_unidades()
     if unidades:
         ultima_transmision_unidades = obtener_ultima_transmision(unidades)
@@ -162,11 +158,11 @@ def enviar_mensajes():
                     print('Mensaje enviado')
                 else:
                     print('Error al enviar mensaje')
-            return jsonify({'message': 'Mensajes enviados exitosamente'})
+            return {'message': 'Mensajes enviados exitosamente'}
         else:
-            return jsonify({'message': 'Todas las unidades GPS están transmitiendo correctamente.'})
+            return {'message': 'Todas las unidades GPS están transmitiendo correctamente.'}
     else:
-        return jsonify({'message': 'No se pudieron obtener las unidades GPS.'}), 500
+        return {'message': 'No se pudieron obtener las unidades GPS.'}
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    enviar_notificaciones()
