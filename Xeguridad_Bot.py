@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime, timedelta, timezone
+import pytz
 import re
 
 # Configuración de la API de WhatsApp
@@ -15,6 +16,9 @@ Xeguridad_PASSWORD = "dhnexasa2022/487-"
 
 # Números de teléfono a los que se enviarán los mensajes
 Numeros_telefonicos = ["50497338021", "50433909408"]
+
+# Definir la zona horaria local
+LOCAL_TZ = pytz.timezone('America/Tegucigalpa')
 
 def formateando_fecha(timestamp):
     return datetime.strptime(timestamp, "%Y%m%d%H%M%S")
@@ -71,16 +75,14 @@ def obtener_ultima_transmision(unidades):
 
 def obtener_unidades_no_transmitiendo(ultima_transmision_unidades):
     unidades_no_transmitiendo = []
-    ahora = datetime.now(timezone.utc)  # Asegurando que 'ahora' tiene información de zona horaria
+    ahora = datetime.now(LOCAL_TZ)  # Usar la hora local
 
     for unidad in ultima_transmision_unidades:
         if unidad['ultima_trans']:
             try:
                 ultima_transmision_dt = formateando_fecha(unidad['ultima_trans'])
-
-                # Si 'ultima_transmision_dt' no tiene información de zona horaria, añade una.
-                if ultima_transmision_dt.tzinfo is None:
-                    ultima_transmision_dt = ultima_transmision_dt.replace(tzinfo=timezone.utc)
+                # Convertir la fecha a UTC y luego a la zona horaria local
+                ultima_transmision_dt = LOCAL_TZ.localize(ultima_transmision_dt, is_dst=None)
 
                 diferencia = ahora - ultima_transmision_dt
                 if diferencia >= timedelta(hours=24):
