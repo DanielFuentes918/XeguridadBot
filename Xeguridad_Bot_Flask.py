@@ -3,12 +3,12 @@ import requests
 
 app = Flask("Xeguridad_Bot_Flask")
 
-# Configura tu verify token aquí
-VERIFY_TOKEN = "YOUR_VERIFY_TOKEN"
+# Configuración de la API de WhatsApp
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
 NAMESPACE = "Xeguridad"
-MENU_TEMPLATE_NAME = "menu_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
+MENU_TEMPLATE_NAME = "menu_xeguridad"
+VERIFY_TOKEN = "4G7B9K2M"  # Reemplaza esto con tu token de verificación real
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -75,5 +75,6 @@ def home():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
 
 
