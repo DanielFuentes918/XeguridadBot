@@ -16,6 +16,8 @@ def webhook():
         # Verificación del webhook
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
+        print(f"Token recibido: {token}")
+        print(f"Challenge recibido: {challenge}")
         if token == VERIFY_TOKEN:
             return str(challenge)
         return "Verificación de token fallida", 403
@@ -34,6 +36,7 @@ def webhook():
                                 for message in value['messages']:
                                     manejar_mensaje_entrante(message)
         return jsonify({'status': 'success'}), 200
+
 
 def manejar_mensaje_entrante(mensaje):
     numero = mensaje['from']
