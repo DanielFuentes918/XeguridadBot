@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import requests
 
 app = Flask("Xeguridad_Bot_Flask")
@@ -74,6 +74,10 @@ def enviar_mensaje_whatsapp(numero, template_name, components):
 @app.route('/')
 def home():
     return "Servidor Flask en funcionamiento."
+
+@app.route('/politica_privacidad')
+def politica_privacidad():
+    return render_template('PoliticasSeguridad.html')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
