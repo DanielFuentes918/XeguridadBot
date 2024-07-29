@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 
-app = Flask("Xeguridad_Bot_Flask")
+app = Flask("Xeguridad_Bot_Flask" , template_folder='.')
 
 # Configura tu verify token aquí
 VERIFY_TOKEN = "9189189189"
