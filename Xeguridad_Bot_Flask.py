@@ -75,7 +75,7 @@ def enviar_mensaje_whatsapp(numero, template_name, components):
 def home():
     return "Servidor Flask en funcionamiento."
 
-@app.route('/politica_privacidad')
+@app.route('/politica_privacidad', methods=['GET'])
 def politica_privacidad():
     return render_template('PoliticasSeguridad.html')
 
