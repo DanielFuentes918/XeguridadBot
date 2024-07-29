@@ -16,8 +16,6 @@ def webhook():
         # Verificación del webhook
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
-        print(f"Token recibido: {token}")
-        print(f"Challenge recibido: {challenge}")
         if token == VERIFY_TOKEN:
             return str(challenge)
         return "Verificación de token fallida", 403
@@ -37,8 +35,8 @@ def webhook():
                                     manejar_mensaje_entrante(message)
         return jsonify({'status': 'success'}), 200
 
-
 def manejar_mensaje_entrante(mensaje):
+    print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
     components = {
         'type': 'body',
@@ -46,7 +44,8 @@ def manejar_mensaje_entrante(mensaje):
             {'type': 'text', 'text': '¡Hola, bienvenido! Soy Xegurbot, ¿en qué te puedo ayudar el día de hoy?'}
         ]
     }
-    enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
+    response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
+    print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
 def enviar_mensaje_whatsapp(numero, template_name, components):
     headers = {
@@ -78,6 +77,7 @@ def home():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
 
 
 
