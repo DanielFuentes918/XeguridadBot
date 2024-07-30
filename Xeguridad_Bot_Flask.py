@@ -1,14 +1,14 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 
-app = Flask("Xeguridad_Bot_Flask" , template_folder='.')
+app = Flask("Xeguridad_Bot_Flask")
 
 # Configura tu verify token aquí
 VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
 NAMESPACE = "Xeguridad"
-MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
+MENU_TEMPLATE_NAME = "menu_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -38,12 +38,12 @@ def webhook():
 def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
-    components = {
+    components = [{
         'type': 'body',
         'parameters': [
             {'type': 'text', 'text': '¡Hola, bienvenido! Soy Xegurbot, ¿en qué te puedo ayudar el día de hoy?'}
         ]
-    }
+    }]
     response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
@@ -63,7 +63,7 @@ def enviar_mensaje_whatsapp(numero, template_name, components):
                 'policy': 'deterministic',
                 'code': 'es'
             },
-            'components': [components]
+            'components': components
         }
     }
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
@@ -81,6 +81,7 @@ def politica_privacidad():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
 
 
 
