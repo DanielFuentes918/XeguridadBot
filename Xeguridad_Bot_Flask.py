@@ -8,7 +8,7 @@ VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
 NAMESPACE = "Xeguridad"
-MENU_TEMPLATE_NAME = "menu_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
+MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
