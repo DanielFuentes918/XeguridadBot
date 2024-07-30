@@ -38,12 +38,7 @@ def webhook():
 def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
-    components = [{
-        'type': 'body',
-        'parameters': [
-            {'type': 'text', 'text': '¡Hola, bienvenido! Soy Xegurbot, ¿en qué te puedo ayudar el día de hoy?'}
-        ]
-    }]
+    components = []  # No enviar parámetros si la plantilla no los espera
     response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
@@ -81,6 +76,7 @@ def politica_privacidad():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
 
 
 
