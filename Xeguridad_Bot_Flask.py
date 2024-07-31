@@ -39,22 +39,14 @@ def webhook():
 def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
-    tipo = mensaje['type']
+    cuerpo_mensaje = mensaje.get('text', {}).get('body', '').lower()
 
-    if tipo == 'interactive':
-        interaccion = mensaje['interactive']
-        tipo_interaccion = interaccion['type']
-        
-        if tipo_interaccion == 'button_reply':
-            id_respuesta = interaccion['button_reply']['id']
-
-            if id_respuesta == 'mandar_comandos_a_unidad':
-                manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
-                return
-
-    components = []  # No enviar parámetros si la plantilla no los espera
-    response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
-    print(f"Estado de la respuesta al enviar mensaje: {response_status}")
+    if cuerpo_mensaje == "mandar comandos a unidad":
+        manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
+    else:
+        components = []  # No enviar parámetros si la plantilla no los espera
+        response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
+        print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
@@ -95,6 +87,7 @@ def politica_privacidad():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
 
 
 
