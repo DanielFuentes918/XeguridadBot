@@ -39,8 +39,13 @@ def webhook():
 def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
-    cuerpo_mensaje = mensaje.get('text', {}).get('body', '').lower()
+    cuerpo_mensaje = ""
 
+    if mensaje['type'] == 'button':
+        cuerpo_mensaje = mensaje['button']['payload'].lower()
+    else:
+        cuerpo_mensaje = mensaje.get('text', {}).get('body', '').lower()
+    
     if cuerpo_mensaje == "mandar comandos a unidad":
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
     else:
@@ -87,6 +92,7 @@ def politica_privacidad():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
 
 
 
