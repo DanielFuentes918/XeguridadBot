@@ -29,11 +29,12 @@ if response.status_code != 200:
     print("Contenido de la respuesta:", response.text)
 else:
     print("Inicio de sesión exitoso")
-
+    
     # Navegar a la URL específica dentro del sitio
     map_url = 'https://mongol.brono.com/mongol/fiona/index.php?m=map&id=2296640'
     response = session.get(map_url)
-
+    print("Contenido de la respuesta despues de login:", response.text)
+    
     # Verificar si la solicitud de navegación fue exitosa
     if response.status_code != 200:
         print("Error al acceder a la página del mapa")
