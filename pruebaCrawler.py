@@ -1,101 +1,112 @@
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
-# Crear una sesión
-session = requests.Session()
+# Configuración del webdriver
+options = webdriver.ChromeOptions()
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
 
-# Configurar los encabezados de la sesión para parecer un navegador real
-session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-})
+# Inicializar el webdriver
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+wait = WebDriverWait(driver, 10)
 
-# Datos de inicio de sesión
-login_data = {
-    'username': 'dhnexasa',
-    'password': 'dhnexasa2022/487-'
-}
+try:
+    # Abrir la página de inicio de sesión
+    driver.get('https://mongol.brono.com/mongol/fiona/index.php')
+    print("Página de inicio de sesión abierta")
 
-# URL de inicio de sesión
-login_url = 'https://mongol.brono.com/'
+    # Esperar hasta que el formulario de inicio de sesión esté presente
+    wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'loginwindow')))
 
-# Enviar la solicitud de inicio de sesión
-response = session.post(login_url, data=login_data, allow_redirects=True)
+    # Limpiar los campos de inicio de sesión
+    username_input = driver.find_element(By.ID, 'user2')
+    password_input = driver.find_element(By.ID, 'p2')
+    username_input.clear()
+    password_input.clear()
+    print("Campos de inicio de sesión limpiados")
 
-# Verificar si la solicitud de inicio de sesión fue exitosa
-if response.status_code != 200:
-    print("Error al iniciar sesión")
-    print("Código de estado:", response.status_code)
-    print("URL después del inicio de sesión:", response.url)
-    print("Contenido de la respuesta:", response.text)
-else:
+    # Ingresar las credenciales de inicio de sesión
+    username = 'dhnexasa'
+    password = 'dhnexasa2022/487-'
+    username_input.send_keys(username)
+    password_input.send_keys(password)
+    print(f"Usuario ingresado: {username}")
+    print(f"Contraseña ingresada: {password}")
+
+    # Enviar el formulario de inicio de sesión
+    login_button = driver.find_element(By.CLASS_NAME, 'loginButton')
+    login_button.click()
+    print("Formulario de inicio de sesión enviado")
+
+    # Esperar hasta que se cargue la página después del inicio de sesión
+    wait.until(EC.url_contains('index.php?m=home'))
     print("Inicio de sesión exitoso")
+
+    # Navegar a la nueva URL después del inicio de sesión
+    target_url = 'https://mongol.brono.com/mongol/fiona/index.php?m=map&id=2296640'
+    driver.get(target_url)
+    print(f"Navegando a {target_url}")
+
+    # Esperar hasta que la página de destino esté cargada
+    wait.until(EC.presence_of_element_located((By.TAG_NAME, 'body')))
+    print("Página de destino cargada")
+
+    # Verificar si el formulario con id `c` está presente
+    form = wait.until(EC.presence_of_element_located((By.ID, 'c')))
     
-    # Navegar a la URL específica dentro del sitio
-    map_url = 'https://mongol.brono.com/mongol/fiona/index.php?m=map&id=2296640'
-    response = session.get(map_url)
-    print("Contenido de la respuesta despues de login:", response.text)
+    # Verificar si el `section` con id `co` está presente dentro del `form`
+    section_co = wait.until(EC.presence_of_element_located((By.ID, 'co')))
+
+    # Verificar si el `select` está dentro del `section`
+    try:
+        select_element = section_co.find_element(By.TAG_NAME, 'select')
+        print("Elemento select encontrado")
+
+        # Seleccionar el `option` con value="rs"
+        option_rs = select_element.find_element(By.CSS_SELECTOR, 'option[value="rs"]')
+        option_rs.click()
+        print("Opción con value='rs' seleccionada")
+    except Exception as e:
+        print(f"Error al encontrar o seleccionar el elemento select: {str(e)}")
+        # Imprimir la estructura del DOM para depuración
+        print(driver.page_source)
+
+    # Ejecutar el `span` con class="btngo" dentro del `div` con class="mapcmds commandsSection"
+    try:
+        mapcmds_div = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.mapcmds.commandsSection')))
+        btngo_span = mapcmds_div.find_element(By.CLASS_NAME, 'btngo')
+        btngo_span.click()
+        print("Span con class='btngo' ejecutado")
+    except Exception as e:
+        print(f"Error al encontrar o ejecutar el span: {str(e)}")
+        # Imprimir la estructura del DOM para depuración
+        print(driver.page_source)
     
-    # Verificar si la solicitud de navegación fue exitosa
-    if response.status_code != 200:
-        print("Error al acceder a la página del mapa")
-        print("Código de estado:", response.status_code)
-        print("Contenido de la respuesta:", response.text)
-    else:
-        print("Acceso a la página del mapa exitoso")
+    driver.quit()
 
-        # Analizar el contenido de la página con BeautifulSoup
-        soup = BeautifulSoup(response.content, 'html.parser')
+except Exception as e:
+    print(f"Error: {str(e)}")
+    # Imprimir la estructura del DOM para depuración
+    print(driver.page_source)
 
-        # Imprimir el HTML completo para verificar el contenido
-        print(soup.prettify())  # Esto imprimirá toda la estructura HTML de la página
 
-        # Encontrar el formulario que contiene el campo <select>
-        form = soup.find('form', {'id': 'c'})
-        if form is None:
-            print("Formulario no encontrado")
-        else:
-            print("Formulario encontrado")
 
-            # Encontrar el elemento <select> con id 'co'
-            select = form.find('select', {'id': 'co'}) if form else None
-            if select is None:
-                print("Elemento <select> no encontrado")
-            else:
-                print("Elemento <select> encontrado")
 
-                # Continuar solo si el formulario y el select fueron encontrados
-                if form and select:
-                    # Seleccionar el valor "Solicitar estado"
-                    for option in select.find_all('option'):
-                        if option['value'] == 'rs':
-                            option['selected'] = 'selected'
-                            break
 
-                    # Crear un diccionario con los datos del formulario
-                    form_data = {tag['name']: tag.get('value', '') for tag in form.find_all(['input', 'select', 'textarea'])}
-                    form_data['co'] = 'rs'  # Asegurar que 'co' tenga el valor 'rs' para "Solicitar estado"
 
-                    # URL para enviar el formulario
-                    submit_url = form['action']
-                    if not submit_url.startswith('http'):
-                        submit_url = 'https://mongol.brono.com' + submit_url  # Asegurar URL completa
 
-                    # Enviar el formulario
-                    response = session.post(submit_url, data=form_data)
 
-                    # Verificar si la solicitud de envío del formulario fue exitosa
-                    if response.status_code != 200:
-                        print("Error al enviar el formulario")
-                    else:
-                        print("Formulario enviado exitosamente")
 
-                    # Leer y mostrar la respuesta después de enviar el formulario
-                    html_response = response.text
-                    print(html_response)
 
-                    # Analizar la respuesta con BeautifulSoup
-                    soup = BeautifulSoup(html_response, 'html.parser')
-                    # Aquí puedes realizar más análisis o extracción de datos según sea necesario
+
+
+
+
+
 
 
 
