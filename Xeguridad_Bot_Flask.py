@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 import requests
+import re
 
 app = Flask("Xeguridad_Bot_Flask")
 
@@ -10,6 +11,9 @@ WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8
 NAMESPACE = "Xeguridad"
 MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
 SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
+XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
+XEGURIDAD_USERNAME = "dhnexasa"
+XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -45,9 +49,18 @@ def manejar_mensaje_entrante(mensaje):
         cuerpo_mensaje = mensaje['button']['payload'].lower()
     else:
         cuerpo_mensaje = mensaje.get('text', {}).get('body', '').lower()
-    
+
     if cuerpo_mensaje == "mandar comandos a unidad":
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
+    elif re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
+        placa = cuerpo_mensaje
+        unitnumber = buscar_unitnumber_por_placa(placa)
+        if unitnumber:
+            # Solo imprimir el unitnumber en consola
+            print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+        else:
+            # Informar que no se encontró el unitnumber
+            print(f"No se encontró el unitnumber para la placa {placa}.")
     else:
         components = []  # No enviar parámetros si la plantilla no los espera
         response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
@@ -57,6 +70,21 @@ def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
     response_status = enviar_mensaje_whatsapp(numero, template_name, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
+
+def buscar_unitnumber_por_placa(placa):
+    params = {
+        'commandname': 'get_units',
+        'user': XEGURIDAD_USERNAME,
+        'pass': XEGURIDAD_PASSWORD,
+        'format': 'json1'
+    }
+    response = requests.get(XEGURIDAD_API_URL, params=params)
+    if response.status_code == 200:
+        unidades = response.json()
+        for unidad in unidades:
+            if unidad['nombre'] == placa:
+                return unidad['unitnumber']
+    return None
 
 def enviar_mensaje_whatsapp(numero, template_name, components):
     headers = {
@@ -92,22 +120,3 @@ def politica_privacidad():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
