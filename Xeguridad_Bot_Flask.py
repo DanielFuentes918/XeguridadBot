@@ -54,7 +54,7 @@ def manejar_mensaje_entrante(mensaje):
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
     elif re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
         placa = cuerpo_mensaje
-        print(placa)
+        print(f"placa={placa}")
         unitnumber = buscar_unitnumber_por_placa(placa)
         print(unitnumber)
         if unitnumber:
