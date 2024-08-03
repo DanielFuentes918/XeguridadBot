@@ -50,13 +50,14 @@ def manejar_mensaje_entrante(mensaje):
     else:
         cuerpo_mensaje = mensaje.get('text', {}).get('body', '').lower()
 
+    print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
+
     if cuerpo_mensaje == "mandar comandos a unidad":
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
     elif re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
         placa = cuerpo_mensaje
-        print(f"placa={placa}")
+        print(f"Placa detectada: {placa}")
         unitnumber = buscar_unitnumber_por_placa(placa)
-        print(unitnumber)
         if unitnumber:
             # Solo imprimir el unitnumber en consola
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
@@ -81,17 +82,25 @@ def buscar_unitnumber_por_placa(placa):
         'format': 'json1'
     }
     response = requests.get(XEGURIDAD_API_URL, params=params)
+    print(f"Estado de la respuesta de la API: {response.status_code}")
     if response.status_code == 200:
         unidades = response.json()
+        print(f"Unidades recibidas: {unidades}")
         for unidad in unidades:
             nombre_placa = extraer_placa(unidad['nombre'])
-            print(nombre_placa)
+            print(f"Nombre de la unidad: {unidad['nombre']}, Placa extraída: {nombre_placa}")
             if nombre_placa == placa:
+                print(f"Unitnumber encontrado: {unidad['unitnumber']} para la placa {placa}")
                 return unidad['unitnumber']
     return None
 
 def extraer_placa(nombre):
+    print(f"Extrayendo placa del nombre: {nombre}")
     match = re.search(r'\b[A-Z]{3}\d{4}\b', nombre)
+    if match:
+        print(f"Placa encontrada: {match.group(0)}")
+    else:
+        print("No se encontró una placa en el nombre")
     return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
 
 def enviar_mensaje_whatsapp(numero, template_name, components):
@@ -128,3 +137,4 @@ def politica_privacidad():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
