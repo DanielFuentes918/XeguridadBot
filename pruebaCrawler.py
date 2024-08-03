@@ -100,7 +100,7 @@ try:
         print(f"Error al encontrar o ejecutar el span: {str(e)}")
         # Imprimir la estructura del DOM para depuración
         print(driver.page_source)
-    time.sleep(120)
+    time.sleep(60)
     driver.quit()
 
 except Exception as e:
