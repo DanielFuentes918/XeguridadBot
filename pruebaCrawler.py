@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 # Configuración del webdriver
 options = webdriver.ChromeOptions()
@@ -61,13 +62,18 @@ try:
     # Verificar si el `section` con id `co` está presente dentro del `form`
     section_co = wait.until(EC.presence_of_element_located((By.ID, 'co')))
 
+    # Agregar un tiempo de espera adicional para asegurarse de que el formulario se haya cargado completamente
+    time.sleep(10)
+
     # Verificar si el `select` está dentro del `section`
     try:
         select_element = section_co.find_element(By.TAG_NAME, 'select')
         print("Elemento select encontrado")
 
-        # Seleccionar el `option` con value="rs"
-        option_rs = select_element.find_element(By.CSS_SELECTOR, 'option[value="rs"]')
+        # Esperar a que la opción con value="rs" sea clickeable
+        option_rs = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'option[value="rs"]'))
+        )
         option_rs.click()
         print("Opción con value='rs' seleccionada")
     except Exception as e:
@@ -92,6 +98,8 @@ except Exception as e:
     print(f"Error: {str(e)}")
     # Imprimir la estructura del DOM para depuración
     print(driver.page_source)
+
+
 
 
 
