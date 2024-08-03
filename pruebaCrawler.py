@@ -5,7 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
-
+import time
 # Configuración del webdriver
 options = webdriver.ChromeOptions()
 options.add_argument('--no-sandbox')
@@ -100,7 +100,7 @@ try:
         print(f"Error al encontrar o ejecutar el span: {str(e)}")
         # Imprimir la estructura del DOM para depuración
         print(driver.page_source)
-    
+    time.sleep(120)
     driver.quit()
 
 except Exception as e:
