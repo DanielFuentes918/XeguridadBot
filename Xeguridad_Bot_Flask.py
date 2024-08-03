@@ -82,9 +82,14 @@ def buscar_unitnumber_por_placa(placa):
     if response.status_code == 200:
         unidades = response.json()
         for unidad in unidades:
-            if unidad['nombre'] == placa:
+            nombre_placa = extraer_placa(unidad['nombre'])
+            if nombre_placa == placa:
                 return unidad['unitnumber']
     return None
+
+def extraer_placa(nombre):
+    match = re.search(r'\b[A-Z]{3}\d{4}\b', nombre)
+    return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
 
 def enviar_mensaje_whatsapp(numero, template_name, components):
     headers = {
