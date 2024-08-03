@@ -65,6 +65,7 @@ def manejar_mensaje_entrante(mensaje):
             # Informar que no se encontró el unitnumber
             print(f"No se encontró el unitnumber para la placa {placa}.")
     else:
+        print("Cuerpo del mensaje no coincide con la expresión regular.")
         components = []  # No enviar parámetros si la plantilla no los espera
         response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
         print(f"Estado de la respuesta al enviar mensaje: {response_status}")
@@ -137,4 +138,5 @@ def politica_privacidad():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+
 
