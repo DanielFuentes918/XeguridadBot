@@ -1,117 +1,141 @@
-# pruebaCrawler.py
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait, Select
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.action_chains import ActionChains
-import time
+from flask import Flask, request, jsonify, render_template
+import requests
+import re
 
-def execute_crawler(unitnumberURL):
-    # Configuración del webdriver
-    options = webdriver.ChromeOptions()
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
+app = Flask("Xeguridad_Bot_Flask")
 
-    # Inicializar el webdriver
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-    wait = WebDriverWait(driver, 10)
-    actions = ActionChains(driver)
+# Configura tu verify token aquí
+VERIFY_TOKEN = "9189189189"
+WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
+WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
+NAMESPACE = "Xeguridad"
+MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
+SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
+XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
+XEGURIDAD_USERNAME = "dhnexasa"
+XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
 
-    try:
-        # Abrir la página de inicio de sesión
-        driver.get('https://mongol.brono.com/mongol/fiona/index.php')
-        print("Página de inicio de sesión abierta")
+@app.route('/webhook', methods=['GET', 'POST'])
+def webhook():
+    if request.method == 'GET':
+        # Verificación del webhook
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+        if token == VERIFY_TOKEN:
+            return str(challenge)
+        return "Verificación de token fallida", 403
+    elif request.method == 'POST':
+        # Manejo de mensajes entrantes
+        data = request.json
+        print(f"Datos recibidos: {data}")
 
-        # Esperar hasta que el formulario de inicio de sesión esté presente
-        wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'loginwindow')))
+        if 'entry' in data:
+            for entry in data['entry']:
+                if 'changes' in entry:
+                    for change in entry['changes']:
+                        if 'value' in change:
+                            value = change['value']
+                            if 'messages' in value:
+                                for message in value['messages']:
+                                    manejar_mensaje_entrante(message)
+        return jsonify({'status': 'success'}), 200
 
-        # Limpiar los campos de inicio de sesión
-        username_input = driver.find_element(By.ID, 'user2')
-        password_input = driver.find_element(By.ID, 'p2')
-        username_input.clear()
-        password_input.clear()
-        print("Campos de inicio de sesión limpiados")
+def manejar_mensaje_entrante(mensaje):
+    print(f"Manejando mensaje entrante: {mensaje}")
+    numero = mensaje['from']
+    cuerpo_mensaje = ""
 
-        # Ingresar las credenciales de inicio de sesión
-        username = 'dhnexasa'
-        password = 'dhnexasa2022/487-'
-        username_input.send_keys(username)
-        password_input.send_keys(password)
-        print(f"Usuario ingresado: {username}")
-        print(f"Contraseña ingresada: {password}")
+    if mensaje['type'] == 'button':
+        cuerpo_mensaje = mensaje['button']['payload'].lower()
+    else:
+        cuerpo_mensaje = mensaje.get('text', {}).get('body', '').lower()
 
-        # Enviar el formulario de inicio de sesión
-        login_button = driver.find_element(By.CLASS_NAME, 'loginButton')
-        login_button.click()
-        print("Formulario de inicio de sesión enviado")
+    print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
-        # Esperar hasta que se cargue la página después del inicio de sesión
-        wait.until(EC.url_contains('index.php?m=home'))
-        print("Inicio de sesión exitoso")
+    if cuerpo_mensaje == "mandar comandos a unidad":
+        manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
+    elif re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
+        placa = cuerpo_mensaje
+        print(f"Placa detectada: {placa}")
+        unitnumber = buscar_unitnumber_por_placa(placa)
+        if unitnumber:
+            # Solo imprimir el unitnumber en consola
+            print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+        else:
+            # Informar que no se encontró el unitnumber
+            print(f"No se encontró el unitnumber para la placa {placa}.")
+    else:
+        print("Cuerpo del mensaje no coincide con la expresión regular.")
+        components = []  # No enviar parámetros si la plantilla no los espera
+        response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
+        print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
-        # Navegar a la nueva URL después del inicio de sesión
-        target_url = f'https://mongol.brono.com/mongol/fiona/index.php?m=map&id={unitnumberURL}'
-        driver.get(target_url)
-        print(f"Navegando a {target_url}")
+def manejar_respuesta_usuario(numero, template_name):
+    components = []  # Añadir los parámetros necesarios si los hay
+    response_status = enviar_mensaje_whatsapp(numero, template_name, components)
+    print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
-        # Esperar hasta que la página de destino esté cargada
-        wait.until(EC.presence_of_element_located((By.TAG_NAME, 'body')))
-        print("Página de destino cargada")
+def buscar_unitnumber_por_placa(placa):
+    params = {
+        'commandname': 'get_units',
+        'user': XEGURIDAD_USERNAME,
+        'pass': XEGURIDAD_PASSWORD,
+        'format': 'json1'
+    }
+    response = requests.get(XEGURIDAD_API_URL, params=params)
+    print(f"Estado de la respuesta de la API: {response.status_code}")
+    if response.status_code == 200:
+        unidades = response.json()
+        print(f"Unidades recibidas: {unidades}")
+        for unidad in unidades:
+            nombre_placa = extraer_placa(unidad['nombre'])
+            print(f"Nombre de la unidad: {unidad['nombre']}, Placa extraída: {nombre_placa}")
+            if nombre_placa == placa:
+                print(f"Unitnumber encontrado: {unidad['unitnumber']} para la placa {placa}")
+                return unidad['unitnumber']
+    return None
 
-        # Verificar si el formulario con id `c` está presente
-        form = wait.until(EC.presence_of_element_located((By.ID, 'c')))
-        print("Formulario con id 'c' encontrado")
+def extraer_placa(nombre):
+    print(f"Extrayendo placa del nombre: {nombre}")
+    match = re.search(r'\b[A-Z]{3}\d{4}\b', nombre)
+    if match:
+        print(f"Placa encontrada: {match.group(0)}")
+    else:
+        print("No se encontró una placa en el nombre")
+    return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
 
-        # Verificar si el `select` con id `co` está presente dentro del `form`
-        select_element = form.find_element(By.ID, 'co')
-        print("Elemento select con id 'co' encontrado")
+def enviar_mensaje_whatsapp(numero, template_name, components):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': template_name,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': components
+        }
+    }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    return response.status_code
 
-        # Seleccionar el `option` con value="rs"
-        select = Select(select_element)
-        select.select_by_value('rs')
-        print("Opción con value='rs' seleccionada")
+@app.route('/')
+def home():
+    return "Servidor Flask en funcionamiento."
 
-        # Ejecutar el `span` con class="btngo" dentro del `div` con class="mapcmds commandsSection"
-        try:
-            mapcmds_div = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div.mapcmds.commandsSection')))
-            btngo_span = mapcmds_div.find_element(By.CSS_SELECTOR, 'span.btngo#btncs')
+@app.route('/politica_privacidad', methods=['GET'])
+def politica_privacidad():
+    return render_template('PoliticasSeguridad.html')
 
-            # Asegurarse de que el elemento es visible desplazándose hasta él
-            driver.execute_script("arguments[0].scrollIntoView(true);", btngo_span)
-            wait.until(EC.visibility_of(btngo_span))
-
-            # Imprimir más información sobre el elemento `btngo_span`
-            print(f"Texto del elemento: {btngo_span.text}")
-            print(f"Atributo class: {btngo_span.get_attribute('class')}")
-            print(f"ID del elemento: {btngo_span.get_attribute('id')}")
-            print(f"Name del elemento: {btngo_span.get_attribute('name')}")
-            print(f"Type del elemento: {btngo_span.get_attribute('type')}")
-            print(f"HTML completo del elemento: {btngo_span.get_attribute('outerHTML')}")
-            print(f"HTML interno del elemento: {btngo_span.get_attribute('innerHTML')}")
-            print(f"Elemento está habilitado: {btngo_span.is_enabled()}")
-            print(f"Elemento está visible: {btngo_span.is_displayed()}")
-
-            # Hacer clic en el elemento `btngo_span` si es interactuable
-            if btngo_span.is_displayed() and btngo_span.is_enabled():
-                actions.move_to_element(btngo_span).click().perform()
-                print("Span con id='btncs' ejecutado")
-            else:
-                print("El span con id='btncs' no es interactuable")
-        except Exception as e:
-            print(f"Error al encontrar o ejecutar el span: {str(e)}")
-            # Imprimir la estructura del DOM para depuración
-            print(driver.page_source)
-        time.sleep(60)
-        driver.quit()
-
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        # Imprimir la estructura del DOM para depuración
-        print(driver.page_source)
-
-# Solo para pruebas locales
 if __name__ == "__main__":
-    unitnumberURL = '2296640'
-    execute_crawler(unitnumberURL)
+    app.run(host='0.0.0.0', port=5000)
+
