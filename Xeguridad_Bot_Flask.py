@@ -58,9 +58,10 @@ def manejar_mensaje_entrante(mensaje):
     if cuerpo_mensaje == "mandar comandos a unidad":
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
         esperando_placa[numero] = True
-    elif numero in esperando_placa and re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
+    elif numero in esperando_placa:
         placa = cuerpo_mensaje.upper()
-        print(f"Placa detectada: {placa}")
+        if re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
+            print(f"Placa detectada: {placa}")
         unitnumber = buscar_unitnumber_por_placa(placa)
         if unitnumber:
             # Solo imprimir el unitnumber en consola
