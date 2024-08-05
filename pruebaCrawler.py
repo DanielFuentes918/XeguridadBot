@@ -15,7 +15,7 @@ def execute_crawler(unitnumber):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--headless')  # Ejecutar en modo sin cabeza
     options.add_argument('--disable-gpu')  # Deshabilitar GPU para mejorar la estabilidad en modo sin cabeza
-    options.binary_location = '/usr/share/bash-completion/completions/google-chrome' # Ajusta esta ruta a la ubicación de tu binario de Chrome
+    options.binary_location = '/usr/bin/chromium-browser' # Ajusta esta ruta a la ubicación de tu binario de Chrome
 
     # Inicializar el webdriver
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
