@@ -60,8 +60,7 @@ def manejar_mensaje_entrante(mensaje):
         esperando_placa[numero] = True
     elif numero in esperando_placa:
         placa = cuerpo_mensaje.upper()
-        if re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
-            print(f"Placa detectada: {placa}")
+        print(f"Placa detectada: {placa}")
         unitnumber = buscar_unitnumber_por_placa(placa)
         if unitnumber:
             # Solo imprimir el unitnumber en consola
