@@ -93,8 +93,8 @@ def buscar_unitnumber_por_placa(placa):
         unidades = response.json()
         print(f"Unidades recibidas: {unidades}")
         for unidad in unidades:
-            nombre_placa = extraer_placa(unidad['nombre'])
-            print(f"Nombre de la unidad: {unidad['nombre']}, Placa extraída: {nombre_placa}")
+            nombre_placa = extraer_placa(unidad['name'])
+            print(f"Nombre de la unidad: {unidad['name']}, Placa extraída: {nombre_placa}")
             if nombre_placa == placa:
                 print(f"Unitnumber encontrado: {unidad['unitnumber']} para la placa {placa}")
                 return unidad['unitnumber']
