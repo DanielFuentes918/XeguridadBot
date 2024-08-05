@@ -60,13 +60,13 @@ def manejar_mensaje_entrante(mensaje):
         esperando_placa[numero] = True
     elif numero in esperando_placa:
         placa = cuerpo_mensaje.upper()
-        #if re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
-        print(f"Placa detectada: {placa}")
-        unitnumber = buscar_unitnumber_por_placa(placa)
-        if unitnumber:
+        if re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
+            print(f"Placa detectada: {placa}")
+            unitnumber = buscar_unitnumber_por_placa(placa)
+            if unitnumber:
              # Solo imprimir el unitnumber en consola
              print(f"El unitnumber para la placa {placa} es {unitnumber}.")
-        else:
+            else:
              # Informar que no se encontró el unitnumber
              print(f"No se encontró el unitnumber para la placa {placa}.")
         del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
