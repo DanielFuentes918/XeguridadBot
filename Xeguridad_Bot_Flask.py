@@ -15,6 +15,9 @@ XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
 
+# Diccionario para rastrear números de teléfono que esperan una placa
+esperando_placa = {}
+
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
@@ -54,8 +57,9 @@ def manejar_mensaje_entrante(mensaje):
 
     if cuerpo_mensaje == "mandar comandos a unidad":
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
-    elif re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
-        placa = cuerpo_mensaje
+        esperando_placa[numero] = True
+    elif numero in esperando_placa and re.match(r'\b[A-Z]{3}\d{4}\b', cuerpo_mensaje):
+        placa = cuerpo_mensaje.upper()
         print(f"Placa detectada: {placa}")
         unitnumber = buscar_unitnumber_por_placa(placa)
         if unitnumber:
@@ -64,8 +68,9 @@ def manejar_mensaje_entrante(mensaje):
         else:
             # Informar que no se encontró el unitnumber
             print(f"No se encontró el unitnumber para la placa {placa}.")
+        del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
     else:
-        print("Cuerpo del mensaje no coincide con la expresión regular.")
+        print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
         components = []  # No enviar parámetros si la plantilla no los espera
         response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
         print(f"Estado de la respuesta al enviar mensaje: {response_status}")
