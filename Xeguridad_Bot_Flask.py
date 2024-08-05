@@ -66,7 +66,10 @@ def manejar_mensaje_entrante(mensaje):
         if unitnumber:
             # Solo imprimir el unitnumber en consola
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
-            execute_crawler(unitnumber)
+            def execute_crawler(unitnumber):
+                print(f"Ejecutando crawler con unitnumber: {unitnumber}")
+                # Tu lógica del crawler aquí
+
             
         else:
             # Informar que no se encontró el unitnumber
