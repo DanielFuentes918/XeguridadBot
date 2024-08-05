@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
+from pruebaCrawler import execute_crawler
 
 app = Flask("Xeguridad_Bot_Flask")
 
@@ -65,6 +66,8 @@ def manejar_mensaje_entrante(mensaje):
         if unitnumber:
             # Solo imprimir el unitnumber en consola
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+            execute_crawler(unitnumber)
+            
         else:
             # Informar que no se encontró el unitnumber
             print(f"No se encontró el unitnumber para la placa {placa}.")

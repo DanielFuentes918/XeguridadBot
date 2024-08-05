@@ -8,7 +8,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 
-def execute_crawler(unitnumberURL):
+def execute_crawler(unitnumber):
     # Configuración del webdriver
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
@@ -51,16 +51,34 @@ def execute_crawler(unitnumberURL):
         wait.until(EC.url_contains('index.php?m=home'))
         print("Inicio de sesión exitoso")
 
-        # Navegar a la nueva URL después del inicio de sesión
-        target_url = f'https://mongol.brono.com/mongol/fiona/index.php?m=map&id={unitnumberURL}'
-        driver.get(target_url)
-        print(f"Navegando a {target_url}")
+        # Navegar a la página de filtrado
+        filtering_url = f'https://mongol.brono.com/mongol/fiona/index.php?filtering=1&f_unitnumber=on&f_vehiclecode=on&f_vehiclemodel=on&f_vehiclecolor=on&f_rxdate=on&f_customstring=on&m=resources_units&subgroup=-1&v={unitnumber}&number=&name=&model=&color=&lastrx=&custom='
+        driver.get(filtering_url)
+        print(f"Navegando a {filtering_url}")
 
-        # Esperar hasta que la página de destino esté cargada
-        wait.until(EC.presence_of_element_located((By.TAG_NAME, 'body')))
-        print("Página de destino cargada")
+        # Esperar hasta que la tabla con id 'restable' esté cargada
+        wait.until(EC.presence_of_element_located((By.ID, 'restable')))
+        print("Tabla con id 'restable' cargada")
 
-        # Verificar si el formulario con id `c` está presente
+        # Ejecutar el div con class 'pointer' dentro de la tabla
+        pointer_div = driver.find_element(By.CSS_SELECTOR, 'table#restable div.pointer')
+        pointer_div.click()
+        print("Div con class 'pointer' ejecutado")
+
+        # Esperar hasta que el div con id 'menu1' esté cargado
+        wait.until(EC.presence_of_element_located((By.ID, 'menu1')))
+        print("Div con id 'menu1' cargado")
+
+        # Ejecutar el td con onclick dentro del div con id 'menu1'
+        td_element = driver.find_element(By.CSS_SELECTOR, 'div#menu1 td[onclick]')
+        td_element.click()
+        print("Td con onclick ejecutado")
+
+        # Esperar hasta que la página final esté cargada
+        wait.until(EC.presence_of_element_located((By.ID, 'c')))
+        print("Página final cargada")
+
+        # Verificar si el formulario con id 'c' está presente
         form = wait.until(EC.presence_of_element_located((By.ID, 'c')))
         print("Formulario con id 'c' encontrado")
 
@@ -103,6 +121,7 @@ def execute_crawler(unitnumberURL):
             print(f"Error al encontrar o ejecutar el span: {str(e)}")
             # Imprimir la estructura del DOM para depuración
             print(driver.page_source)
+
         time.sleep(60)
         driver.quit()
 
@@ -111,7 +130,10 @@ def execute_crawler(unitnumberURL):
         # Imprimir la estructura del DOM para depuración
         print(driver.page_source)
 
-# Solo para pruebas locales
 if __name__ == "__main__":
-    unitnumberURL = '2296640'
-    execute_crawler(unitnumberURL)
+    import sys
+    if len(sys.argv) > 1:
+        unitnumber = sys.argv[1]
+        execute_crawler(unitnumber)
+    else:
+        print("No se proporcionó ningún unitnumber.")
