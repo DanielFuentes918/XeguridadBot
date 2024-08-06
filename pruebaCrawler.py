@@ -25,6 +25,9 @@ def execute_crawler(unitnumber):
     wait = WebDriverWait(driver, 10)
     actions = ActionChains(driver)
 
+    driver.maximize_window()
+
+
     try:
         # Abrir la página de inicio de sesión
         driver.get('https://mongol.brono.com/mongol/fiona/index.php')
