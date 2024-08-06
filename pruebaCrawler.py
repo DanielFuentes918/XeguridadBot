@@ -3,24 +3,23 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 
 def execute_crawler(unitnumber):
     # Configuración del webdriver
-    options = webdriver.ChromeOptions()
+    options = Options()
+    options.add_argument('--headless')  # Ejecutar en modo sin cabeza
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     options.add_argument('--remote-debugging-port=9222')
     options.add_argument('--disable-software-rasterizer')
-    options.binary_location = '/usr/bin/chromium-browser' # Ajusta esta ruta a la ubicación de tu binario de Chrome
 
     # Inicializar el webdriver
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Firefox(service=FirefoxService('/usr/local/bin/geckodriver'), options=options)
     wait = WebDriverWait(driver, 10)
     actions = ActionChains(driver)
 
