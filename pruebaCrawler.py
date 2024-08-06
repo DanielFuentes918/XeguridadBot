@@ -9,13 +9,12 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 
 def execute_crawler(unitnumber):
-    # Configuración del webdriver
+    # Configuración del webdriver para Firefox
     options = Options()
     options.add_argument('--headless')  # Ejecutar en modo sin cabeza
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
-    options.add_argument('--remote-debugging-port=9222')
     options.add_argument('--disable-software-rasterizer')
 
     # Inicializar el webdriver
