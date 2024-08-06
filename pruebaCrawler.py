@@ -19,6 +19,8 @@ def execute_crawler(unitnumber):
     options.add_argument('--disable-software-rasterizer')
     options.add_argument('--disable-dev-shm-usage')
     #options.binary_location = '/usr/bin/chromium-browser' # Ajusta esta ruta a la ubicación de tu binario de Chrome
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.138 Safari/537.36"
+    options.add_argument(f'user-agent={user_agent}')
 
     # Inicializar el webdriver
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
