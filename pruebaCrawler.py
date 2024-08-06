@@ -17,7 +17,7 @@ def execute_crawler(unitnumber):
     options.add_argument('--disable-gpu')
     options.add_argument('--remote-debugging-port=9222')
     options.add_argument('--disable-software-rasterizer')
-    options.binary_location = '/usr/bin/chromium-browser' # Ajusta esta ruta a la ubicación de tu binario de Chrome
+    options.binary_location = '/usr/local/bin/chromedriver' # Ajusta esta ruta a la ubicación de tu binario de Chrome
 
     # Inicializar el webdriver
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
