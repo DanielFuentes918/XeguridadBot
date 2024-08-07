@@ -11,8 +11,8 @@ VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
 NAMESPACE = "Xeguridad"
-MENU_TEMPLATE_NAME = "menu2_xeguridad"
-SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"
+MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
+SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
@@ -23,12 +23,14 @@ esperando_placa = {}
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
+        # Verificación del webhook
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
         if token == VERIFY_TOKEN:
             return str(challenge)
         return "Verificación de token fallida", 403
     elif request.method == 'POST':
+        # Manejo de mensajes entrantes
         data = request.json
         print(f"Datos recibidos: {data}")
 
@@ -63,25 +65,28 @@ def manejar_mensaje_entrante(mensaje):
         print(f"Placa detectada: {placa}")
         unitnumber = buscar_unitnumber_por_placa(placa)
         if unitnumber:
+            # Solo imprimir el unitnumber en consola
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
             if execute_crawler(unitnumber):
                 print("Crawler ejecutado correctamente.")
                 ultima_transmision = obtener_ultima_transmision(unitnumber)
                 enviar_mensaje_whatsapp(numero, ultima_transmision)
             else:
-                print("Error al ejecutar el crawler.")
+                print("Error al ejecutar el crawler.")            
         else:
+            # Informar que no se encontró el unitnumber
             print(f"No se encontró el unitnumber para la placa {placa}.")
-        del esperando_placa[numero]
+        del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
     else:
         print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
+        
         if numero not in esperando_placa:
             components = []
             response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
             print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
 def manejar_respuesta_usuario(numero, template_name):
-    components = []
+    components = []  # Añadir los parámetros necesarios si los hay
     response_status = enviar_mensaje_whatsapp(numero, template_name, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
@@ -112,7 +117,7 @@ def extraer_placa(nombre):
         print(f"Placa encontrada: {match.group(0)}")
     else:
         print("No se encontró una placa en el nombre")
-    return match.group(0) if match else nombre
+    return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
 
 def obtener_ultima_transmision(unitnumber):
     params = {
@@ -141,9 +146,9 @@ def obtener_ultima_transmision(unitnumber):
         else:
             return "No se encontró la última transmisión."
     else:
-        return "No se pudo obtener la última transmisión."
+        return "No se pudo obtener la última transmisión."    
 
-def enviar_mensaje_whatsapp(numero, mensaje):
+def enviar_mensaje_whatsapp(numero, template_name, components):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
         'Content-Type': 'application/json'
@@ -151,9 +156,15 @@ def enviar_mensaje_whatsapp(numero, mensaje):
     data = {
         'messaging_product': 'whatsapp',
         'to': numero,
-        'type': 'text',
-        'text': {
-            'body': mensaje
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': template_name,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': components
         }
     }
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
