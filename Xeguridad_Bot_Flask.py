@@ -176,11 +176,12 @@ def enviar_mensaje_whatsapp(numero, template_name, components):
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
 
-def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
+def enviar_mensaje_whatsapp(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
         'Content-Type': 'application/json'
     }
+    location_text = f"{address}\nhttps://www.google.com/maps?q={latitud},{longitud}"
     data = {
         'messaging_product': 'whatsapp',
         'to': numero,
@@ -194,13 +195,11 @@ def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, lati
             },
             'components': components + [
                 {
-                    "type": "location",
-                    "parameters": [
+                    'type': 'body',
+                    'parameters': [
                         {
-                            "longitude": longitud,
-                            "latitude": latitud,
-                            "name": address,
-                            "address": ""
+                            'type': 'text',
+                            'text': location_text
                         }
                     ]
                 }
@@ -211,7 +210,6 @@ def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, lati
     print(f"Estado de la respuesta: {response.status_code}")
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
-
 @app.route('/')
 def home():
     return "Servidor Flask en funcionamiento."
