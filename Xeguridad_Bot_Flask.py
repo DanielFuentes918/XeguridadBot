@@ -201,7 +201,7 @@ def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, lati
                             "location": {
                                 "longitude": longitud,
                                 "latitude": latitud,
-                                "name": address,
+                                "name": str(latitud)+","+str(longitud),
                                 "address": str(latitud)+","+str(longitud)
                             }
                         }
