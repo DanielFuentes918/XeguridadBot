@@ -29,7 +29,6 @@ def execute_crawler(unitnumber):
 
     driver.maximize_window()
 
-
     try:
         # Abrir la página de inicio de sesión
         driver.get('https://mongol.brono.com/mongol/fiona/index.php')
@@ -134,12 +133,13 @@ def execute_crawler(unitnumber):
             print(driver.page_source)
 
         time.sleep(60)
-        driver.quit()
-
+        
     except Exception as e:
         print(f"Error: {str(e)}")
         # Imprimir la estructura del DOM para depuración
         print(driver.page_source)
+    finally:
+        driver.quit()
 
 if __name__ == "__main__":
     import sys
