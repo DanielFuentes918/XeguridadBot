@@ -226,6 +226,13 @@ def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, lati
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
     print(f"Estado de la respuesta: {response.status_code}")
     print(f"Contenido de la respuesta: {response.text}")
+    # Eliminar el número de esperando_placa si el mensaje se envió correctamente
+    if response.status_code == 200:
+        if numero in esperando_placa:
+            del esperando_placa[numero]
+            print(f"Número {numero} eliminado de esperando_placa")
+    else:
+        print(f"Error al enviar mensaje, estado de la respuesta: {response.status_code}")
     return response.status_code
 
 
