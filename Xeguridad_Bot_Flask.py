@@ -198,10 +198,12 @@ def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, lati
                     "parameters": [
                         {
                             "type": "location",
-                            "longitude": longitud,
-                            "latitude": latitud,
-                            "name": address,
-                            "address": ""
+                            "location": {
+                                "longitude": longitud,
+                                "latitude": latitud,
+                                "name": address,
+                                "address": ""
+                            }
                         }
                     ]
                 },
@@ -225,6 +227,7 @@ def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, lati
     print(f"Estado de la respuesta: {response.status_code}")
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
+
 
 @app.route('/')
 def home():
