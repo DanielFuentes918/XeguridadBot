@@ -145,7 +145,7 @@ def obtener_ultima_transmision(unitnumber, numero):
             datetime_actual = datetime_actual.strftime("%Y-%m-%d %H:%M:%S")
             components = []
             #def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
-            enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE,longitud, latitud, address, components)
+            enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE,longitud, latitud, address, components, datetime_actual)
             #return f"Latitud: {latitud}, Longitud: {longitud}, Dirección: {address}, Perímetro: {perimeter}, Fecha y Hora: {datetime_actual}"
         else:
             return "No se encontró la última transmisión."
@@ -176,12 +176,11 @@ def enviar_mensaje_whatsapp(numero, template_name, components):
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
 
-def enviar_mensaje_whatsapp(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
+def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, datetime_actual):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
         'Content-Type': 'application/json'
     }
-    location_text = f"{address}\nhttps://www.google.com/maps?q={latitud},{longitud}"
     data = {
         'messaging_product': 'whatsapp',
         'to': numero,
@@ -193,13 +192,29 @@ def enviar_mensaje_whatsapp(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latit
                 'policy': 'deterministic',
                 'code': 'es'
             },
-            'components': components + [
+            'components': [
                 {
-                    'type': 'body',
-                    'parameters': [
+                    "type": "header",
+                    "parameters": [
                         {
-                            'type': 'text',
-                            'text': location_text
+                            "type": "location",
+                            "longitude": longitud,
+                            "latitude": latitud,
+                            "name": address,
+                            "address": ""
+                        }
+                    ]
+                },
+                {
+                    "type": "body",
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": address
+                        },
+                        {
+                            "type": "text",
+                            "text": datetime_actual
                         }
                     ]
                 }
@@ -210,6 +225,7 @@ def enviar_mensaje_whatsapp(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latit
     print(f"Estado de la respuesta: {response.status_code}")
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
+
 @app.route('/')
 def home():
     return "Servidor Flask en funcionamiento."
