@@ -70,7 +70,8 @@ def manejar_mensaje_entrante(mensaje):
             if execute_crawler(unitnumber):
                 print("Crawler ejecutado correctamente.")
                 ultima_transmision = obtener_ultima_transmision(unitnumber)
-                enviar_mensaje_whatsapp(numero, ultima_transmision)
+                components = []
+                enviar_mensaje_whatsapp(numero, ultima_transmision, components)
             else:
                 print("Error al ejecutar el crawler.")            
         else:
