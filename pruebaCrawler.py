@@ -1,4 +1,3 @@
-# pruebaCrawler.py
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -18,7 +17,6 @@ def execute_crawler(unitnumber):
     options.add_argument('--remote-debugging-port=9222')
     options.add_argument('--disable-software-rasterizer')
     options.add_argument('--disable-dev-shm-usage')
-    #options.binary_location = '/usr/bin/chromium-browser' # Ajusta esta ruta a la ubicación de tu binario de Chrome
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.138 Safari/537.36"
     options.add_argument(f'user-agent={user_agent}')
 
@@ -140,6 +138,8 @@ def execute_crawler(unitnumber):
         print(driver.page_source)
     finally:
         driver.quit()
+        print("Instancia de WebDriver cerrada")
+        return True
 
 if __name__ == "__main__":
     import sys
