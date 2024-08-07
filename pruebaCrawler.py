@@ -130,7 +130,7 @@ def execute_crawler(unitnumber):
             # Imprimir la estructura del DOM para depuración
             print(driver.page_source)
 
-        time.sleep(60)
+        time.sleep(120)
         
     except Exception as e:
         print(f"Error: {str(e)}")

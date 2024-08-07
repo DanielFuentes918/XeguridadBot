@@ -13,6 +13,7 @@ WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8
 NAMESPACE = "Xeguridad"
 MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
 SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
+RESPUESTA_COMANDOS_TEMPLATE = "respuesta_comandos"
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
@@ -69,9 +70,9 @@ def manejar_mensaje_entrante(mensaje):
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
             if execute_crawler(unitnumber):
                 print("Crawler ejecutado correctamente.")
-                ultima_transmision = obtener_ultima_transmision(unitnumber)
+                obtener_ultima_transmision(unitnumber, numero)
                 components = []
-                enviar_mensaje_whatsapp(numero, ultima_transmision, components)
+                
             else:
                 print("Error al ejecutar el crawler.")            
         else:
@@ -120,7 +121,7 @@ def extraer_placa(nombre):
         print("No se encontró una placa en el nombre")
     return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
 
-def obtener_ultima_transmision(unitnumber):
+def obtener_ultima_transmision(unitnumber, numero):
     params = {
         'commandname': 'get_last_transmit',
         'unitnumber': unitnumber,
@@ -142,8 +143,10 @@ def obtener_ultima_transmision(unitnumber):
             # Convertir datetime_actual a formato legible
             datetime_actual = datetime.strptime(datetime_actual, "%Y%m%d%H%M%S")
             datetime_actual = datetime_actual.strftime("%Y-%m-%d %H:%M:%S")
-
-            return f"Latitud: {latitud}, Longitud: {longitud}, Dirección: {address}, Perímetro: {perimeter}, Fecha y Hora: {datetime_actual}"
+            components = []
+            #def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
+            enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE,longitud, latitud, address, components)
+            #return f"Latitud: {latitud}, Longitud: {longitud}, Dirección: {address}, Perímetro: {perimeter}, Fecha y Hora: {datetime_actual}"
         else:
             return "No se encontró la última transmisión."
     else:
@@ -166,6 +169,42 @@ def enviar_mensaje_whatsapp(numero, template_name, components):
                 'code': 'es'
             },
             'components': components
+        }
+    }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    return response.status_code
+
+def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': RESPUESTA_COMANDOS_TEMPLATE,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': components + [
+                {
+                    "type": "location",
+                    "parameters": [
+                        {
+                            "longitude": longitud,
+                            "latitude": latitud,
+                            "name": address,
+                            "address": ""
+                        }
+                    ]
+                }
+            ]
         }
     }
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
