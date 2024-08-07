@@ -21,6 +21,9 @@ XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
 # Diccionario para rastrear números de teléfono que esperan una placa
 esperando_placa = {}
 
+# Diccionario para almacenar los últimos mensajes procesados
+ultimos_mensajes = {}
+
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
@@ -50,6 +53,13 @@ def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
     cuerpo_mensaje = ""
+    message_id = mensaje.get('id')
+
+    # Evitar procesar el mismo mensaje dos veces
+    if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
+        print(f"Mensaje duplicado detectado: {message_id}")
+        return
+    ultimos_mensajes[numero] = message_id
 
     if mensaje['type'] == 'button':
         cuerpo_mensaje = mensaje['button']['payload'].lower()
@@ -66,19 +76,16 @@ def manejar_mensaje_entrante(mensaje):
         print(f"Placa detectada: {placa}")
         unitnumber = buscar_unitnumber_por_placa(placa)
         if unitnumber:
-            # Solo imprimir el unitnumber en consola
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
             if execute_crawler(unitnumber):
                 print("Crawler ejecutado correctamente.")
                 obtener_ultima_transmision(unitnumber, numero)
-                components = []
-                
             else:
-                print("Error al ejecutar el crawler.")            
+                print("Error al ejecutar el crawler.")
         else:
-            # Informar que no se encontró el unitnumber
             print(f"No se encontró el unitnumber para la placa {placa}.")
         del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
+
     else:
         print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
         
@@ -86,6 +93,7 @@ def manejar_mensaje_entrante(mensaje):
             components = []
             response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
             print(f"Estado de la respuesta al enviar mensaje: {response_status}")
+
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
