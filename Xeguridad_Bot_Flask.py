@@ -319,7 +319,7 @@ def enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, l
                         },
                         {
                             "type": "text",
-                            "text": datetime_actual
+                            "text": datetime_actual.strftime("%Y-%m-%d %H:%M:%S")  # Convertir a cadena de texto
                         },
                         {
                             "type": "text",
