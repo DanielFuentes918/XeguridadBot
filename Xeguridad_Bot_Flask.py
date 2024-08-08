@@ -27,6 +27,9 @@ esperando_placa = {}
 # Diccionario para almacenar los últimos mensajes procesados
 ultimos_mensajes = {}
 
+# Variables globales para almacenar datos
+user_requests = {}
+
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
@@ -81,6 +84,10 @@ def manejar_mensaje_entrante(mensaje):
         unitnumber = buscar_unitnumber_por_placa(placa)
         if unitnumber:
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+            user_requests[numero] = {
+                "placa": placa,
+                "hora": datetime.now()
+            }
             enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
             if execute_crawler(unitnumber):
                 print("Crawler ejecutado correctamente.")
@@ -157,11 +164,17 @@ def obtener_ultima_transmision(unitnumber, numero):
 
             # Convertir datetime_actual a formato legible
             datetime_actual = datetime.strptime(datetime_actual, "%Y%m%d%H%M%S")
-            datetime_actual = datetime_actual.strftime("%Y-%m-%d %H:%M:%S")
+            datetime_actual = datetime_actual.strftime("%Y-%m-%d %H:%M:%S") 
             components = []
             #def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
             enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE,longitud, latitud, address, components, datetime_actual)
             #return f"Latitud: {latitud}, Longitud: {longitud}, Dirección: {address}, Perímetro: {perimeter}, Fecha y Hora: {datetime_actual}"
+
+            hora_envio_placa = user_requests[numero]['hora']
+            if datetime_actual >= hora_envio_placa:
+                enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, transmision)
+            else:
+                enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, user_requests[numero]['placa'])
         else:
             return "No se encontró la última transmisión."
     else:
@@ -259,7 +272,7 @@ def enviar_cargando_comandos(numero, template_name, components, placa):
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
 
-def enviar_ubicacion_comando(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, latitud, address, components, datetime_actual, placa):
+def enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, latitud, address, components, datetime_actual, placa):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
         'Content-Type': 'application/json'
