@@ -164,14 +164,17 @@ def obtener_ultima_transmision(unitnumber, numero):
 
             # Convertir datetime_actual a formato legible
             datetime_actual = datetime.strptime(datetime_actual, "%Y%m%d%H%M%S")
-            datetime_actual = datetime_actual.strftime("%Y-%m-%d %H:%M:%S") 
+            datetime_actual = datetime_actual.strftime("%Y-%m-%d %H:%M:%S")
+
+            fecha_hora_obj = datetime.strptime(datetime_actual, "%Y-%m-%d %H:%M:%S") 
+
             components = []
             #def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
             enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE,longitud, latitud, address, components, datetime_actual)
             #return f"Latitud: {latitud}, Longitud: {longitud}, Dirección: {address}, Perímetro: {perimeter}, Fecha y Hora: {datetime_actual}"
 
             hora_envio_placa = user_requests[numero]['hora']
-            if datetime_actual >= hora_envio_placa:
+            if fecha_hora_obj >= hora_envio_placa:
                 enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, transmision)
             else:
                 enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, user_requests[numero]['placa'])
