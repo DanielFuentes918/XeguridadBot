@@ -76,10 +76,10 @@ def manejar_mensaje_entrante(mensaje):
         placa = cuerpo_mensaje.upper()
         print(f"Placa detectada: {placa}")
         components = []
-        enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
         unitnumber = buscar_unitnumber_por_placa(placa)
         if unitnumber:
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+            enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
             if execute_crawler(unitnumber):
                 print("Crawler ejecutado correctamente.")
                 obtener_ultima_transmision(unitnumber, numero)
