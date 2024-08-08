@@ -178,7 +178,8 @@ def obtener_ultima_transmision(unitnumber, numero):
                 enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, transmision)
             else:
                 placa = user_requests[numero]['placa']
-                enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, address, components, datetime_actual, placa)
+                print("PLACA::",placa)
+                enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, address, components, fecha_hora_obj, placa)
         else:
             return "No se encontró la última transmisión."
     else:
