@@ -15,6 +15,8 @@ MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida
 SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
 CARGANDO_COMANDOS_TEMPLATE_NAME = "cargando_comandos"  # Nombre de la plantilla de cargando
 RESPUESTA_COMANDOS_TEMPLATE = "respuesta_comandos"
+COMANDO_NO_RECIBIDO_TEMPLATE = "comandos_no_recibidos"
+PLACA_NO_ENCONTRADA_TEMPLATE = "placa_no_encontrada"
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
@@ -221,6 +223,57 @@ def enviar_cargando_comandos(numero, template_name, components, placa):
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
 
+def enviar_ubicacion_comando(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, latitud, address, components, datetime_actual, placa):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': COMANDO_NO_RECIBIDO_TEMPLATE,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': [
+                {
+                    "type": "header",
+                    "parameters": [
+                        {
+                            "type": "location",
+                            "location": {
+                                "longitude": longitud,
+                                "latitude": latitud,
+                                "name": str(latitud)+","+str(longitud),
+                                "address": str(latitud)+","+str(longitud)
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "body",
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": placa
+                        },
+                        {
+                            "type": "text",
+                            "text": datetime_actual
+                        },
+                        {
+                            "type": "text",
+                            "text": address
+                        }
+                    ]
+                }
+            ]
+        }
+    }
 def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, datetime_actual):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
