@@ -88,7 +88,9 @@ def manejar_mensaje_entrante(mensaje):
             else:
                 print("Error al ejecutar el crawler.")
         else:
+            components = []
             print(f"No se encontró el unitnumber para la placa {placa}.")
+            enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa)
         del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
 
     else:
@@ -182,6 +184,40 @@ def enviar_mensaje_whatsapp(numero, template_name, components):
                 'code': 'es'
             },
             'components': components
+        }
+    }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    return response.status_code
+
+def enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': PLACA_NO_ENCONTRADA_TEMPLATE,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': [
+                {
+                    "type": "body",
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": placa
+                        },
+                    ]
+                }
+            ]
         }
     }
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
