@@ -13,6 +13,7 @@ WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8
 NAMESPACE = "Xeguridad"
 MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
 SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
+CARGANDO_COMANDOS_TEMPLATE_NAME = "cargando_comandos"  # Nombre de la plantilla de cargando
 RESPUESTA_COMANDOS_TEMPLATE = "respuesta_comandos"
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
@@ -74,6 +75,8 @@ def manejar_mensaje_entrante(mensaje):
     elif numero in esperando_placa:
         placa = cuerpo_mensaje.upper()
         print(f"Placa detectada: {placa}")
+        components = []
+        enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
         unitnumber = buscar_unitnumber_por_placa(placa)
         if unitnumber:
             print(f"El unitnumber para la placa {placa} es {unitnumber}.")
@@ -177,6 +180,40 @@ def enviar_mensaje_whatsapp(numero, template_name, components):
                 'code': 'es'
             },
             'components': components
+        }
+    }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    return response.status_code
+
+def enviar_cargando_comandos(numero, template_name, components, placa):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': template_name,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': [
+                {
+                    "type": "body",
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": placa
+                        },
+                    ]
+                }
+            ]    
         }
     }
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
