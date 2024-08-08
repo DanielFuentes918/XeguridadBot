@@ -175,11 +175,13 @@ def obtener_ultima_transmision(unitnumber, numero):
 
             hora_envio_placa = user_requests[numero]['hora']
             if fecha_hora_obj >= hora_envio_placa:
-                enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, address, components, fecha_hora_obj)
+                #numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, datetime_actual
+                enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, fecha_hora_obj)
             else:
                 
                 print("PLACA::",placa)
-                enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, address, components, fecha_hora_obj, placa)
+                #(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, datetime_actual):
+                enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, latitud, address, components, fecha_hora_obj, placa)
         else:
             return "No se encontró la última transmisión."
     else:
