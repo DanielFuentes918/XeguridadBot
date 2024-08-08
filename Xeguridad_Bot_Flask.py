@@ -330,6 +330,11 @@ def enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, l
             ]
         }
     }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    return response.status_code
+
 def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, datetime_actual):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
