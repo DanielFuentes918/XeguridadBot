@@ -32,9 +32,14 @@ ultimos_mensajes = {}
 # Variables globales para almacenar datos
 user_requests = {}
 
-#Conexion a MongoDB
-client = MongoClient("mongodb://admin:@@0e84FDF70b@localhost:27017/")
-db = client['XeguridadBotDB']
+# Conexion a MongoDB con manejo de excepciones
+try:
+    client = MongoClient("mongodb://admin:@@0e84FDF70b@localhost:27017/")
+    db = client['XeguridadBotDB']
+    print("Conexión a MongoDB exitosa.")
+except Exception as e:
+    print(f"Error al conectar a MongoDB: {e}")
+
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -428,6 +433,16 @@ def home():
 @app.route('/politica_privacidad', methods=['GET'])
 def politica_privacidad():
     return render_template('PoliticasSeguridad.html')
+
+@app.route('/test_mongodb', methods=['GET'])
+def test_mongodb_connection():
+    try:
+        # Realiza una consulta simple para verificar la conexión
+        db.command('ping')
+        return jsonify({'status': 'success', 'message': 'Conexión a MongoDB exitosa.'}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
