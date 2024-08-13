@@ -12,6 +12,7 @@ VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
 NAMESPACE = "Xeguridad"
+AUTH_TEMPLATE = "auth1"
 MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
 SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
 CARGANDO_COMANDOS_TEMPLATE_NAME = "cargando_comandos"  # Nombre de la plantilla de cargando
@@ -191,6 +192,26 @@ def obtener_ultima_transmision(unitnumber, numero):
             return "No se encontró la última transmisión."
     else:
         return "No se pudo obtener la última transmisión."    
+    
+def enviar_mensaje_auth(numero, AUTH_TEMPLATE, components):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': AUTH_TEMPLATE,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': components
+        }
+    }
 
 def enviar_mensaje_whatsapp(numero, template_name, components):
     headers = {
