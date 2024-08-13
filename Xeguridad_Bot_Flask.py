@@ -436,12 +436,15 @@ def politica_privacidad():
 
 @app.route('/test_mongodb', methods=['GET'])
 def test_mongodb_connection():
+    if db is None:
+        return jsonify({'status': 'error', 'message': 'No se pudo conectar a la base de datos.'}), 500
     try:
         # Realiza una consulta simple para verificar la conexión
         db.command('ping')
         return jsonify({'status': 'success', 'message': 'Conexión a MongoDB exitosa.'}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 
 if __name__ == "__main__":
