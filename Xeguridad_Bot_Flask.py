@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
+from pymongo import MongoClient
 from datetime import datetime
 from pruebaCrawler import execute_crawler
 
@@ -29,6 +30,10 @@ ultimos_mensajes = {}
 
 # Variables globales para almacenar datos
 user_requests = {}
+
+#Conexion a MongoDB
+client = MongoClient("mongodb://admin:@@0e84FDF70b@localhost:27017/")
+db = client['XeguridadBotDB']
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
