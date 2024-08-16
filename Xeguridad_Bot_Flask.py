@@ -92,9 +92,9 @@ def manejar_mensaje_entrante(mensaje):
         usuario_db = collectionUsuarios.find_one({"usuario": usuario, "contraseña": contraseña})
         
         if usuario_db:
-            response_message = "Autenticación exitosa. Bienvenido."
+            print("Autenticación exitosa. Bienvenido.")
         else:
-            response_message = "Credenciales incorrectas. Por favor, intente de nuevo."
+            print("Credenciales incorrectas. Por favor, intente de nuevo.")
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
