@@ -53,6 +53,15 @@ try:
 except Exception as e:
     print(f"Error al conectar a MongoDB: {e}")
 
+def check_password(stored_hash: bytes, provided_password: str) -> bool:
+    return bcrypt.checkpw(provided_password.encode('utf-8'), stored_hash)
+
+def autenticar_usuario(username: str, password: str) -> bool:
+    usuario = collectionUsuarios.find_one({'': username})
+    if usuario:
+        stored_hash = usuario['password']
+        return check_password(stored_hash, password)
+    return False
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -78,42 +87,14 @@ def webhook():
                                 for message in value['messages']:
                                     manejar_mensaje_entrante(message)
         return jsonify({'status': 'success'}), 200
+    
+    
 
-# region Manejo de mensajes
 def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
     message_id = mensaje.get('id')
-    cuerpo_mensaje = mensaje['text']['body']
-    
-    # Suponiendo que el mensaje tiene la contraseña
-    contraseña = cuerpo_mensaje.strip()
-
-    try:
-        # Busca al usuario en la base de datos
-        usuario_db = collectionUsuarios.find_one({"telefono": numero})
-        
-        if usuario_db:
-            contraseña_en_db = usuario_db['contraseña']  # Contraseña guardada en MongoDB
-            
-            # Si la contraseña guardada en MongoDB es de tipo BSON Binary, deberías obtenerla como bytes
-            if isinstance(contraseña_en_db, Binary):
-                contraseña_en_db = contraseña_en_db.decode('utf-8')
-
-            # Convierte la contraseña proporcionada a bytes
-            contraseña_bytes = contraseña.encode('utf-8')
-            
-            # Compara las contraseñas
-            if bcrypt.checkpw(contraseña_bytes, contraseña_en_db):
-                print("Autenticación exitosa. Bienvenido.")
-            else:
-                print("Credenciales incorrectas. Por favor, intente de nuevo.")
-        else:
-            print("Usuario no encontrado.")
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+    cuerpo_mensaje = " "
 
     # Evitar procesar el mismo mensaje dos veces
     if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
@@ -127,6 +108,16 @@ def manejar_mensaje_entrante(mensaje):
         cuerpo_mensaje = mensaje.get('text', {}).get('body', '').lower()
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
+
+    if cuerpo_mensaje.startswith("login"):
+        # Espera formato del mensaje "login usuario:contraseña"
+        _, credenciales = cuerpo_mensaje.split(' ', 1)
+        username, password = credenciales.split(':', 1)
+        if autenticar_usuario(username, password):
+            respuesta = "Autenticación exitosa. Bienvenido."
+        else:
+            respuesta = "Autenticación fallida. Usuario o contraseña incorrectos."
+        enviar_mensaje_whatsapp(numero, respuesta, [])
 
     if cuerpo_mensaje == "mandar comandos a unidad":
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
