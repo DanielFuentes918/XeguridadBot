@@ -54,7 +54,10 @@ except Exception as e:
     print(f"Error al conectar a MongoDB: {e}")
 
 def check_password(stored_hash: bytes, provided_password: str) -> bool:
+    if isinstance(stored_hash, str):
+        stored_hash = stored_hash.encode('utf-8')
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_hash)
+
 
 def autenticar_usuario(username: str, password: str) -> bool:
     usuario = collectionUsuarios.find_one({'telefono': username})
