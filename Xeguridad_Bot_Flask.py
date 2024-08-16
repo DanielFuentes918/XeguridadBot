@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import re
 import os
+from bson import ObjectId
 from urllib.parse import quote_plus
 from pymongo import MongoClient
 from datetime import datetime
@@ -435,6 +436,13 @@ def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, lati
         print(f"Error al enviar mensaje, estado de la respuesta: {response.status_code}")
     return response.status_code
 
+def serialize_document(doc):
+    """Convierte un documento de MongoDB a un formato JSON serializable."""
+    if doc is None:
+        return None
+    doc = dict(doc)  # Convertir BSON a diccionario
+    doc['_id'] = str(doc['_id'])  # Convertir ObjectId a string
+    return doc
 
 @app.route('/')
 def home():
@@ -453,7 +461,7 @@ def test_mongodb_connection():
         db.command('ping')
         usuarioPrueba = collectionUsuarios.find_one({"telefono": "50497338021"})
         if usuarioPrueba:
-            return jsonify({'status': 'success', 'data': usuarioPrueba}), 200
+            return jsonify({'status': 'success', 'data': serialize_document(usuarioPrueba)}), 200
         else:
             return jsonify({'status': 'success', 'message': 'Usuario no encontrado.'}), 404
     except Exception as e:
