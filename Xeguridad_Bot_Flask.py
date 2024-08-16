@@ -452,7 +452,10 @@ def test_mongodb_connection():
         # Realiza una consulta simple para verificar la conexión
         db.command('ping')
         usuarioPrueba = collectionUsuarios.find_one({"telefono": "50497338021"})
-        return jsonify({'status': 'success', 'message': 'Conexión a MongoDB exitosa.'}), 200
+        if usuarioPrueba:
+            return jsonify({'status': 'success', 'data': usuarioPrueba}), 200
+        else:
+            return jsonify({'status': 'success', 'message': 'Usuario no encontrado.'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
