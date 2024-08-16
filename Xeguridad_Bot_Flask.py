@@ -34,8 +34,9 @@ user_requests = {}
 
 # Conexion a MongoDB con manejo de excepciones
 try:
-    client = MongoClient("mongodb://admin:@@0e84FDF70b@localhost:27017/")
+    client = MongoClient("localhost:27017")
     db = client['XeguridadBotDB']
+    collection = db['usuarios']
     print("Conexión a MongoDB exitosa.")
 except Exception as e:
     print(f"Error al conectar a MongoDB: {e}")
