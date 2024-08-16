@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import re
 import os
+import bcrypt
 from bson import ObjectId
 from urllib.parse import quote_plus
 from pymongo import MongoClient
@@ -89,9 +90,9 @@ def manejar_mensaje_entrante(mensaje):
         contraseña = cuerpo_mensaje = ""
         
         # Verificar credenciales en MongoDB
-        usuario_db = collectionUsuarios.find_one({"usuario": usuario, "contraseña": contraseña})
-        
-        if usuario_db:
+        usuario_db = collectionUsuarios.find_one({"telefono": usuario})
+     
+        if usuario_db and bcrypt.checkpw(contraseña.encode(), usuario_db['contraseña']):
             print("Autenticación exitosa. Bienvenido.")
         else:
             print("Credenciales incorrectas. Por favor, intente de nuevo.")
@@ -146,6 +147,12 @@ def manejar_mensaje_entrante(mensaje):
             response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
             print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
+def generar_hash(contraseña):
+    # Generar una sal aleatoria
+    salt = bcrypt.gensalt()
+    # Crear el hash usando bcrypt
+    hashed = bcrypt.hashpw(contraseña.encode(), salt)
+    return hashed
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
