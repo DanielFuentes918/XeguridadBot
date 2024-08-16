@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 import requests
 import re
 import os
+from urllib.parse import quote_plus
 from pymongo import MongoClient
 from datetime import datetime
 from pruebaCrawler import execute_crawler
@@ -25,6 +26,7 @@ XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
 USUARIO_MONGO = "admin"
 CONTRASEÑA_MONGO = os.getenv("MONGO_DB_PASSWORD")
+CONTRASEÑA_MONGO_ESCAPADA = quote_plus(CONTRASEÑA_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
 
@@ -37,7 +39,7 @@ ultimos_mensajes = {}
 # Variables globales para almacenar datos
 user_requests = {}
 
-uri = f"mongodb://{USUARIO_MONGO}:{CONTRASEÑA_MONGO}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
+uri = f"mongodb://{USUARIO_MONGO}:{CONTRASEÑA_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
 
 # Conexion a MongoDB con manejo de excepciones
 try:
