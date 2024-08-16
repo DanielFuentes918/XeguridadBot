@@ -8,6 +8,7 @@ from urllib.parse import quote_plus
 from pymongo import MongoClient
 from datetime import datetime
 from pruebaCrawler import execute_crawler
+from bson.binary import Binary
 
 app = Flask("Xeguridad_Bot_Flask")
 
@@ -82,23 +83,27 @@ def webhook():
 def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
-    cuerpo_mensaje = ""
     message_id = mensaje.get('id')
+    cuerpo_mensaje = mensaje['text']['body']
+    
+    # Suponiendo que el mensaje tiene la contraseña
+    contraseña = cuerpo_mensaje.strip()
 
     try:
-        usuario = mensaje['from']
-        contraseña = cuerpo_mensaje = ""
+        # Busca al usuario en la base de datos
+        usuario_db = collectionUsuarios.find_one({"telefono": numero})
         
-        # Verificar credenciales en MongoDB
-        usuario_db = collectionUsuarios.find_one({"telefono": usuario})
-
         if usuario_db:
-            # Si la contraseña en MongoDB está guardada como BSON Binary
-            contraseña_en_db = usuario_db['contraseña']
-            # Asegúrate de que la contraseña proporcionada por el usuario se convierta a bytes
+            contraseña_en_db = usuario_db['contraseña']  # Contraseña guardada en MongoDB
+            
+            # Si la contraseña guardada en MongoDB es de tipo BSON Binary, deberías obtenerla como bytes
+            if isinstance(contraseña_en_db, Binary):
+                contraseña_en_db = contraseña_en_db.decode('utf-8')
+
+            # Convierte la contraseña proporcionada a bytes
             contraseña_bytes = contraseña.encode('utf-8')
-     
-         # Luego realiza la comparación
+            
+            # Compara las contraseñas
             if bcrypt.checkpw(contraseña_bytes, contraseña_en_db):
                 print("Autenticación exitosa. Bienvenido.")
             else:
