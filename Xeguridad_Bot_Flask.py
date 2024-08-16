@@ -78,7 +78,7 @@ def webhook():
                                     manejar_mensaje_entrante(message)
         return jsonify({'status': 'success'}), 200
 
-
+# region Manejo de mensajes
 def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
@@ -91,11 +91,21 @@ def manejar_mensaje_entrante(mensaje):
         
         # Verificar credenciales en MongoDB
         usuario_db = collectionUsuarios.find_one({"telefono": usuario})
+
+        if usuario_db:
+            # Si la contraseña en MongoDB está guardada como BSON Binary
+            contraseña_en_db = usuario_db['contraseña']
+            # Asegúrate de que la contraseña proporcionada por el usuario se convierta a bytes
+            contraseña_bytes = contraseña.encode('utf-8')
      
-        if usuario_db and bcrypt.checkpw(contraseña.encode(), usuario_db['contraseña']):
-            print("Autenticación exitosa. Bienvenido.")
+         # Luego realiza la comparación
+            if bcrypt.checkpw(contraseña_bytes, contraseña_en_db):
+                print("Autenticación exitosa. Bienvenido.")
+            else:
+                print("Credenciales incorrectas. Por favor, intente de nuevo.")
         else:
-            print("Credenciales incorrectas. Por favor, intente de nuevo.")
+            print("Usuario no encontrado.")
+
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
@@ -146,13 +156,6 @@ def manejar_mensaje_entrante(mensaje):
             components = []
             response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
             print(f"Estado de la respuesta al enviar mensaje: {response_status}")
-
-def generar_hash(contraseña):
-    # Generar una sal aleatoria
-    salt = bcrypt.gensalt()
-    # Crear el hash usando bcrypt
-    hashed = bcrypt.hashpw(contraseña.encode(), salt)
-    return hashed
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
