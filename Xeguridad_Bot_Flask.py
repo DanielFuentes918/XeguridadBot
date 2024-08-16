@@ -77,11 +77,27 @@ def webhook():
                                     manejar_mensaje_entrante(message)
         return jsonify({'status': 'success'}), 200
 
+
 def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
     cuerpo_mensaje = ""
     message_id = mensaje.get('id')
+
+    try:
+        usuario = mensaje['from']
+        contraseña = cuerpo_mensaje = ""
+        
+        # Verificar credenciales en MongoDB
+        usuario_db = collectionUsuarios.find_one({"usuario": usuario, "contraseña": contraseña})
+        
+        if usuario_db:
+            response_message = "Autenticación exitosa. Bienvenido."
+        else:
+            response_message = "Credenciales incorrectas. Por favor, intente de nuevo."
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
     # Evitar procesar el mismo mensaje dos veces
     if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
