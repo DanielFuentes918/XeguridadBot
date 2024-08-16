@@ -36,7 +36,7 @@ user_requests = {}
 try:
     client = MongoClient("localhost:27017")
     db = client['XeguridadBotDB']
-    collection = db['usuarios']
+    collectionUsuarios = db['usuarios']
     print("Conexión a MongoDB exitosa.")
 except Exception as e:
     print(f"Error al conectar a MongoDB: {e}")
@@ -442,6 +442,7 @@ def test_mongodb_connection():
     try:
         # Realiza una consulta simple para verificar la conexión
         db.command('ping')
+        usuarioPrueba = collectionUsuarios.find_one({"telefono": "50497338021"})
         return jsonify({'status': 'success', 'message': 'Conexión a MongoDB exitosa.'}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
