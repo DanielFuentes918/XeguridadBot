@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
+import os
 from pymongo import MongoClient
 from datetime import datetime
 from pruebaCrawler import execute_crawler
@@ -22,6 +23,10 @@ PLACA_NO_ENCONTRADA_TEMPLATE = "placa_no_encontrada"
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
+USUARIO_MONGO = "admin"
+CONTRASEÑA_MONGO = os.getenv("MONGO_DB_PASSWORD")
+BASE_DATOS_MONGO = "XeguridadBotDB"
+AUTH_DB = "admin"
 
 # Diccionario para rastrear números de teléfono que esperan una placa
 esperando_placa = {}
@@ -32,10 +37,12 @@ ultimos_mensajes = {}
 # Variables globales para almacenar datos
 user_requests = {}
 
+uri = f"mongodb://{USUARIO_MONGO}:{CONTRASEÑA_MONGO}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
+
 # Conexion a MongoDB con manejo de excepciones
 try:
-    client = MongoClient("localhost:27017")
-    db = client['XeguridadBotDB']
+    client = MongoClient(uri)
+    db = client[BASE_DATOS_MONGO]
     collectionUsuarios = db['usuarios']
     print("Conexión a MongoDB exitosa.")
 except Exception as e:
