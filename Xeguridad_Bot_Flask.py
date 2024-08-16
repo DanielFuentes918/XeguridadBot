@@ -59,7 +59,7 @@ def check_password(stored_hash: bytes, provided_password: str) -> bool:
 def autenticar_usuario(username: str, password: str) -> bool:
     usuario = collectionUsuarios.find_one({'telefono': username})
     if usuario:
-        stored_hash = usuario['password']
+        stored_hash = usuario['contraseña']
         return check_password(stored_hash, password)
     return False
 
@@ -114,10 +114,9 @@ def manejar_mensaje_entrante(mensaje):
         _, credenciales = cuerpo_mensaje.split(' ', 1)
         username, password = credenciales.split(':', 1)
         if autenticar_usuario(username, password):
-            respuesta = "Autenticación exitosa. Bienvenido."
+            print("Autenticación exitosa. Bienvenido.")
         else:
-            respuesta = "Autenticación fallida. Usuario o contraseña incorrectos."
-        enviar_mensaje_whatsapp(numero, respuesta, [])
+            print("Autenticación fallida. Usuario o contraseña incorrectos.")
 
     if cuerpo_mensaje == "mandar comandos a unidad":
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
