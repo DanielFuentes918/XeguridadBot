@@ -68,7 +68,7 @@ def autenticar_usuario(username: str, password: str) -> bool:
     
     # Verifica si se encontró el usuario
     if usuario:
-        stored_hash = usuario['contraseña']
+        stored_hash = usuario['password']
         print(f"Contraseña en mongo: {stored_hash}, contraseña ingresada: {password}")
         
         # Verifica si la contraseña ingresada coincide con el hash almacenado
