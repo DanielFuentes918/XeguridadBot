@@ -64,7 +64,7 @@ def autenticar_usuario(username: str, password: str) -> bool:
     if usuario:
         stored_hash = usuario['password']
         return check_password(stored_hash, password)
-    return False
+    return False and print(f"Contraseña en mongo: {stored_hash}, contraseña ingresada: {password}")
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -120,6 +120,7 @@ def manejar_mensaje_entrante(mensaje):
             print("Autenticación exitosa. Bienvenido.")
         else:
             print("Autenticación fallida. Usuario o contraseña incorrectos.")
+
 
     if cuerpo_mensaje == "mandar comandos a unidad":
         manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
