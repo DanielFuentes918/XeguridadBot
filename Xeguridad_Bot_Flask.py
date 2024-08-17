@@ -134,9 +134,9 @@ def manejar_mensaje_entrante(mensaje):
             manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
             return
 
-    if cuerpo_mensaje.startswith("login"):
-        _, password = cuerpo_mensaje.split(' ', 1)
-        if autenticar_usuario(numero, password):
+    # Manejo de la autenticación y comandos
+    if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
+        if autenticar_usuario(numero, cuerpo_mensaje):
             print("Autenticación exitosa. Bienvenido.")
             manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)  # Envía el menú de opciones tras autenticación
         else:
