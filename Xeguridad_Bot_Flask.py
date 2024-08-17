@@ -133,6 +133,11 @@ def manejar_mensaje_entrante(mensaje):
             del usuarios_autenticados[numero]
             manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
             return
+        
+    if numero not in usuarios_autenticados:
+        print("Usuario no autenticado.")
+        manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
+        return
 
     # Manejo de la autenticación y comandos
     if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
