@@ -147,7 +147,7 @@ def manejar_mensaje_entrante(mensaje):
         manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
     else:
         # Solo procesa el resto de comandos si el usuario está autenticado
-        if cuerpo_mensaje == "mandar comandos a unidad":
+        if cuerpo_mensaje == "Mandar comandos a unidad":
             manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
             esperando_placa[numero] = True
         elif numero in esperando_placa:
