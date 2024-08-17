@@ -106,10 +106,10 @@ def manejar_mensaje_entrante(mensaje):
         return
     ultimos_mensajes[numero] = message_id
 
-    #if mensaje['type'] == 'button':
-     #   cuerpo_mensaje = mensaje['button']['payload'].lower()
-    #else:
-     #   cuerpo_mensaje = mensaje.get('text', {}).get('body', '').lower()
+    if mensaje['type'] == 'button':
+        cuerpo_mensaje = mensaje['button']['payload']#.lower()
+    else:
+        cuerpo_mensaje = mensaje.get('text', {}).get('body', '')#.lower()
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
