@@ -172,13 +172,14 @@ def manejar_mensaje_entrante(mensaje):
                 print(f"No se encontró el unitnumber para la placa {placa}.")
                 enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa)
             del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
+
         else:
             print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-
-            if numero not in esperando_placa:
-                components = []
-                response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
-                print(f"Estado de la respuesta al enviar mensaje: {response_status}")
+        
+        if numero not in esperando_placa:
+            components = []
+            response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
+            print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
