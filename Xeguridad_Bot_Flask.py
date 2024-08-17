@@ -115,9 +115,8 @@ def manejar_mensaje_entrante(mensaje):
 
     if cuerpo_mensaje.startswith("login"):
         # Espera formato del mensaje "login usuario:contraseña"
-        _, credenciales = cuerpo_mensaje.split(' ', 1)
-        username, password = credenciales.split(':', 1)
-        if autenticar_usuario(username, password):
+        _, password = cuerpo_mensaje.split(' ', 1)
+        if autenticar_usuario(numero, password):
             print("Autenticación exitosa. Bienvenido.")
         else:
             print("Autenticación fallida. Usuario o contraseña incorrectos.")
