@@ -133,52 +133,48 @@ def manejar_mensaje_entrante(mensaje):
             del usuarios_autenticados[numero]
             manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
             return
-        
-    # Manejo de la autenticación y comandos
-    if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
+
+        # Si el usuario está autenticado, manejar los comandos
+        if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
+            if cuerpo_mensaje == "Mandar comandos a unidad":
+                manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
+                esperando_placa[numero] = True
+            elif numero in esperando_placa:
+                placa = cuerpo_mensaje.upper()
+                print(f"Placa detectada: {placa}")
+                components = []
+                unitnumber = buscar_unitnumber_por_placa(placa)
+                if unitnumber:
+                    print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+                    user_requests[numero] = {
+                        "placa": placa,
+                        "hora": datetime.now()
+                    }
+                    enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
+                    if execute_crawler(unitnumber):
+                        print("Crawler ejecutado correctamente.")
+                        obtener_ultima_transmision(unitnumber, numero)
+                    else:
+                        print("Error al ejecutar el crawler.")
+                else:
+                    components = []
+                    print(f"No se encontró el unitnumber para la placa {placa}.")
+                    enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa)
+                del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
+            else:
+                print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
+                components = []
+                response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
+                print(f"Estado de la respuesta al enviar mensaje: {response_status}")
+
+    else:
+        # Si el usuario no está autenticado, verificar autenticación
         if autenticar_usuario(numero, cuerpo_mensaje):
             print("Autenticación exitosa. Bienvenido.")
             manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)  # Envía el menú de opciones tras autenticación
         else:
             print("Autenticación fallida. Usuario o contraseña incorrectos.")
             manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje de fallo de autenticación
-    elif numero not in usuarios_autenticados:
-        print("Usuario no autenticado.")
-        manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
-    else:
-        # Solo procesa el resto de comandos si el usuario está autenticado
-        if cuerpo_mensaje == "Mandar comandos a unidad":
-            manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
-            esperando_placa[numero] = True
-        elif numero in esperando_placa:
-            placa = cuerpo_mensaje.upper()
-            print(f"Placa detectada: {placa}")
-            components = []
-            unitnumber = buscar_unitnumber_por_placa(placa)
-            if unitnumber:
-                print(f"El unitnumber para la placa {placa} es {unitnumber}.")
-                user_requests[numero] = {
-                    "placa": placa,
-                    "hora": datetime.now()
-                }
-                enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
-                if execute_crawler(unitnumber):
-                    print("Crawler ejecutado correctamente.")
-                    obtener_ultima_transmision(unitnumber, numero)
-                else:
-                    print("Error al ejecutar el crawler.")
-            else:
-                components = []
-                print(f"No se encontró el unitnumber para la placa {placa}.")
-                enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa)
-            del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
-        else:
-            print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-
-            if numero not in esperando_placa:
-                components = []
-                response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
-                print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
