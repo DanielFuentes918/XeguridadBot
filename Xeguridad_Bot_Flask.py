@@ -63,8 +63,9 @@ def autenticar_usuario(username: str, password: str) -> bool:
     usuario = collectionUsuarios.find_one({'telefono': username})
     if usuario:
         stored_hash = usuario['password']
+        print(f"Contraseña en mongo: {stored_hash}, contraseña ingresada: {password}")
         return check_password(stored_hash, password)
-    return False and print(f"Contraseña en mongo: {stored_hash}, contraseña ingresada: {password}")
+    return False
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
