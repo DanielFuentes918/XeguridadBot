@@ -62,7 +62,7 @@ def check_password(stored_hash: bytes, provided_password: str) -> bool:
 def autenticar_usuario(username: str, password: str) -> bool:
     usuario = collectionUsuarios.find_one({'telefono': username})
     if usuario:
-        stored_hash = usuario['contraseña']
+        stored_hash = usuario['password']
         return check_password(stored_hash, password)
     return False
 
