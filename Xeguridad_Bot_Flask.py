@@ -294,16 +294,19 @@ def enviar_solicitud_placa (numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, com
             },
             'components': [
                 {
-                    "type": "body",
+                    "type": "header",
                     "parameters": [
                         {
-                            "type": "text",
-                            "text": "image",
+                            "type": "image",
                             "image": {
-                                "url": logo_xeguridad,
+                                "link": logo_xeguridad,
                             }
-                        },
+                        }
                     ]
+                },
+                {
+                    "type": "body",
+                    "parameters": components
                 }
             ]
         }
