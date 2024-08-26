@@ -10,6 +10,7 @@ from datetime import datetime
 from datetime import datetime, timedelta
 from pruebaCrawler import execute_crawler
 from bson.binary import Binary
+logo_xeguridad = "static/logo_xeguridad.png"
 
 app = Flask("Xeguridad_Bot_Flask")
 
@@ -20,7 +21,7 @@ WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8
 NAMESPACE = "Xeguridad"
 AUTH_TEMPLATE = "auth1"
 MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
-SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
+SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_placa_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
 CARGANDO_COMANDOS_TEMPLATE_NAME = "cargando_comandos"  # Nombre de la plantilla de cargando
 RESPUESTA_COMANDOS_TEMPLATE = "respuesta_comandos"
 COMANDO_NO_RECIBIDO_TEMPLATE = "comandos_no_recibidos"
@@ -69,7 +70,7 @@ def autenticar_usuario(username: str, password: str) -> bool:
     # Verifica si se encontró el usuario
     if usuario:
         stored_hash = usuario['password']
-        print(f"Contraseña en mongo: {stored_hash}, contraseña ingresada: {password}")
+        print(f"Contraseña en mongo: {stored_hash}, contraseña ingresada: {password}", )
         
         # Verifica si la contraseña ingresada coincide con el hash almacenado
         if check_password(stored_hash, password):
@@ -137,7 +138,8 @@ def manejar_mensaje_entrante(mensaje):
         # Si el usuario está autenticado, manejar los comandos
         if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
             if cuerpo_mensaje == "Mandar comandos a unidad":
-                manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
+                components = []
+                enviar_solicitud_placa(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, components)
                 esperando_placa[numero] = True
             elif numero in esperando_placa:
                 placa = cuerpo_mensaje.upper()
@@ -273,6 +275,43 @@ def enviar_mensaje_auth(numero, AUTH_TEMPLATE, components):
             'components': components
         }
     }
+
+def enviar_solicitud_placa (numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, components):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': [
+                {
+                    "type": "body",
+                    "parameters": [
+                        {
+                            "type": "text",
+                            "text": "image",
+                            "image": {
+                                "url": logo_xeguridad,
+                            }
+                        },
+                    ]
+                }
+            ]
+        }
+    }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    return response.status_code
 
 def enviar_mensaje_whatsapp(numero, template_name, components):
     headers = {
