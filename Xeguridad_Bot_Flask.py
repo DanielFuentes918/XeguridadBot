@@ -10,8 +10,7 @@ from datetime import datetime
 from datetime import datetime, timedelta
 from pruebaCrawler import execute_crawler
 from bson.binary import Binary
-logo_xeguridad = "static/logo_xeguridad.png"
-
+from flask import Flask, send_from_directory
 app = Flask("Xeguridad_Bot_Flask")
 
 # Configura tu verify token aquí
@@ -299,7 +298,7 @@ def enviar_solicitud_placa (numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, com
                         {
                             "type": "image",
                             "image": {
-                                "link": logo_xeguridad,
+                                "link": "https://9d4c-68-183-104-5.ngrok-free.app/logo_xeguridad",
                             }
                         }
                     ]
@@ -553,6 +552,11 @@ def test_mongodb_connection():
             return jsonify({'status': 'success', 'message': 'Usuario no encontrado.'}), 404
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+@app.route('/logo_xeguridad')
+def mostrar_imagen():
+    # 'static' es la carpeta en la que está almacenada la imagen
+    return send_from_directory('static', 'logo_xeguridad.png')
 
 
 
