@@ -21,7 +21,7 @@ NAMESPACE = "Xeguridad"
 AUTH_TEMPLATE = "auth1"
 AUTH_FAILED_TEMPLATE = "auth_failed"
 MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
-SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_placa_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
+SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_unidad_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
 CARGANDO_COMANDOS_TEMPLATE_NAME = "cargando_comandos"  # Nombre de la plantilla de cargando
 RESPUESTA_COMANDOS_TEMPLATE = "respuesta_comandos"
 COMANDO_NO_RECIBIDO_TEMPLATE = "comandos_no_recibidos"
@@ -140,7 +140,7 @@ def manejar_mensaje_entrante(mensaje):
         if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
             if cuerpo_mensaje == "Mandar comandos a unidad":
                 components = []
-                enviar_solicitud_placa(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, components)
+                manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, components)
                 esperando_placa[numero] = True
             elif numero in esperando_placa:
                 placa = cuerpo_mensaje.upper()
@@ -274,42 +274,6 @@ def enviar_mensaje_auth(numero, AUTH_TEMPLATE, components):
                 'code': 'es'
             },
             'components': components
-        }
-    }
-
-def enviar_solicitud_placa (numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, components):
-    headers = {
-        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
-        'Content-Type': 'application/json'
-    }
-    data = {
-        'messaging_product': 'whatsapp',
-        'to': numero,
-        'type': 'template',
-        'template': {
-            'namespace': NAMESPACE,
-            'name': SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME,
-            'language': {
-                'policy': 'deterministic',
-                'code': 'es'
-            },
-            'components': [
-                {
-                    "type": "header",
-                    "parameters": [
-                        {
-                            "type": "image",
-                            "image": {
-                                "link": "https://9d4c-68-183-104-5.ngrok-free.app/logo_xeguridad",
-                            }
-                        }
-                    ]
-                },
-                {
-                    "type": "body",
-                    "parameters": components
-                }
-            ]
         }
     }
     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
