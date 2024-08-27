@@ -19,12 +19,14 @@ WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
 NAMESPACE = "Xeguridad"
 AUTH_TEMPLATE = "auth1"
+AUTH_FAILED_TEMPLATE = "auth_failed"
 MENU_TEMPLATE_NAME = "menu2_xeguridad"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
 SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "solicitud_placa_comandos"  # Nombre de la plantilla para solicitud de comandos a unidad
 CARGANDO_COMANDOS_TEMPLATE_NAME = "cargando_comandos"  # Nombre de la plantilla de cargando
 RESPUESTA_COMANDOS_TEMPLATE = "respuesta_comandos"
 COMANDO_NO_RECIBIDO_TEMPLATE = "comandos_no_recibidos"
 PLACA_NO_ENCONTRADA_TEMPLATE = "placa_no_encontrada"
+
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
@@ -175,7 +177,7 @@ def manejar_mensaje_entrante(mensaje):
             manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)  # Envía el menú de opciones tras autenticación
         else:
             print("Autenticación fallida. Usuario o contraseña incorrectos.")
-            manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje de fallo de autenticación
+            manejar_respuesta_usuario(numero, AUTH_FAILED_TEMPLATE)  # Envía mensaje de fallo de autenticación
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
