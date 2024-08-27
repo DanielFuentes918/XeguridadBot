@@ -47,6 +47,8 @@ user_requests = {}
 
 usuarios_autenticados = {}
 
+usuarios_esperando_password = {}
+
 uri = f"mongodb://{USUARIO_MONGO}:{CONTRASEÑA_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
 
 # Conexion a MongoDB con manejo de excepciones
@@ -71,7 +73,7 @@ def autenticar_usuario(username: str, password: str) -> bool:
     # Verifica si se encontró el usuario
     if usuario:
         stored_hash = usuario['password']
-        print(f"Contraseña en mongo: {stored_hash}, contraseña ingresada: {password}", )
+        print(f"Contraseña en mongo: {stored_hash}, contraseña ingresada: {password}")
         
         # Verifica si la contraseña ingresada coincide con el hash almacenado
         if check_password(stored_hash, password):
@@ -120,32 +122,33 @@ def manejar_mensaje_entrante(mensaje):
         return
     ultimos_mensajes[numero] = message_id
 
+    # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
-        cuerpo_mensaje = mensaje['button']['payload']#.lower()
+        cuerpo_mensaje = mensaje['button']['payload']
     else:
-        cuerpo_mensaje = mensaje.get('text', {}).get('body', '')#.lower()
+        cuerpo_mensaje = mensaje.get('text', {}).get('body', '')
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
-   # Verificar autenticación
+    # Verificar autenticación del usuario
     if numero in usuarios_autenticados:
         hora_autenticacion = usuarios_autenticados[numero]
+        
+        # Verificar si la sesión ha expirado (más de 24 horas)
         if datetime.now() - hora_autenticacion > timedelta(hours=24):
             print("Sesión expirada. El usuario necesita autenticarse de nuevo.")
             del usuarios_autenticados[numero]
             manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
             return
-
-        # Si el usuario está autenticado, manejar los comandos
+        
+        # Si el usuario está autenticado, manejar comandos
         if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
             if cuerpo_mensaje == "Mandar comandos a unidad":
-                components = []
                 manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
                 esperando_placa[numero] = True
             elif numero in esperando_placa:
                 placa = cuerpo_mensaje.upper()
                 print(f"Placa detectada: {placa}")
-                components = []
                 unitnumber = buscar_unitnumber_por_placa(placa)
                 if unitnumber:
                     print(f"El unitnumber para la placa {placa} es {unitnumber}.")
@@ -153,31 +156,36 @@ def manejar_mensaje_entrante(mensaje):
                         "placa": placa,
                         "hora": datetime.now()
                     }
-                    enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
+                    enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, placa)  # Enviar plantilla de cargando
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
                         obtener_ultima_transmision(unitnumber, numero)
                     else:
                         print("Error al ejecutar el crawler.")
                 else:
-                    components = []
                     print(f"No se encontró el unitnumber para la placa {placa}.")
-                    enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa)
+                    enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, placa)
                 del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                components = []
-                response_status = enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME, components)
-                print(f"Estado de la respuesta al enviar mensaje: {response_status}")
-
+                enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME)
+    
     else:
-        # Si el usuario no está autenticado, verificar autenticación
-        if autenticar_usuario(numero, cuerpo_mensaje):
-            print("Autenticación exitosa. Bienvenido.")
-            manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)  # Envía el menú de opciones tras autenticación
+        # Usuario no autenticado
+        if numero not in usuarios_esperando_password:
+            # Envía la plantilla solicitando la contraseña
+            manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
+            usuarios_esperando_password[numero] = True  # Ahora está esperando una contraseña
         else:
-            print("Autenticación fallida. Usuario o contraseña incorrectos.")
-            manejar_respuesta_usuario(numero, AUTH_FAILED_TEMPLATE)  # Envía mensaje de fallo de autenticación
+            # El usuario ha enviado la contraseña, ahora la autenticamos
+            if autenticar_usuario(numero, cuerpo_mensaje):
+                print("Autenticación exitosa. Bienvenido.")
+                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)  # Envía el menú de opciones tras autenticación
+                del usuarios_esperando_password[numero]  # Ya no está esperando la contraseña
+            else:
+                print("Autenticación fallida. Usuario o contraseña incorrectos.")
+                manejar_respuesta_usuario(numero, AUTH_FAILED_TEMPLATE)  # Envía mensaje de fallo de autenticación
+                del usuarios_esperando_password[numero]  # Resetear el proceso de autenticación
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
