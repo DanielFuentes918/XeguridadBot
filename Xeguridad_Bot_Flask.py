@@ -140,7 +140,7 @@ def manejar_mensaje_entrante(mensaje):
         if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
             if cuerpo_mensaje == "Mandar comandos a unidad":
                 components = []
-                manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, components)
+                manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
                 esperando_placa[numero] = True
             elif numero in esperando_placa:
                 placa = cuerpo_mensaje.upper()
@@ -276,10 +276,6 @@ def enviar_mensaje_auth(numero, AUTH_TEMPLATE, components):
             'components': components
         }
     }
-    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
-    print(f"Estado de la respuesta: {response.status_code}")
-    print(f"Contenido de la respuesta: {response.text}")
-    return response.status_code
 
 def enviar_mensaje_whatsapp(numero, template_name, components):
     headers = {
