@@ -166,7 +166,8 @@ def manejar_mensaje_entrante(mensaje):
                         "placa": placa,
                         "hora": datetime.now()
                     }
-                    enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
+                    # enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa) 
+                    manejar_respuesta_usuario(numero, CARGANDO_COMANDOS_TEMPLATE_NAME) # Enviar plantilla de cargando
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
                         obtener_ultima_transmision(unitnumber, numero)
@@ -387,39 +388,39 @@ def enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components,
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
 
-def enviar_cargando_comandos(numero, template_name, components, placa):
-    headers = {
-        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
-        'Content-Type': 'application/json'
-    }
-    data = {
-        'messaging_product': 'whatsapp',
-        'to': numero,
-        'type': 'template',
-        'template': {
-            'namespace': NAMESPACE,
-            'name': template_name,
-            'language': {
-                'policy': 'deterministic',
-                'code': 'es'
-            },
-            'components': [
-                {
-                    "type": "body",
-                    "parameters": components + [
-                        {
-                            "type": "text",
-                            "text": placa
-                        },
-                    ]
-                }
-            ]    
-        }
-    }
-    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
-    print(f"Estado de la respuesta: {response.status_code}")
-    print(f"Contenido de la respuesta: {response.text}")
-    return response.status_code
+# def enviar_cargando_comandos(numero, template_name, components, placa):
+#     headers = {
+#         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+#         'Content-Type': 'application/json'
+#     }
+#     data = {
+#         'messaging_product': 'whatsapp',
+#         'to': numero,
+#         'type': 'template',
+#         'template': {
+#             'namespace': NAMESPACE,
+#             'name': template_name,
+#             'language': {
+#                 'policy': 'deterministic',
+#                 'code': 'es'
+#             },
+#             'components': [
+#                 {
+#                     "type": "body",
+#                     "parameters": components + [
+#                         {
+#                             "type": "text",
+#                             "text": placa
+#                         },
+#                     ]
+#                 }
+#             ]    
+#         }
+#     }
+#     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+#     print(f"Estado de la respuesta: {response.status_code}")
+#     print(f"Contenido de la respuesta: {response.text}")
+#     return response.status_code
 
 def enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, latitud, address, components, datetime_actual, placa):
     headers = {
