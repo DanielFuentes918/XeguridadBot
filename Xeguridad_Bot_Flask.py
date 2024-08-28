@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from datetime import datetime
 from datetime import datetime, timedelta
 from pruebaCrawler import execute_crawler
+from UnitsData import obtener_datos
 from bson.binary import Binary
 from flask import Flask, send_from_directory
 app = Flask("Xeguridad_Bot_Flask")
@@ -575,6 +576,11 @@ def mostrar_imagen():
     # 'static' es la carpeta en la que está almacenada la imagen
     return send_from_directory('static', 'logo_xeguridad.png')
 
+@app.route('/units_data')
+def obtener_datos_route():
+    unidades = obtener_unidades()  # Llama a la función para obtener la lista de unidades
+    datos = obtener_datos(unidades)  # Llama a la función original para obtener los datos
+    return jsonify(datos)  # Devuelve los datos como JSON a través de la ruta
 
 
 if __name__ == "__main__":
