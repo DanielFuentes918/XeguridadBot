@@ -7,40 +7,34 @@ Xeguridad_USERNAME = "dhnexasa"
 Xeguridad_PASSWORD = "dhnexasa2022/487-"
 
 def obtener_datos(unidades):
-    # Filtrar unidades que no están transmitiendo en el día anterior completo
     units_data = []
 
-    # Calcular la fecha de ayer
-    fecha_ayer = datetime.now() - timedelta(days=1)
-    
-    # Obtener los tiempos de inicio y fin para el día anterior (desde las 00:00 hasta las 23:59)
-    start = fecha_ayer.replace(hour=0, minute=0, second=0).strftime("%Y%m%d%H%M%S")
-    end = fecha_ayer.replace(hour=23, minute=59, second=59).strftime("%Y%m%d%H%M%S")
+    # Calcular las fechas de inicio y fin de acuerdo al formato requerido por la API
+    start = (datetime.now() - timedelta(days=1)).replace(hour=0, minute=0, second=0).strftime("%Y%m%d%H%M%S")
+    end = (datetime.now() - timedelta(days=1)).replace(hour=23, minute=59, second=0).strftime("%Y%m%d%H%M%S")
 
     for unidad in unidades:
+        # Construcción del URL con los parámetros correctos
         params = {
-            'commandname': 'get_historial',
+            'commandname': 'get_history',  # El nombre del comando debe ser 'get_history'
             'user': Xeguridad_USERNAME,
             'pass': Xeguridad_PASSWORD,
             'unitnumber': unidad['unitnumber'],
-            'start': start,
-            'end': end,
+            'start': start,  # Formato YYYYMMDDHHMMSS para el inicio
+            'end': end,  # Formato YYYYMMDDHHMMSS para el fin
             'format': 'json1'
         }
-        response = requests.get(Xeguridad_API_URL, params=params)
+        
+        response = requests.get(Xeguridad_API_URL, params=params)  # Realizar la solicitud con los parámetros
         print(f"Estado de la respuesta: {response.status_code}")
+        print(f"Contenido de la respuesta: {response.text}")  # Imprimir el contenido completo de la respuesta
 
         if response.status_code == 200:
             try:
                 transmisiones = response.json()
                 for data in transmisiones:
-                    # Guardar la última transmisión
                     ultima_transmision = data['datetime_utc']
-                    # Imprimir la última transmisión obtenida
-                    print(f"Unidad: {unidad['unitnumber']} - Última transmisión: {ultima_transmision}")
-                    units_data.append(
-                        {'unitnumber': unidad['unitnumber'], 'ultima_trans': ultima_transmision,
-                         'nombre': data['name']})
+                    units_data.append({'unitnumber': unidad['unitnumber'], 'ultima_trans': ultima_transmision, 'nombre': data['name']})
             except Exception as e:
                 print(f"Error al procesar las transmisiones: {e}")
 
