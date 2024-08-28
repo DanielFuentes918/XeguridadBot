@@ -180,7 +180,7 @@ def manejar_mensaje_entrante(mensaje):
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
                 # enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)
-                manejar_respuesta_usuario(numero, CARGANDO_COMANDOS_TEMPLATE_NAME)
+                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)
     
     else:
         # Usuario no autenticado
@@ -193,7 +193,7 @@ def manejar_mensaje_entrante(mensaje):
             if autenticar_usuario(numero, cuerpo_mensaje):
                 print("Autenticación exitosa. Bienvenido.")
                 # enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)  
-                manejar_respuesta_usuario(numero, CARGANDO_COMANDOS_TEMPLATE_NAME) # Envía el menú de opciones tras autenticación
+                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME) # Envía el menú de opciones tras autenticación
                 del usuarios_esperando_password[numero]  # Ya no está esperando la contraseña
             else:
                 print("Autenticación fallida. Usuario o contraseña incorrectos.")
