@@ -115,6 +115,16 @@ def manejar_mensaje_entrante(mensaje):
     numero = mensaje['from']
     message_id = mensaje.get('id')
     cuerpo_mensaje = " "
+    usuario = collectionUsuarios.find_one({'telefono': numero})
+    components = []
+
+    if usuario:
+        # Si el usuario es encontrado, puedes acceder a su nombre
+        nombre_usuario = usuario['nombre']
+        print(f"Nombre del usuario: {nombre_usuario}")
+    else:
+        # Si el usuario no es encontrado
+        print("Usuario no encontrado.")
 
     # Evitar procesar el mismo mensaje dos veces
     if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
@@ -168,7 +178,7 @@ def manejar_mensaje_entrante(mensaje):
                 del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                enviar_mensaje_whatsapp(numero, MENU_TEMPLATE_NAME)
+                enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)
     
     else:
         # Usuario no autenticado
@@ -180,7 +190,7 @@ def manejar_mensaje_entrante(mensaje):
             # El usuario ha enviado la contraseña, ahora la autenticamos
             if autenticar_usuario(numero, cuerpo_mensaje):
                 print("Autenticación exitosa. Bienvenido.")
-                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)  # Envía el menú de opciones tras autenticación
+                enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)  # Envía el menú de opciones tras autenticación
                 del usuarios_esperando_password[numero]  # Ya no está esperando la contraseña
             else:
                 print("Autenticación fallida. Usuario o contraseña incorrectos.")
@@ -220,6 +230,40 @@ def extraer_placa(nombre):
     else:
         print("No se encontró una placa en el nombre")
     return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
+
+def enviar_menu(numero, MENU_TEMPLATE_NAME, components, usuario_nombre):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': MENU_TEMPLATE_NAME,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': [
+                {
+                    "type": "body",
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": usuario_nombre
+                        },
+                    ]
+                }
+            ]
+        }
+    }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    return response.status_code
 
 def obtener_ultima_transmision(unitnumber, numero):
     params = {
