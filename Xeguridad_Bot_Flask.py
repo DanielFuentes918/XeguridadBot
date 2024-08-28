@@ -166,7 +166,7 @@ def manejar_mensaje_entrante(mensaje):
                         "placa": placa,
                         "hora": datetime.now()
                     }
-                    enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, placa)  # Enviar plantilla de cargando
+                    enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa)  # Enviar plantilla de cargando
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
                         obtener_ultima_transmision(unitnumber, numero)
