@@ -174,7 +174,7 @@ def manejar_mensaje_entrante(mensaje):
                         print("Error al ejecutar el crawler.")
                 else:
                     print(f"No se encontró el unitnumber para la placa {placa}.")
-                    enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, placa)
+                    enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa)
                 del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
