@@ -32,6 +32,7 @@ def obtener_datos(unidades):
         if response.status_code == 200:
             try:
                 transmisiones = response.json()
+                transmisiones = transmisiones.unidad=unidad['unitnumber']
 
                 # if isinstance(transmisiones, list) and len(transmisiones) > 0:
                 #     for data in transmisiones:
