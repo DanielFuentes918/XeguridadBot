@@ -576,11 +576,14 @@ def mostrar_imagen():
     # 'static' es la carpeta en la que está almacenada la imagen
     return send_from_directory('static', 'logo_xeguridad.png')
 
-@app.route('/units_data')
+@app.route('/units_data', methods=['GET'])
 def obtener_datos_route():
-    unidades = obtener_unidades()  # Llama a la función para obtener la lista de unidades
-    datos = obtener_datos(unidades)  # Llama a la función original para obtener los datos
-    return jsonify(datos)  # Devuelve los datos como JSON a través de la ruta
+    unidades = obtener_unidades()
+    if unidades:
+        datos = obtener_datos(unidades)
+        return jsonify(datos)  # Devuelve los datos en formato JSON
+    else:
+        return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
 
 if __name__ == "__main__":
