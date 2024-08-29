@@ -31,23 +31,26 @@ def obtener_datos(unidades):
 
         if response.status_code == 200:
             try:
+                # Convertir la respuesta a JSON
                 transmisiones = response.json()
-                transmisiones = transmisiones.unidad=unidad['unitnumber']
 
-                # if isinstance(transmisiones, list) and len(transmisiones) > 0:
-                #     for data in transmisiones:
-                #         # Verificar si las claves existen antes de acceder a ellas
-                #         ultima_transmision = data.get('datetime_utc', 'Desconocido')
-                #         nombre_unidad = data.get('name', 'Nombre no disponible')
-                #         units_data.append({'unitnumber': unidad['unitnumber'], 'ultima_trans': ultima_transmision, 'nombre': nombre_unidad})
-                # else:
-                #     print(f"No hay transmisiones para la unidad {unidad['unitnumber']}")
+                # Asegurarse de que transmisiones sea una lista o convertirla en una
+                if isinstance(transmisiones, list):
+                    for data in transmisiones:
+                        # Añadir el número de unidad a cada registro de transmisión
+                        data['unitnumber'] = unidad['unitnumber']
+                    units_data.extend(transmisiones)  # Agregar las transmisiones procesadas
+                else:
+                    # Si no es una lista, crear una lista con el único elemento
+                    units_data.append(transmisiones)
+                    units_data[-1]['unitnumber'] = unidad['unitnumber']
+                    
             except Exception as e:
                 print(f"Error al procesar las transmisiones: {e}")
         else:
             print(f"Error en la solicitud: {response.status_code} - {response.text}")
 
-    return transmisiones
+    return units_data  # Retornar todos los datos de las unidades
 
 def obtener_unidades():
     # Realizar la solicitud para obtener todas las unidades
