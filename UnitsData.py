@@ -80,3 +80,6 @@ def main():
         print(f"Datos de las unidades: {datos_unidades}")
     else:
         print("No se obtuvieron unidades.")
+
+if __name__ == '__main__':
+    main.run(debug=True)
