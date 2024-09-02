@@ -1,10 +1,6 @@
 import os
-from dotenv import load_dotenv
 import requests
 from whatsapp_templates import TEMPLATES
-
-# Cargar las variables de entorno desde el archivo .env
-load_dotenv()
 
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
@@ -42,6 +38,50 @@ def enviar_mensaje_whatsapp(numero, template_key, components=None):
 
 # Funciones específicas para enviar mensajes con diferentes plantillas
 
+def enviar_auth_template(numero, placa):
+    components = [
+        {
+            "type": "body",
+            "parameters": [
+                {"type": "text", "text": placa}
+            ]
+        }
+    ]
+    return enviar_mensaje_whatsapp(numero, "AUTH_TEMPLATE", components)
+
+def enviar_auth_failed_template(numero, placa):
+    components = [
+        {
+            "type": "body",
+            "parameters": [
+                {"type": "text", "text": placa}
+            ]
+        }
+    ]
+    return enviar_mensaje_whatsapp(numero, "AUTH_FAILED_TEMPLATE", components)
+
+def enviar_menu_template(numero, placa):
+    components = [
+        {
+            "type": "body",
+            "parameters": [
+                {"type": "text", "text": placa}
+            ]
+        }
+    ]
+    return enviar_mensaje_whatsapp(numero, "MENU_TEMPLATE", components)
+
+def enviar_solicitud_unidad_comandos_template(numero, placa):
+    components = [
+        {
+            "type": "body",
+            "parameters": [
+                {"type": "text", "text": placa}
+            ]
+        }
+    ]
+    return enviar_mensaje_whatsapp(numero, "SOLICITUD_UNIDAD_COMANDOS_TEMPLATE", components)
+
 def enviar_cargando_comandos(numero, placa):
     components = [
         {
@@ -53,39 +93,34 @@ def enviar_cargando_comandos(numero, placa):
     ]
     return enviar_mensaje_whatsapp(numero, "CARGANDO_COMANDOS_TEMPLATE_NAME", components)
 
-def enviar_placa_no_encontrada(numero, placa):
-    components = [
-        {
-            "type": "body",
-            "parameters": [
-                {"type": "text", "text": placa}
-            ]
-        }
-    ]
-    return enviar_mensaje_whatsapp(numero, "PLACA_NO_ENCONTRADA_TEMPLATE", components)
-
 def enviar_ubicacion_comando(numero, longitud, latitud, address, datetime_actual):
     components = [
         {
             "type": "header",
-            "parameters": [
-                {
-                    "type": "location",
-                    "location": {
-                        "longitude": longitud,
-                        "latitude": latitud,
-                        "name": f"{latitud},{longitud}",
-                        "address": address
-                    }
-                }
-            ]
+                    "parameters": [
+                        {
+                            "type": "location",
+                            "location": {
+                                "longitude": longitud,
+                                "latitude": latitud,
+                                "name": str(latitud)+","+str(longitud),
+                                "address": str(latitud)+","+str(longitud)
+                            }
+                        }
+                    ]
         },
         {
             "type": "body",
-            "parameters": [
-                {"type": "text", "text": address},
-                {"type": "text", "text": datetime_actual.strftime("%Y-%m-%d %H:%M:%S")}
-            ]
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": address
+                        },
+                        {
+                            "type": "text",
+                            "text": datetime_actual.strftime("%Y-%m-%d %H:%M:%S")
+                        }
+                    ]
         }
     ]
     return enviar_mensaje_whatsapp(numero, "RESPUESTA_COMANDOS_TEMPLATE", components)
@@ -94,47 +129,34 @@ def enviar_comando_no_recibido(numero, longitud, latitud, address, datetime_actu
     components = [
         {
             "type": "header",
-            "parameters": [
-                {
-                    "type": "location",
-                    "location": {
-                        "longitude": longitud,
-                        "latitude": latitud,
-                        "name": f"{latitud},{longitud}",
-                        "address": address
-                    }
-                }
-            ]
+                    "parameters": [
+                        {
+                            "type": "location",
+                            "location": {
+                                "longitude": longitud,
+                                "latitude": latitud,
+                                "name": str(latitud)+","+str(longitud),
+                                "address": str(latitud)+","+str(longitud)
+                            }
+                        }
+                    ]
         },
         {
             "type": "body",
-            "parameters": [
-                {"type": "text", "text": placa},
-                {"type": "text", "text": datetime_actual.strftime("%Y-%m-%d %H:%M:%S")},
-                {"type": "text", "text": address}
-            ]
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": placa
+                        },
+                        {
+                            "type": "text",
+                            "text": datetime_actual.strftime("%Y-%m-%d %H:%M:%S")  # Convertir a cadena de texto
+                        },
+                        {
+                            "type": "text",
+                            "text": address
+                        }
+                    ]
         }
     ]
     return enviar_mensaje_whatsapp(numero, "COMANDO_NO_RECIBIDO_TEMPLATE", components)
-
-def prueba_envio_mensaje(numero):
-    """
-    Función para probar el envío de un mensaje utilizando la plantilla 'MENU_TEMPLATE_NAME'.
-    """
-    # Define los componentes que quieres enviar con la plantilla, si es necesario
-    components = [
-        {
-            "type": "body",
-            "parameters": [
-                {"type": "text", "text": "Este es un mensaje de prueba."}
-            ]
-        }
-    ]
-    
-    # Llama a la función `enviar_mensaje_whatsapp` para enviar el mensaje
-    status_code = enviar_mensaje_whatsapp(numero, "MENU_TEMPLATE_NAME", components)
-    
-    if status_code == 200:
-        print("Mensaje enviado exitosamente.")
-    else:
-        print(f"Fallo en el envío del mensaje. Código de estado: {status_code}")
