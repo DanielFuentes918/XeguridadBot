@@ -32,8 +32,8 @@ XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
 USUARIO_MONGO = "admin"
-CONTRASEÑA_MONGO = os.getenv("MONGO_DB_PASSWORD")
-CONTRASEÑA_MONGO_ESCAPADA = quote_plus(CONTRASEÑA_MONGO)
+PASSWORD_MONGO = os.getenv("MONGO_DB_PASSWORD")
+PASSWORD_MONGO_ESCAPADA = quote_plus(PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
 
@@ -50,7 +50,7 @@ usuarios_autenticados = {}
 
 usuarios_esperando_password = {}
 
-uri = f"mongodb://{USUARIO_MONGO}:{CONTRASEÑA_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
+uri = f"mongodb://{USUARIO_MONGO}:{PASSWORD_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
 
 # Conexion a MongoDB con manejo de excepciones
 try:
