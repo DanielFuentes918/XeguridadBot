@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 from auth import autenticar_usuario, verificar_sesion_activa
 from mongodb import db, serialize_document, collectionUsuarios
-from whatsapp import enviar_mensaje_whatsapp, enviar_auth_template, enviar_auth_failed_template, enviar_menu_template, enviar_solicitud_unidad_comandos_template, enviar_cargando_comandos, enviar_placa_no_encontrada_template, enviar_ubicacion_comando, enviar_comando_no_recibido
+from whatsapp import enviar_auth_template, enviar_auth_failed_template, enviar_menu_template, enviar_solicitud_unidad_comandos_template, enviar_cargando_comandos_template, enviar_placa_no_encontrada_template, enviar_respuesta_comandos_template, enviar_comando_no_recibido_template
 from datetime import datetime
 from datetime import datetime, timedelta
 from BotCrawler import execute_crawler
@@ -92,13 +92,13 @@ def manejar_mensaje_entrante(mensaje):
         if datetime.now() - hora_autenticacion > timedelta(hours=24):
             print("Sesión expirada. El usuario necesita autenticarse de nuevo.")
             del usuarios_autenticados[numero]
-            manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
+            enviar_auth_template(numero)# Envía mensaje solicitando autenticación
             return
         
         # Si el usuario está autenticado, manejar comandos
         if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
             if cuerpo_mensaje == "Mandar comandos a unidad":
-                manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
+                enviar_solicitud_unidad_comandos_template(numero)
                 esperando_placa[numero] = True
             elif numero in esperando_placa:
                 placa = cuerpo_mensaje.upper()
@@ -119,29 +119,29 @@ def manejar_mensaje_entrante(mensaje):
                         print("Error al ejecutar el crawler.")
                 else:
                     print(f"No se encontró el unitnumber para la placa {placa}.")
-                    enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa)
+                    enviar_cargando_comandos_template(numero)
                 del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
                 # enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)
-                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)
+                enviar_menu_template(numero)
     
     else:
         # Usuario no autenticado
         if numero not in usuarios_esperando_password:
             # Envía la plantilla solicitando la contraseña
-            manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
+            enviar_auth_template(numero)
             usuarios_esperando_password[numero] = True  # Ahora está esperando una contraseña
         else:
             # El usuario ha enviado la contraseña, ahora la autenticamos
             if autenticar_usuario(numero, cuerpo_mensaje):
                 print("Autenticación exitosa. Bienvenido.")
                 # enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)  
-                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME) # Envía el menú de opciones tras autenticación
+                enviar_menu_template(numero) # Envía el menú de opciones tras autenticación
                 del usuarios_esperando_password[numero]  # Ya no está esperando la contraseña
             else:
                 print("Autenticación fallida. Usuario o contraseña incorrectos.")
-                manejar_respuesta_usuario(numero, AUTH_FAILED_TEMPLATE)  # Envía mensaje de fallo de autenticación
+                enviar_auth_failed_template(numero)  # Envía mensaje de fallo de autenticación
                 del usuarios_esperando_password[numero]  # Resetear el proceso de autenticación
 
 def manejar_respuesta_usuario(numero, template_name):
@@ -208,12 +208,12 @@ def obtener_ultima_transmision(unitnumber, numero):
             hora_envio_placa = user_requests[numero]['hora']
             if fecha_hora_obj >= hora_envio_placa:
                 #numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, datetime_actual
-                enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, fecha_hora_obj)
+                # enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, fecha_hora_obj)
+                enviar_respuesta_comandos_template(numero, transmision["longitude"], transmision["latitude"], transmision.get("address"), [], fecha_hora_obj)
             else:
                 
                 print("PLACA::",placa)
-                #(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components, datetime_actual):
-                enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, latitud, address, components, fecha_hora_obj, placa)
+                enviar_comando_no_recibido_template(numero, transmision["longitude"], transmision["latitude"], transmision.get("address"), [], datetime_actual, placa)
         else:
             return "No se encontró la última transmisión."
     else:

@@ -38,62 +38,31 @@ def enviar_mensaje_whatsapp(numero, template_key, components=None):
 
 # Funciones específicas para enviar mensajes con diferentes plantillas
 
-def enviar_auth_template(numero, placa):
-    components = [
-        {
-            "type": "body",
-            "parameters": [
-                {"type": "text", "text": placa}
-            ]
-        }
-    ]
+def enviar_auth_template(numero):
+    components = []
     return enviar_mensaje_whatsapp(numero, "AUTH_TEMPLATE", components)
 
-def enviar_auth_failed_template(numero, placa):
-    components = [
-        {
-            "type": "body",
-            "parameters": [
-                {"type": "text", "text": placa}
-            ]
-        }
-    ]
+def enviar_auth_failed_template(numero):
+    components = []
     return enviar_mensaje_whatsapp(numero, "AUTH_FAILED_TEMPLATE", components)
 
-def enviar_menu_template(numero, placa):
-    components = [
-        {
-            "type": "body",
-            "parameters": [
-                {"type": "text", "text": placa}
-            ]
-        }
-    ]
+def enviar_menu_template(numero):
+    components = []
     return enviar_mensaje_whatsapp(numero, "MENU_TEMPLATE", components)
 
-def enviar_solicitud_unidad_comandos_template(numero, placa):
-    components = [
-        {
-            "type": "body",
-            "parameters": [
-                {"type": "text", "text": placa}
-            ]
-        }
-    ]
+def enviar_solicitud_unidad_comandos_template(numero):
+    components = []
     return enviar_mensaje_whatsapp(numero, "SOLICITUD_UNIDAD_COMANDOS_TEMPLATE", components)
 
-def enviar_cargando_comandos(numero, placa):
-    components = [
-        {
-            "type": "body",
-            "parameters": [
-                {"type": "text", "text": placa}
-            ]
-        }
-    ]
+def enviar_cargando_comandos_template(numero):
+    components = []
     return enviar_mensaje_whatsapp(numero, "CARGANDO_COMANDOS_TEMPLATE_NAME", components)
 
-def enviar_ubicacion_comando(numero, longitud, latitud, address, datetime_actual):
+def enviar_placa_no_encontrada_template(numero):
+    components = []
+    return enviar_mensaje_whatsapp(numero, "PLACA_NO_ENCONTRADA_TEMPLATE", components)
+
+def enviar_respuesta_comandos_template(numero, longitud, latitud, address, components, datetime_actual):
     components = [
         {
             "type": "header",
@@ -125,7 +94,7 @@ def enviar_ubicacion_comando(numero, longitud, latitud, address, datetime_actual
     ]
     return enviar_mensaje_whatsapp(numero, "RESPUESTA_COMANDOS_TEMPLATE", components)
 
-def enviar_comando_no_recibido(numero, longitud, latitud, address, datetime_actual, placa):
+def enviar_comando_no_recibido_template(numero, longitud, latitud, address, datetime_actual, placa):
     components = [
         {
             "type": "header",
