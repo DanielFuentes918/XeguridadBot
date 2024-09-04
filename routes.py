@@ -111,7 +111,8 @@ def manejar_mensaje_entrante(mensaje):
                         "hora": datetime.now()
                     }
                     # enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa) 
-                    manejar_respuesta_usuario(numero, CARGANDO_COMANDOS_TEMPLATE_NAME) # Enviar plantilla de cargando
+                    # manejar_respuesta_usuario(numero, CARGANDO_COMANDOS_TEMPLATE_NAME)
+                    enviar_cargando_comandos_template(numero) # Enviar plantilla de cargando
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
                         obtener_ultima_transmision(unitnumber, numero)
@@ -119,7 +120,7 @@ def manejar_mensaje_entrante(mensaje):
                         print("Error al ejecutar el crawler.")
                 else:
                     print(f"No se encontró el unitnumber para la placa {placa}.")
-                    enviar_cargando_comandos_template(numero)
+                    enviar_placa_no_encontrada_template(numero)
                 del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
@@ -143,11 +144,6 @@ def manejar_mensaje_entrante(mensaje):
                 print("Autenticación fallida. Usuario o contraseña incorrectos.")
                 enviar_auth_failed_template(numero)  # Envía mensaje de fallo de autenticación
                 del usuarios_esperando_password[numero]  # Resetear el proceso de autenticación
-
-def manejar_respuesta_usuario(numero, template_name):
-    components = []  # Añadir los parámetros necesarios si los hay
-    response_status = enviar_mensaje_whatsapp(numero, template_name, components)
-    print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
 def buscar_unitnumber_por_placa(placa):
     params = {
