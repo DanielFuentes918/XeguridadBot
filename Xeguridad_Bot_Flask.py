@@ -35,7 +35,6 @@ USUARIO_MONGO = "admin"
 PASSWORD_MONGO = os.getenv("MONGO_DB_PASSWORD")
 PASSWORD_MONGO_ESCAPADA = (PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
-collectionUsuarios = 'usuarios'
 AUTH_DB = "admin"
 
 # Diccionario para rastrear números de teléfono que esperan una placa
@@ -50,6 +49,10 @@ user_requests = {}
 usuarios_autenticados = {}
 
 usuarios_esperando_password = {}
+
+client = MongoClient('mongodb://localhost:27017/')
+db = client['BASE_DATOS_MONGO']
+collectionUsuarios = db['usuarios']
 
 uri = f"mongodb://{USUARIO_MONGO}:{PASSWORD_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
 
