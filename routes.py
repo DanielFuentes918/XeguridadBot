@@ -14,7 +14,7 @@ from flask import Flask, send_from_directory
 import os
 
 # Configura tu verify token aquí
-VERIFY_TOKEN = "9189189189"
+VERIFY_TOKEN = "Exa@2024.."
 WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
 WHATSAPP_API_TOKEN = "EAAFiQXfoAV4BO10PdMbULG2wAmGa108puKpkvVzOzWiSMAusEp4xinrQ8DqcORjWZCzQ07DlNIR3jrcsNGbHVFx0zaJOOzn0GurZC0aTCATmCarHUgne5wWhdNp7qDQvpRMZBwFeWOOWC5ZCDpkmfjRUCMG5s51w4YlB7w1XZBdOgqQfENknQ4XdNsNWHQsZBGSQZDZD"
 NAMESPACE = "Xeguridad"
