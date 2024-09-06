@@ -7,6 +7,7 @@ from utils import extraer_placa
 import requests
 import bcrypt
 from pymongo import MongoClient
+from urllib.parse import quote_plus
 import re
 from UnitsData import obtener_datos, obtener_unidades
 from flask import Flask, send_from_directory
@@ -20,7 +21,7 @@ XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
 USUARIO_MONGO = "exasa"
 PASSWORD_MONGO = os.getenv("MONGO_DB_PASSWORD")
-PASSWORD_MONGO_ESCAPADA = (PASSWORD_MONGO)
+PASSWORD_MONGO_ESCAPADA = quote_plus(PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
 
