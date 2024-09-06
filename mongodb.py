@@ -2,7 +2,7 @@ import os
 from urllib.parse import quote_plus
 from pymongo import MongoClient
 
-USUARIO_MONGO = "admin"
+USUARIO_MONGO = "exasa"
 CONTRASEÑA_MONGO = os.getenv("MONGO_DB_PASSWORD")
 CONTRASEÑA_MONGO_ESCAPADA = quote_plus(CONTRASEÑA_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
