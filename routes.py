@@ -298,6 +298,3 @@ def obtener_datos_route():
         return jsonify(datos)  # Devuelve los datos en formato JSON
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
-    
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5001)
