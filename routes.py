@@ -1,6 +1,4 @@
 from flask import Flask, request, jsonify, render_template
-from auth import autenticar_usuario, verificar_sesion_activa
-from mongodb import db, serialize_document, collectionUsuarios
 from whatsapp import enviar_auth_template, enviar_auth_failed_template, enviar_menu_template, enviar_solicitud_unidad_comandos_template, enviar_cargando_comandos_template, enviar_placa_no_encontrada_template, enviar_respuesta_comandos_template, enviar_comando_no_recibido_template
 from datetime import datetime
 from datetime import datetime, timedelta
