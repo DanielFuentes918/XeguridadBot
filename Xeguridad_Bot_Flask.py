@@ -134,10 +134,16 @@ def manejar_mensaje_entrante(mensaje):
         return
     ultimos_mensajes[numero] = message_id
 
+    # Detectar si el usuario es nuevo o no está autenticado
+    if numero not in usuarios_autenticados and numero not in usuarios_esperando_password:
+        # Usuario no autenticado ni en proceso de autenticación, se envía el starter menu
+        manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
+        return  # Detenemos el flujo aquí hasta que el usuario responda
+
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
         cuerpo_mensaje = mensaje['button']['payload']
-    else:
+    else:   
         cuerpo_mensaje = mensaje.get('text', {}).get('body', '')
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
