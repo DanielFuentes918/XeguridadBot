@@ -2,8 +2,8 @@ import os
 import requests
 from whatsapp_templates import TEMPLATES
 
-WHATSAPP_API_URL = "https://graph.facebook.com/v19.0/354178054449225/messages"
-WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
+WHATSAPP_API_URL = "https://graph.facebook.com/v20.0/443756312149340/messages"
+WHATSAPP_API_TOKEN = "EAARCdrR4dXkBO8dUuQyWQG4G6vVMNywfLepNxDZAK3dko619JnEWX5Ar4ZBzheXB77L6fukmQYsNvIMzgQuFXVoAWb1kqwJ1A5VA27X9i7WTDKT5SbHSrQjKpTZAF5TRZAOsFfeIgNxMbddXyMUuYYqy6VB4lqm9KzR98L3ZALqo8pum5JZCZABivP30ZCKPQpQ26rFlcC5mtmwGcZADZBNbr7ZA3jPEzsZD"
 
 def enviar_mensaje_whatsapp(numero, template_key, components=None):
     if components is None:
