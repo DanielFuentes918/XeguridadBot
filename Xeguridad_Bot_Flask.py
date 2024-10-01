@@ -12,6 +12,7 @@ from pruebaCrawler import execute_crawler
 from UnitsData import obtener_datos, obtener_unidades
 from bson.binary import Binary
 from flask import Flask, send_from_directory
+
 app = Flask("Xeguridad_Bot_Flask")
 
 # Configura tu verify token aquí
@@ -201,7 +202,7 @@ def manejar_mensaje_entrante(mensaje):
             if autenticar_usuario(numero, cuerpo_mensaje):
                 print("Autenticación exitosa. Bienvenido.")
                 # enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)  
-                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME) # Envía el menú de opciones tras autenticación
+                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME) # Envía el menSú de opciones tras autenticación
                 del usuarios_esperando_password[numero]  # Ya no está esperando la contraseña
             else:
                 print("Autenticación fallida. Usuario o contraseña incorrectos.")
@@ -209,7 +210,7 @@ def manejar_mensaje_entrante(mensaje):
                 del usuarios_esperando_password[numero]  # Resetear el proceso de autenticación
 
 def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
-    if cuerpo_mensaje.lower() == "xeguridad's bot":
+    if cuerpo_mensaje == "Xeguridad's Bot":
         # Iniciar flujo de autenticación enviando plantilla auth_request
         manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
         usuarios_esperando_password[numero] = True
