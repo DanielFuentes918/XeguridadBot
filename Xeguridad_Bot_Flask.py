@@ -208,6 +208,19 @@ def manejar_mensaje_entrante(mensaje):
                 manejar_respuesta_usuario(numero, AUTH_FAILED_TEMPLATE)  # Envía mensaje de fallo de autenticación
                 del usuarios_esperando_password[numero]  # Resetear el proceso de autenticación
 
+def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
+    if cuerpo_mensaje.lower() == "xeguridad's bot":
+        # Iniciar flujo de autenticación enviando plantilla auth_request
+        manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
+        usuarios_esperando_password[numero] = True
+    #elif cuerpo_mensaje.lower() == "denuncias o reclamos":
+        # Lógica para manejar denuncias o reclamos
+    #    enviar_template_denuncias(numero)
+    #else:
+        # Si el mensaje no coincide, reenviar el starter menu
+    #S    enviar_starter_menu(numero)
+
+
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
     response_status = enviar_mensaje_whatsapp(numero, template_name, components)
