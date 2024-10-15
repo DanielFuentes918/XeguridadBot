@@ -210,7 +210,7 @@ def manejar_mensaje_entrante(mensaje):
                 del usuarios_esperando_password[numero]  # Resetear el proceso de autenticación
 
 def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
-    if cuerpo_mensaje == "Xeguridad's Bot":
+    if cuerpo_mensaje == "Xeguridad":
         # Iniciar flujo de autenticación enviando plantilla auth_request
         manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
         usuarios_esperando_password[numero] = True
