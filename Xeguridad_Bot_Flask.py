@@ -18,7 +18,7 @@ app = Flask("Xeguridad_Bot_Flask")
 # Configura tu verify token aquí
 VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = "https://graph.facebook.com/v20.0/443756312149340/messages"
-WHATSAPP_API_TOKEN = "EAARCdrR4dXkBO2sboIJNXUgPoqtP82K05xfKi0GFNwxEI4ZB9eIf6hQTc6Y8X9MOMmBCkouJHtghu01lLWPlXAmtRrPmmHMQXkfqPKnmWH7Ps6ydy63J4UKVsQGminSLkOMgfhZAUGgasMDARZABvOZBChXWjZABJc7LqHOGeli7pFZCJC0Ws9fHoN3BlTBVfJFjroz6Nso3FzmiZBnooEvtOXiomG0"
+WHATSAPP_API_TOKEN = "EAARCdrR4dXkBO2JD0QHUnhjbji9NHpeAmF3LpkEAKmY3H1svnVXew6aZAy53Uq7gLtvr0sBtxnz2pAU4dc8O6lSrqyCxRiK2yLIxuPJY49rmXTrOWZB1J1WAUbPAvA9LV1u7WJhUXyDfazUGDuFLESHPYi3T15nZASam7sGJ348eidoSamg7bucdZCG3clYP"
 NAMESPACE = "Xeguridad"
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
@@ -214,12 +214,9 @@ def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
         # Iniciar flujo de autenticación enviando plantilla auth_request
         manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
         usuarios_esperando_password[numero] = True
-    #elif cuerpo_mensaje.lower() == "denuncias o reclamos":
+    #else cuerpo_mensaje.lower() == "denuncias o reclamos":
         # Lógica para manejar denuncias o reclamos
     #    enviar_template_denuncias(numero)
-    #else:
-        # Si el mensaje no coincide, reenviar el starter menu
-    #S    enviar_starter_menu(numero)
 
 
 def manejar_respuesta_usuario(numero, template_name):
