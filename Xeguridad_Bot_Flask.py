@@ -117,29 +117,24 @@ def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
     message_id = mensaje.get('id')
-    cuerpo_mensaje = ""
+    cuerpo_mensaje = ""  # Cambiado a cadena vacía
     usuario = collectionUsuarios.find_one({'telefono': numero})
     components = []
 
     if usuario:
-        # Si el usuario es encontrado, puedes acceder a su nombre
         nombre_usuario = usuario['nombre']
         print(f"Nombre del usuario: {nombre_usuario}")
     else:
-        # Si el usuario no es encontrado
         print("Usuario no encontrado.")
 
-    # Evitar procesar el mismo mensaje dos veces
     if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
         print(f"Mensaje duplicado detectado: {message_id}")
         return
     ultimos_mensajes[numero] = message_id
 
-    # Detectar si el usuario es nuevo o no está autenticado
     if numero not in usuarios_autenticados and numero not in usuarios_esperando_password:
-        # Usuario no autenticado ni en proceso de autenticación, se envía el starter menu
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
-        return  # Detenemos el flujo aquí hasta que el usuario responda
+        return
 
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
@@ -162,15 +157,14 @@ def manejar_mensaje_entrante(mensaje):
     if numero in usuarios_autenticados:
         hora_autenticacion = usuarios_autenticados[numero]
         
-        # Verificar si la sesión ha expirado (más de 24 horas)
         if datetime.now() - hora_autenticacion > timedelta(hours=24):
             print("Sesión expirada. El usuario necesita autenticarse de nuevo.")
             del usuarios_autenticados[numero]
-            manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Envía mensaje solicitando autenticación
+            manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
             return
         
         # Si el usuario está autenticado, manejar comandos
-        if cuerpo_mensaje.strip():  # Si el mensaje no está vacío
+        if cuerpo_mensaje.strip(): 
             if cuerpo_mensaje == "Mandar comandos a unidad":
                 manejar_respuesta_usuario(numero, SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
                 esperando_placa[numero] = True
@@ -184,8 +178,7 @@ def manejar_mensaje_entrante(mensaje):
                         "placa": placa,
                         "hora": datetime.now()
                     }
-                    # enviar_cargando_comandos(numero, CARGANDO_COMANDOS_TEMPLATE_NAME, components, placa) 
-                    manejar_respuesta_usuario(numero, CARGANDO_COMANDOS_TEMPLATE_NAME) # Enviar plantilla de cargando
+                    manejar_respuesta_usuario(numero, CARGANDO_COMANDOS_TEMPLATE_NAME)
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
                         obtener_ultima_transmision(unitnumber, numero)
@@ -194,40 +187,35 @@ def manejar_mensaje_entrante(mensaje):
                 else:
                     print(f"No se encontró el unitnumber para la placa {placa}.")
                     enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components, placa)
-                del esperando_placa[numero]  # Eliminamos el número de teléfono del diccionario
+                del esperando_placa[numero]  
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                # enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)
                 manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)
-    
+
     else:
-        # Usuario no autenticado
         if numero not in usuarios_esperando_password:
-            # Envía la plantilla solicitando la contraseña
             manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
-            usuarios_esperando_password[numero] = True  # Ahora está esperando una contraseña
+            usuarios_esperando_password[numero] = True
         else:
-            # El usuario ha enviado la contraseña, ahora la autenticamos
             if autenticar_usuario(numero, cuerpo_mensaje):
                 print("Autenticación exitosa. Bienvenido.")
-                # enviar_menu(numero, MENU_TEMPLATE_NAME, components, nombre_usuario)  
-                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME) # Envía el menSú de opciones tras autenticación
-                del usuarios_esperando_password[numero]  # Ya no está esperando la contraseña
+                manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)
+                del usuarios_esperando_password[numero]  
             else:
                 print("Autenticación fallida. Usuario o contraseña incorrectos.")
-                manejar_respuesta_usuario(numero, AUTH_FAILED_TEMPLATE)  # Envía mensaje de fallo de autenticación
-                del usuarios_esperando_password[numero]  # Resetear el proceso de autenticación
+                manejar_respuesta_usuario(numero, AUTH_FAILED_TEMPLATE)
+                del usuarios_esperando_password[numero]  
 
 def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
     print(f"Cuerpo del mensaje recibido: {cuerpo_mensaje}")
-    if cuerpo_mensaje.lower() == "xeguridad":
+    if cuerpo_mensaje.strip().lower() == "xeguridad":
         manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
         usuarios_esperando_password[numero] = True
-    #elif cuerpo_mensaje.lower() == "denuncias o reclamos":
-        # Lógica para manejar denuncias o reclamos
-        #enviar_template_denuncias(numero)
-    #else:
-        #print("Opción no válida del menú inicial.")
+    # elif cuerpo_mensaje.lower() == "denuncias o reclamos":
+    #     enviar_template_denuncias(numero)
+    # else:
+    #     print("Opción no válida del menú inicial.")
+
 
 
 
