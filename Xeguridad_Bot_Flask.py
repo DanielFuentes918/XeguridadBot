@@ -52,6 +52,8 @@ usuarios_autenticados = {}
 
 usuarios_esperando_password = {}
 
+usuarios_en_starter_menu = {}
+
 uri = f"mongodb://{USUARIO_MONGO}:{CONTRASEÑA_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
 
 # Conexion a MongoDB con manejo de excepciones
@@ -134,9 +136,10 @@ def manejar_mensaje_entrante(mensaje):
 
     print(numero,usuarios_autenticados,usuarios_esperando_password)
 
-    if numero not in usuarios_autenticados and numero not in usuarios_esperando_password:
+    if numero not in usuarios_autenticados and numero not in usuarios_esperando_password and numero not in usuarios_en_starter_menu:
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
         print("Usuario no autenticado. Enviando menú inicial.")
+        usuarios_en_starter_menu[numero] = True
         return
 
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
