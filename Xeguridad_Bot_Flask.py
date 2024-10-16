@@ -140,6 +140,9 @@ def manejar_mensaje_entrante(mensaje):
         # Usuario no autenticado ni en proceso de autenticación, se envía el starter menu
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
         return  # Detenemos el flujo aquí hasta que el usuario responda
+    
+    if cuerpo_mensaje == "Xeguridad":
+        manejar_starter_menu_respuesta(numero, cuerpo_mensaje)
 
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
@@ -254,40 +257,6 @@ def extraer_placa(nombre):
         print("No se encontró una placa en el nombre")
     return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
 
-# def enviar_menu(numero, MENU_TEMPLATE_NAME, components, usuario_nombre):
-#     headers = {
-#         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
-#         'Content-Type': 'application/json'
-#     }
-#     data = {
-#         'messaging_product': 'whatsapp',
-#         'to': numero,
-#         'type': 'template',
-#         'template': {
-#             'namespace': NAMESPACE,
-#             'name': MENU_TEMPLATE_NAME,
-#             'language': {
-#                 'policy': 'deterministic',
-#                 'code': 'es'
-#             },
-#             'components': [
-#                 {
-#                     "type": "body",
-#                     "parameters": components + [
-#                         {
-#                             "type": "text",
-#                             "text": usuario_nombre
-#                         },
-#                     ]
-#                 }
-#             ]
-#         }
-#     }
-#     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
-#     print(f"Estado de la respuesta: {response.status_code}")
-#     print(f"Contenido de la respuesta: {response.text}")
-#     return response.status_code
-
 def obtener_ultima_transmision(unitnumber, numero):
     params = {
         'commandname': 'get_last_transmit',
@@ -314,9 +283,6 @@ def obtener_ultima_transmision(unitnumber, numero):
             fecha_hora_obj = datetime.strptime(datetime_actual, "%Y-%m-%d %H:%M:%S") 
             placa = user_requests[numero]['placa']
             components = []
-            #def enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE, longitud, latitud, address, components):
-            #enviar_ubicacion_comando(numero, RESPUESTA_COMANDOS_TEMPLATE,longitud, latitud, address, components, fecha_hora_obj, placa)
-            #return f"Latitud: {latitud}, Longitud: {longitud}, Dirección: {address}, Perímetro: {perimeter}, Fecha y Hora: {datetime_actual}"
 
             hora_envio_placa = user_requests[numero]['hora']
             if fecha_hora_obj >= hora_envio_placa:
@@ -409,40 +375,6 @@ def enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components,
     print(f"Estado de la respuesta: {response.status_code}")
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
-
-# def enviar_cargando_comandos(numero, template_name, components, placa):
-#     headers = {
-#         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
-#         'Content-Type': 'application/json'
-#     }
-#     data = {
-#         'messaging_product': 'whatsapp',
-#         'to': numero,
-#         'type': 'template',
-#         'template': {
-#             'namespace': NAMESPACE,
-#             'name': template_name,
-#             'language': {
-#                 'policy': 'deterministic',
-#                 'code': 'es'
-#             },
-#             'components': [
-#                 {
-#                     "type": "body",
-#                     "parameters": components + [
-#                         {
-#                             "type": "text",
-#                             "text": placa
-#                         },
-#                     ]
-#                 }
-#             ]    
-#         }
-#     }
-#     response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
-#     print(f"Estado de la respuesta: {response.status_code}")
-#     print(f"Contenido de la respuesta: {response.text}")
-#     return response.status_code
 
 def enviar_comando_no_recibido(numero, COMANDO_NO_RECIBIDO_TEMPLATE, longitud, latitud, address, components, datetime_actual, placa):
     headers = {
