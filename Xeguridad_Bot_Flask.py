@@ -136,6 +136,7 @@ def manejar_mensaje_entrante(mensaje):
 
     if numero not in usuarios_autenticados and numero not in usuarios_esperando_password:
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
+        print("Usuario no autenticado. Enviando menú inicial.")
         return
 
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
