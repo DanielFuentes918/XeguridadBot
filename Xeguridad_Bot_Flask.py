@@ -140,9 +140,6 @@ def manejar_mensaje_entrante(mensaje):
         # Usuario no autenticado ni en proceso de autenticación, se envía el starter menu
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
         return  # Detenemos el flujo aquí hasta que el usuario responda
-    
-    if cuerpo_mensaje == "Xeguridad":
-        manejar_starter_menu_respuesta(numero, cuerpo_mensaje)
 
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
@@ -151,6 +148,16 @@ def manejar_mensaje_entrante(mensaje):
         cuerpo_mensaje = mensaje.get('text', {}).get('body', '')
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
+
+    # Llama a manejar_starter_menu_respuesta si el usuario no está autenticado
+    if numero not in usuarios_autenticados:
+        if cuerpo_mensaje.strip() == "Xeguridad":
+            manejar_starter_menu_respuesta(numero, cuerpo_mensaje)
+            return  # Detenemos el flujo aquí
+        else:
+            # Si se recibe otro mensaje del menú, se puede manejar aquí
+            print("El usuario no está autenticado, pero envió otro mensaje.")
+            return
 
     # Verificar autenticación del usuario
     if numero in usuarios_autenticados:
@@ -213,14 +220,16 @@ def manejar_mensaje_entrante(mensaje):
                 del usuarios_esperando_password[numero]  # Resetear el proceso de autenticación
 
 def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
-    print(cuerpo_mensaje)
-    if cuerpo_mensaje == "Xeguridad":
-        # Iniciar flujo de autenticación enviando plantilla auth_request
+    print(f"Cuerpo del mensaje recibido: {cuerpo_mensaje}")
+    if cuerpo_mensaje.lower() == "xeguridad":
         manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
         usuarios_esperando_password[numero] = True
-    #else cuerpo_mensaje.lower() == "denuncias o reclamos":
+    #elif cuerpo_mensaje.lower() == "denuncias o reclamos":
         # Lógica para manejar denuncias o reclamos
-    #    enviar_template_denuncias(numero)
+        #enviar_template_denuncias(numero)
+    #else:
+        #print("Opción no válida del menú inicial.")
+
 
 
 def manejar_respuesta_usuario(numero, template_name):
