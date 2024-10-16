@@ -117,7 +117,7 @@ def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
     message_id = mensaje.get('id')
-    cuerpo_mensaje = " "
+    cuerpo_mensaje = ""
     usuario = collectionUsuarios.find_one({'telefono': numero})
     components = []
 
@@ -151,11 +151,10 @@ def manejar_mensaje_entrante(mensaje):
 
     # Llama a manejar_starter_menu_respuesta si el usuario no está autenticado
     if numero not in usuarios_autenticados:
-        if cuerpo_mensaje.strip() == "Xeguridad":
+        if cuerpo_mensaje.strip().lower() == "xeguridad":
             manejar_starter_menu_respuesta(numero, cuerpo_mensaje)
             return  # Detenemos el flujo aquí
         else:
-            # Si se recibe otro mensaje del menú, se puede manejar aquí
             print("El usuario no está autenticado, pero envió otro mensaje.")
             return
 
