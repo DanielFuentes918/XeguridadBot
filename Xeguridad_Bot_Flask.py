@@ -202,7 +202,6 @@ def manejar_mensaje_entrante(mensaje):
         if numero not in usuarios_esperando_password:
             manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
             usuarios_esperando_password[numero] = True
-            return
         else:
             if autenticar_usuario(numero, cuerpo_mensaje):
                 print("Autenticación exitosa. Bienvenido.")
