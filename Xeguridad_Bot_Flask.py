@@ -136,7 +136,7 @@ def manejar_mensaje_entrante(mensaje):
 
     print(usuarios_autenticados,usuarios_esperando_password, usuarios_en_starter_menu)
 
-    if numero not in usuarios_autenticados and numero not in usuarios_esperando_password and numero not in usuarios_en_starter_menu:
+    if (numero not in usuarios_autenticados) and (numero not in usuarios_esperando_password) and (numero not in usuarios_en_starter_menu):
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
         print("Usuario no autenticado. Enviando menú inicial.")
         usuarios_en_starter_menu[numero] = True
