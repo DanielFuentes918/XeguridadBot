@@ -134,7 +134,7 @@ def manejar_mensaje_entrante(mensaje):
         return
     ultimos_mensajes[numero] = message_id
 
-    print(numero,usuarios_autenticados,usuarios_esperando_password)
+    print(usuarios_autenticados,usuarios_esperando_password, usuarios_en_starter_menu)
 
     if numero not in usuarios_autenticados and numero not in usuarios_esperando_password and numero not in usuarios_en_starter_menu:
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
