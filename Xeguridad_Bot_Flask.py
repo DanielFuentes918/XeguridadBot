@@ -136,7 +136,7 @@ def manejar_mensaje_entrante(mensaje):
 
     print(usuarios_autenticados,usuarios_esperando_password, usuarios_en_starter_menu)
 
-    if numero not in usuarios_autenticados and numero not in usuarios_esperando_password and numero not in usuarios_en_starter_menu:
+    if (numero not in usuarios_autenticados) and (numero not in usuarios_esperando_password) and (numero not in usuarios_en_starter_menu):
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
         print("Usuario no autenticado. Enviando menú inicial.")
         usuarios_en_starter_menu[numero] = True
@@ -202,16 +202,16 @@ def manejar_mensaje_entrante(mensaje):
         if numero not in usuarios_esperando_password:
             manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
             usuarios_esperando_password[numero] = True
+            return
         else:
             if autenticar_usuario(numero, cuerpo_mensaje):
                 print("Autenticación exitosa. Bienvenido.")
                 manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)
-                del usuarios_esperando_password[numero]  
+                del usuarios_esperando_password[numero]
             else:
                 print("Autenticación fallida. Usuario o contraseña incorrectos.")
                 manejar_respuesta_usuario(numero, AUTH_FAILED_TEMPLATE)
                 del usuarios_esperando_password[numero]
-    return
 
 def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
     print(f"Cuerpo del mensaje recibido: {cuerpo_mensaje}")
