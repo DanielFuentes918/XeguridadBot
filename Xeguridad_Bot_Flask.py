@@ -157,7 +157,6 @@ def manejar_mensaje_entrante(mensaje):
             return  # Detenemos el flujo aquí
         else:
             print("El usuario no está autenticado, pero envió otro mensaje.")
-            return
 
     # Verificar autenticación del usuario
     if numero in usuarios_autenticados:
