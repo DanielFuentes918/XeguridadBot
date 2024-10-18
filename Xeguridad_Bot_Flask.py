@@ -29,6 +29,7 @@ CARGANDO_COMANDOS_TEMPLATE_NAME = "lt_command__loading"  # Nombre de la plantill
 RESPUESTA_COMANDOS_TEMPLATE = "lt_command__response"  # Nombre de la plantilla de respuesta de comandos
 COMANDO_NO_RECIBIDO_TEMPLATE = "lt_command__failed"
 PLACA_NO_ENCONTRADA_TEMPLATE = "plate_number_wasnt_find"
+COMPLAINT_CLAIMS_TEMPLATE = "complaint_claims_request"
 
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
@@ -217,10 +218,10 @@ def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
     if cuerpo_mensaje.strip().lower() == "xeguridad":
         manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
         usuarios_esperando_password[numero] = True
-    # elif cuerpo_mensaje.lower() == "denuncias o reclamos":
-    #     enviar_template_denuncias(numero)
-    # else:
-    #     print("Opción no válida del menú inicial.")
+    elif cuerpo_mensaje.lower() == "denuncias o reclamos":
+        manejar_respuesta_usuario(numero, COMPLAINT_CLAIMS_TEMPLATE)
+    else:
+        print("Opción no válida del menú inicial.")
 
 
 
