@@ -1,6 +1,10 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configuración del servidor SMTP
 SMTP_SERVER = 'mail.exasa.net'  # Cambia esto a tu servidor SMTP
