@@ -12,8 +12,9 @@ from pruebaCrawler import execute_crawler
 from UnitsData import obtener_datos, obtener_unidades
 from bson.binary import Binary
 from flask import Flask, send_from_directory
+from DenunciasReclamos_SMTP import enviar_queja_anonima
 import time
-from Denuncias&Reclamos_SMTP import enviar_queja_anonima
+
 
 app = Flask("Xeguridad_Bot_Flask")
 
@@ -44,6 +45,8 @@ AUTH_DB = "admin"
 
 # Diccionario para rastrear números de teléfono que esperan una placa
 esperando_placa = {}
+
+esperando_denuncia = {}
 
 # Diccionario para almacenar los últimos mensajes procesados
 ultimos_mensajes = {}
@@ -156,6 +159,11 @@ def manejar_mensaje_entrante(mensaje):
     # Separar lógica para Denuncias o Reclamos (sin autenticación)
     if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
         manejar_respuesta_usuario(numero, COMPLAINT_CLAIMS_TEMPLATE)  # Enviar plantilla de denuncias/reclamos
+        esperando_denuncia[numero] = True
+    elif numero in esperando_denuncia:
+        denuncia= cuerpo_mensaje
+        print(f"Denuncia recibida: {denuncia}")
+        enviar_queja_anonima(denuncia)
         return  # Detener el flujo aquí ya que no requiere autenticación
 
     # Separar lógica para Xeguridad (requiere autenticación)
