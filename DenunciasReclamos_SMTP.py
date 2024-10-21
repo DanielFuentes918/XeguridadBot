@@ -10,7 +10,7 @@ load_dotenv()
 SMTP_SERVER = 'mail.exasa.net'  # Cambia esto a tu servidor SMTP
 SMTP_PORT = 465 # Puerto seguro para el servidor SMTP
 EMAIL_USER = 'not-reply@exasa.net'
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Usa variables de entorno para la seguridad
+EMAIL_PASSWORD = "Exasa/24@"  # Usa variables de entorno para la seguridad
 
 # Función para enviar el correo de queja
 def enviar_queja_anonima(denuncia):
