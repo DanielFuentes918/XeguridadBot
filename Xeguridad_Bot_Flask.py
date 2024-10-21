@@ -230,6 +230,7 @@ def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
     response_status = enviar_mensaje_whatsapp(numero, template_name, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
+    time.sleep(2)  # Pausa de 2 segundos antes de enviar el siguiente mensaje
 
 def buscar_unitnumber_por_placa(placa):
     params = {
