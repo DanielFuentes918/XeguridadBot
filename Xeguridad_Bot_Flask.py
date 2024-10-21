@@ -12,6 +12,7 @@ from pruebaCrawler import execute_crawler
 from UnitsData import obtener_datos, obtener_unidades
 from bson.binary import Binary
 from flask import Flask, send_from_directory
+import time
 
 app = Flask("Xeguridad_Bot_Flask")
 
