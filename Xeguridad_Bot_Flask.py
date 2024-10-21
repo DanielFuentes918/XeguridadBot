@@ -13,6 +13,7 @@ from UnitsData import obtener_datos, obtener_unidades
 from bson.binary import Binary
 from flask import Flask, send_from_directory
 import time
+from Denuncias&Reclamos_SMTP import enviar_queja_anonima
 
 app = Flask("Xeguridad_Bot_Flask")
 
@@ -234,6 +235,15 @@ def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
     response_status = enviar_mensaje_whatsapp(numero, template_name, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
+
+def recibir_denuncia(denuncia):
+    data = request.json  # Captura el contenido JSON enviado en el cuerpo de la solicitud
+    if 'denuncia' in data:
+        denuncia = data['denuncia']  # Obtiene el campo "denuncia" del JSON recibido
+        enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
+        return jsonify({"status": "denuncia recibida y enviada por correo"}), 200  # Retorna un éxito
+    return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400  # Error si no se encuentra el campo "denuncia"
+
 
 def buscar_unitnumber_por_placa(placa):
     params = {
