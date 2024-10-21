@@ -163,8 +163,9 @@ def manejar_mensaje_entrante(mensaje):
     elif numero in esperando_denuncia:
         denuncia= cuerpo_mensaje
         print(f"Denuncia recibida: {denuncia}")
-        enviar_queja_anonima(denuncia)
-        return  # Detener el flujo aquí ya que no requiere autenticación
+        enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
+        return jsonify({"status": "denuncia recibida y enviada por correo"}), 200  # Retorna un éxito
+    return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400  # Error si no se encuentra el campo "denuncia"
 
     # Separar lógica para Xeguridad (requiere autenticación)
     if cuerpo_mensaje.strip().lower() == "xeguridad":
@@ -244,13 +245,13 @@ def manejar_respuesta_usuario(numero, template_name):
     response_status = enviar_mensaje_whatsapp(numero, template_name, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
-def recibir_denuncia(denuncia):
-    data = request.json  # Captura el contenido JSON enviado en el cuerpo de la solicitud
-    if 'denuncia' in data:
-        denuncia = data['denuncia']  # Obtiene el campo "denuncia" del JSON recibido
-        enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
-        return jsonify({"status": "denuncia recibida y enviada por correo"}), 200  # Retorna un éxito
-    return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400  # Error si no se encuentra el campo "denuncia"
+# def recibir_denuncia(denuncia):
+#     data = request.json  # Captura el contenido JSON enviado en el cuerpo de la solicitud
+#     if 'denuncia' in data:
+#         denuncia = data['denuncia']  # Obtiene el campo "denuncia" del JSON recibido
+#         enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
+#         return jsonify({"status": "denuncia recibida y enviada por correo"}), 200  # Retorna un éxito
+#     return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400  # Error si no se encuentra el campo "denuncia"
 
 
 def buscar_unitnumber_por_placa(placa):
