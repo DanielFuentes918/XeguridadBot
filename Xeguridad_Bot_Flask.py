@@ -152,13 +152,19 @@ def manejar_mensaje_entrante(mensaje):
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
-    # Llama a manejar_starter_menu_respuesta si el usuario no está autenticado
-    if numero not in usuarios_autenticados:
-        if cuerpo_mensaje.strip().lower() == "xeguridad":
+    # Separar lógica para Denuncias o Reclamos (sin autenticación)
+    if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
+        manejar_respuesta_usuario(numero, COMPLAINT_CLAIMS_TEMPLATE)  # Enviar plantilla de denuncias/reclamos
+        return  # Detener el flujo aquí ya que no requiere autenticación
+
+    # Separar lógica para Xeguridad (requiere autenticación)
+    if cuerpo_mensaje.strip().lower() == "xeguridad":
+        # Si no está autenticado, iniciar autenticación
+        if numero not in usuarios_autenticados:
             manejar_starter_menu_respuesta(numero, cuerpo_mensaje)
-            return  # Detenemos el flujo aquí
         else:
-            print("El usuario no está autenticado, pero envió otro mensaje.")
+            manejar_respuesta_usuario(numero, MENU_TEMPLATE_NAME)  # Menú después de autenticación
+        return
 
     # Verificar autenticación del usuario
     if numero in usuarios_autenticados:
@@ -217,21 +223,17 @@ def manejar_mensaje_entrante(mensaje):
 def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
     print(f"Cuerpo del mensaje recibido: {cuerpo_mensaje}")
     if cuerpo_mensaje.strip().lower() == "xeguridad":
-        manejar_respuesta_usuario(numero, AUTH_TEMPLATE)
+        manejar_respuesta_usuario(numero, AUTH_TEMPLATE)  # Requiere autenticación
         usuarios_esperando_password[numero] = True
     elif cuerpo_mensaje.lower() == "denuncias o reclamos":
-        manejar_respuesta_usuario(numero, COMPLAINT_CLAIMS_TEMPLATE)
+        manejar_respuesta_usuario(numero, COMPLAINT_CLAIMS_TEMPLATE)  # Sin autenticación
     else:
         print("Opción no válida del menú inicial.")
-
-
-
 
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
     response_status = enviar_mensaje_whatsapp(numero, template_name, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
-    time.sleep(2)  # Pausa de 2 segundos antes de enviar el siguiente mensaje
 
 def buscar_unitnumber_por_placa(placa):
     params = {
