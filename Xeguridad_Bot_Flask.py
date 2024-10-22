@@ -33,6 +33,8 @@ RESPUESTA_COMANDOS_TEMPLATE = "lt_command__response"  # Nombre de la plantilla d
 COMANDO_NO_RECIBIDO_TEMPLATE = "lt_command__failed"
 PLACA_NO_ENCONTRADA_TEMPLATE = "plate_number_wasnt_find"
 COMPLAINT_CLAIMS_TEMPLATE = "complaint_claims_request"
+COMPLAINT_CLAIMS_COPY_TEMPLATE = "complaint_claims__copy"
+COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE = "complaint_claims_notification"
 
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
 XEGURIDAD_USERNAME = "dhnexasa"
@@ -166,9 +168,13 @@ def manejar_mensaje_entrante(mensaje):
         print(f"Denuncia recibida: {denuncia}")
         enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
         print("Llamada a enviar_queja_anonima realizada")
+        manejar_respuesta_usuario(numero, COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE)  # Enviar plantilla de confirmación
+        enviar_complaint_claims_notification_template(numero,COMPLAINT_CLAIMS_COPY_TEMPLATE, components, denuncia)
         return jsonify({"status": "denuncia recibida y enviada por correo"}), 200  # Retorna un éxito
+        
     else:
         print("El mensaje no es una denuncia o reclamo.")
+        return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
 
     # Separar lógica para Xeguridad (requiere autenticación)
     if cuerpo_mensaje.strip().lower() == "xeguridad":
@@ -394,6 +400,40 @@ def enviar_placa_no_encontrada(numero, PLACA_NO_ENCONTRADA_TEMPLATE, components,
                         {
                             "type": "text",
                             "text": placa
+                        },
+                    ]
+                }
+            ]
+        }
+    }
+    response = requests.post(WHATSAPP_API_URL, headers=headers, json=data)
+    print(f"Estado de la respuesta: {response.status_code}")
+    print(f"Contenido de la respuesta: {response.text}")
+    return response.status_code
+
+def enviar_complaint_claims_notification_template(numero, COMPLAINT_CLAIMS_COPY_TEMPLATE, components, denuncia):
+    headers = {
+        'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    data = {
+        'messaging_product': 'whatsapp',
+        'to': numero,
+        'type': 'template',
+        'template': {
+            'namespace': NAMESPACE,
+            'name': COMPLAINT_CLAIMS_COPY_TEMPLATE,
+            'language': {
+                'policy': 'deterministic',
+                'code': 'es'
+            },
+            'components': [
+                {
+                    "type": "body",
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": denuncia
                         },
                     ]
                 }
