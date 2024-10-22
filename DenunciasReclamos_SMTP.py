@@ -25,9 +25,8 @@ def enviar_queja_anonima(denuncia):
         cuerpo = f"Se ha recibido la siguiente queja anónima:\n\n{denuncia}"
         msg.attach(MIMEText(cuerpo, 'plain'))
 
-        # Conexión al servidor SMTP
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()  # Iniciar la conexión segura
+        # Conexión al servidor SMTP (SSL para el puerto 465)
+        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)  # Usar SMTP_SSL en lugar de SMTP
         server.login(EMAIL_USER, EMAIL_PASSWORD)
 
         # Enviar correo

@@ -158,14 +158,20 @@ def manejar_mensaje_entrante(mensaje):
 
     # Separar lógica para Denuncias o Reclamos (sin autenticación)
     if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
+        print("El usuario ha seleccionado la opción de 'denuncias o reclamos'")
         manejar_respuesta_usuario(numero, COMPLAINT_CLAIMS_TEMPLATE)  # Enviar plantilla de denuncias/reclamos
         esperando_denuncia[numero] = True
     elif numero in esperando_denuncia:
         denuncia= cuerpo_mensaje
         print(f"Denuncia recibida: {denuncia}")
         enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
+        print("Llamada a enviar_queja_anonima realizada")
         return jsonify({"status": "denuncia recibida y enviada por correo"}), 200  # Retorna un éxito
-    return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400  # Error si no se encuentra el campo "denuncia"
+    else:
+        print("El mensaje no es una denuncia o reclamo.")
+
+    # Asegúrate de que el código no caiga fuera de las condiciones esperadas
+    return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
 
     # Separar lógica para Xeguridad (requiere autenticación)
     if cuerpo_mensaje.strip().lower() == "xeguridad":
