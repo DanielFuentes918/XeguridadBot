@@ -170,9 +170,6 @@ def manejar_mensaje_entrante(mensaje):
     else:
         print("El mensaje no es una denuncia o reclamo.")
 
-    # Asegúrate de que el código no caiga fuera de las condiciones esperadas
-    return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
-
     # Separar lógica para Xeguridad (requiere autenticación)
     if cuerpo_mensaje.strip().lower() == "xeguridad":
         # Si no está autenticado, iniciar autenticación
