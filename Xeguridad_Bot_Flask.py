@@ -33,7 +33,7 @@ RESPUESTA_COMANDOS_TEMPLATE = "lt_command__response"  # Nombre de la plantilla d
 COMANDO_NO_RECIBIDO_TEMPLATE = "lt_command__failed"
 PLACA_NO_ENCONTRADA_TEMPLATE = "plate_number_wasnt_find"
 COMPLAINT_CLAIMS_TEMPLATE = "complaint_claims_request"
-COMPLAINT_CLAIMS_COPY_TEMPLATE = "complaint_claims__copy"
+COMPLAINT_CLAIMS_COPY_TEMPLATE = "complaint_claims_copy"
 COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE = "complaint_claims_notification"
 
 XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
