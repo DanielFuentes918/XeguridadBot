@@ -6,42 +6,38 @@ import bcrypt
 from bson import ObjectId
 from urllib.parse import quote_plus
 from pymongo import MongoClient
-from datetime import datetime
 from datetime import datetime, timedelta
 from pruebaCrawler import execute_crawler
 from UnitsData import obtener_datos, obtener_unidades
 from bson.binary import Binary
 from flask import Flask, send_from_directory
 from DenunciasReclamos_SMTP import enviar_queja_anonima
-import time
-
 
 app = Flask("Xeguridad_Bot_Flask")
 
-# Configura tu verify token aquí
 VERIFY_TOKEN = "9189189189"
-WHATSAPP_API_URL = "https://graph.facebook.com/v20.0/443756312149340/messages"
-WHATSAPP_API_TOKEN = "EAARCdrR4dXkBO2JD0QHUnhjbji9NHpeAmF3LpkEAKmY3H1svnVXew6aZAy53Uq7gLtvr0sBtxnz2pAU4dc8O6lSrqyCxRiK2yLIxuPJY49rmXTrOWZB1J1WAUbPAvA9LV1u7WJhUXyDfazUGDuFLESHPYi3T15nZASam7sGJ348eidoSamg7bucdZCG3clYP"
+WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL")
+WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
 NAMESPACE = "Xeguridad"
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
 AUTH_FAILED_TEMPLATE = "auth_failed"
-MENU_TEMPLATE_NAME = "xeguridad_menu"  # Asegúrate de que este nombre coincida con el de tu plantilla de menú
-SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "plate_number__request"  # Nombre de la plantilla para solicitud de comandos a unidad
-CARGANDO_COMANDOS_TEMPLATE_NAME = "lt_command__loading"  # Nombre de la plantilla de cargando
-RESPUESTA_COMANDOS_TEMPLATE = "lt_command__response"  # Nombre de la plantilla de respuesta de comandos
+MENU_TEMPLATE_NAME = "xeguridad_menu" 
+SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "plate_number__request"  
+CARGANDO_COMANDOS_TEMPLATE_NAME = "lt_command__loading"
+RESPUESTA_COMANDOS_TEMPLATE = "lt_command__response"  
 COMANDO_NO_RECIBIDO_TEMPLATE = "lt_command__failed"
 PLACA_NO_ENCONTRADA_TEMPLATE = "plate_number_wasnt_find"
 COMPLAINT_CLAIMS_TEMPLATE = "complaint_claims_request"
 COMPLAINT_CLAIMS_COPY_TEMPLATE = "complaint_claims_copy"
 COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE = "complaint_claims_notification"
 
-XEGURIDAD_API_URL = "https://mongol.brono.com/mongol/api.php"
+XEGURIDAD_API_URL = os.getenv("XEGURIDAD_API_URL")
 XEGURIDAD_USERNAME = "dhnexasa"
-XEGURIDAD_PASSWORD = "dhnexasa2022/487-"
+XEGURIDAD_PASSWORD = os.getenv("XEGURIDAD_PASSWORD")
 USUARIO_MONGO = "exasa"
-CONTRASEÑA_MONGO = os.getenv("MONGO_DB_PASSWORD")
-CONTRASEÑA_MONGO_ESCAPADA = quote_plus(CONTRASEÑA_MONGO)
+PASSWORD_MONGO = os.getenv("PASSWORD_MONGO")
+PASSWORD_MONGO_ESCAPADA = quote_plus(PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
 
@@ -62,7 +58,7 @@ usuarios_esperando_password = {}
 
 usuarios_en_starter_menu = {}
 
-uri = f"mongodb://{USUARIO_MONGO}:{CONTRASEÑA_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
+uri = f"mongodb://{USUARIO_MONGO}:{PASSWORD_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
 
 # Conexion a MongoDB con manejo de excepciones
 try:
