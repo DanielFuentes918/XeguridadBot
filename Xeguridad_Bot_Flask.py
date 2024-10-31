@@ -31,7 +31,6 @@ PLACA_NO_ENCONTRADA_TEMPLATE = "plate_number_wasnt_find"
 COMPLAINT_CLAIMS_TEMPLATE = "complaint_claims_request"
 COMPLAINT_CLAIMS_COPY_TEMPLATE = "complaint_claims_copy"
 COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE = "complaint_claims_notification"
-
 XEGURIDAD_API_URL = os.getenv("XEGURIDAD_API_URL")
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = os.getenv("XEGURIDAD_PASSWORD")

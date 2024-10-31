@@ -1,0 +1,23 @@
+name: Deploy to Testing Environment
+
+on:
+  push:
+    branches:
+      - dev  # Solo se ejecuta cuando hay cambios en la rama dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_XEGURIDAD_LINUX }}
+
+    - name: Deploy to Testing Server
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd /home/exasa/XeguridadBot-pruebas && git pull origin dev && source venv/bin/activate && pip install -r requirements.txt && systemctl restart Xeguridad_Bot_Flask.py"
