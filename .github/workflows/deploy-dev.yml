@@ -36,4 +36,3 @@ jobs:
     - name: Deploy to Server
       run: |
         git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git ${{ github.ref_name }}
-        systemctl restart Xeguridad_Bot_Flask.py
