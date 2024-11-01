@@ -3,7 +3,7 @@ name: Deploy to Testing Environment
 on:
   push:
     branches:
-      - dev  # Solo se ejecuta cuando hay cambios en la rama dev
+      - dev
 
 jobs:
   deploy:
@@ -12,12 +12,14 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.SSH_XEGURIDAD_LINUX }}
+        token: ${{ secrets.ACCESS_TOKEN }}  # Usa el token personal aquí
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
 
     - name: Deploy to Testing Server
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd /home/exasa/XeguridadBot-pruebas && git pull origin dev && pip install -r requirements.txt && systemctl restart Xeguridad_Bot_Flask.py"
+        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/usuario/nombre-del-repositorio.git dev
