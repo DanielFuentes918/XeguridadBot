@@ -20,4 +20,4 @@ jobs:
 
     - name: Deploy to Testing Server
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd /home/exasa/XeguridadBot-pruebas && git pull origin dev && source venv/bin/activate && pip install -r requirements.txt && systemctl restart Xeguridad_Bot_Flask.py"
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd /home/exasa/XeguridadBot-pruebas && git pull origin dev && pip install -r requirements.txt && systemctl restart Xeguridad_Bot_Flask.py"
