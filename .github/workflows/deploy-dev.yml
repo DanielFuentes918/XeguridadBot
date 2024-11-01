@@ -22,4 +22,4 @@ jobs:
 
     - name: Deploy to Testing Server
       run: |
-        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/usuario/nombre-del-repositorio.git dev
+        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git dev
