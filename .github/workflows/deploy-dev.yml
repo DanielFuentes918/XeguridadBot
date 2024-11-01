@@ -1,0 +1,25 @@
+name: Deploy to Testing Environment
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}  # Usa el token personal aquí
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Deploy to Testing Server
+      run: |
+        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git dev
