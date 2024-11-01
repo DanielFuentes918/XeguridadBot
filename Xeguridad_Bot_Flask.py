@@ -1,5 +1,3 @@
-#Prueba exitosa
-
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
@@ -20,7 +18,7 @@ app = Flask("Xeguridad_Bot_Flask")
 VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL")
 WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
-NAMESPACE = os.getenv("NAMESPACE")
+NAMESPACE = ""
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
 AUTH_FAILED_TEMPLATE = "auth_failed"

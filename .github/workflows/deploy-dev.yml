@@ -1,9 +1,14 @@
-name: Deploy to Testing Environment
+name: Deploy to Testing or Production Environment
 
 on:
   push:
     branches:
       - dev
+      - master
+  pull_request:
+    branches:
+      - dev
+      - master
 
 jobs:
   deploy:
@@ -13,13 +18,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        token: ${{ secrets.ACCESS_TOKEN }}  # Usa el token personal aquí
+        token: ${{ secrets.ACCESS_TOKEN }}
 
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.9'
 
-    - name: Deploy to Testing Server
+    - name: Update namespace for dev or master
       run: |
-        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git dev
+        if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+          sed -i 's/^namespace = .*/NAMESPACE = "Xeguridad2"/' Xeguridad_Bot_Flask.py
+        elif [ "${{ github.ref }}" == "refs/heads/master" ]; then
+          sed -i 's/^namespace = .*/NAMESPACE = "Xeguridad"/' Xeguridad_Bot_Flask.py
+        fi
+
+    - name: Deploy to Server
+      run: |
+        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git ${{ github.ref_name }}
+        systemctl restart Xeguridad_Bot_Flask.py
