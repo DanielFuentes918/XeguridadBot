@@ -25,14 +25,18 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Update namespace for dev or master
+    - name: Set environment variables
       run: |
         if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
-          sed -i 's/^namespace = .*/NAMESPACE = "Xeguridad2"/' Xeguridad_Bot_Flask.py
+          echo "WHATSAPP_API_TOKEN=${{ secrets.XEGURIDAD2_WB_API }}" >> $GITHUB_ENV
+          echo "NAMESPACE=Xeguridad2" >> $GITHUB_ENV
         elif [ "${{ github.ref }}" == "refs/heads/master" ]; then
-          sed -i 's/^namespace = .*/NAMESPACE = "Xeguridad"/' Xeguridad_Bot_Flask.py
+          echo "WHATSAPP_API_TOKEN=${{ secrets.XEGURIDAD_WB_API }}" >> $GITHUB_ENV
+          echo "NAMESPACE=Xeguridad" >> $GITHUB_ENV
         fi
 
     - name: Deploy to Server
+      env:
+        WHATSAPP_API_TOKEN: ${{ env.WHATSAPP_API_TOKEN }}
       run: |
         git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git ${{ github.ref_name }}

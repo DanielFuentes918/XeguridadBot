@@ -19,7 +19,7 @@ app = Flask("Xeguridad_Bot_Flask")
 
 VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL")
-WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
+WHATSAPP_API_TOKEN = ""
 NAMESPACE = ""
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
