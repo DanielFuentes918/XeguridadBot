@@ -25,8 +25,23 @@ jobs:
       with:
         python-version: '3.9'
 
+    - name: Set environment variables
+      run: |
+        if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+          echo "WHATSAPP_API_TOKEN=${{ secrets.XEGURIDAD_API_TOKEN }}" >> $GITHUB_ENV
+          echo "WHATSAPP_API_URL=${{ secrets.XEGURIDAD2_WB_API }}" >> $GITHUB_ENV
+          echo "NAMESPACE=Xeguridad2" >> $GITHUB_ENV
+        elif [ "${{ github.ref }}" == "refs/heads/master" ]; then
+          echo "WHATSAPP_API_TOKEN=${{ secrets.XEGURIDAD2_API_TOKEN }}" >> $GITHUB_ENV
+          echo "WHATSAPP_API_URL=${{ secrets.XEGURIDAD_WB_API }}" >> $GITHUB_ENV
+          echo "NAMESPACE=Xeguridad" >> $GITHUB_ENV
+        fi
+
     - name: Deploy to Server
       env:
         WHATSAPP_API_TOKEN: ${{ env.WHATSAPP_API_TOKEN }}
       run: |
-        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git ${{ github.ref_name }}
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+          cd /home/exasa/XeguridadBot-pruebas/XeguridadBot && \
+          git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git ${{ github.ref_name }}
+        "
