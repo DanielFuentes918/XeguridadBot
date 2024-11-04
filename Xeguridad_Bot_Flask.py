@@ -16,9 +16,9 @@ from DenunciasReclamos_SMTP import enviar_queja_anonima
 app = Flask("Xeguridad_Bot_Flask")
 
 VERIFY_TOKEN = "9189189189"
-WHATSAPP_API_URL = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
-WHATSAPP_API_TOKEN = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
-NAMESPACE = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_URL = "https://graph.facebook.com/v21.0/407123635824758/messages" #El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_TOKEN = "EAARCdrR4dXkBO5CazxXO5pCWYGSQ7blM1QQWDZCBWhdZAaObL2vmnCgnZBB75jhpBQZBgJnW7XquYz5HAXju3jAfp5waPRo6rT2Faz1DrIbqMAGNcWoCZB5gAetoXdO2hXcBvmGyj7M2mg8hzZAGTS7JDmcZBQRYuZBZAiosZAdqdQswZAPy9QVJnQj4sbUBnAoxlsz" #El valor se obtiene directamente del pipeline bajo un secret de Github
+NAMESPACE = "Xeguridad2" #El valor se obtiene directamente del pipeline bajo un secret de Github
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
 AUTH_FAILED_TEMPLATE = "auth_failed"
@@ -31,6 +31,7 @@ PLACA_NO_ENCONTRADA_TEMPLATE = "plate_number_wasnt_find"
 COMPLAINT_CLAIMS_TEMPLATE = "complaint_claims_request"
 COMPLAINT_CLAIMS_COPY_TEMPLATE = "complaint_claims_copy"
 COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE = "complaint_claims_notification"
+XEGURIDAD_API_URL = os.getenv("XEGURIDAD_API_URL")
 XEGURIDAD_USERNAME = "dhnexasa"
 XEGURIDAD_PASSWORD = os.getenv("XEGURIDAD_PASSWORD")
 USUARIO_MONGO = "exasa"
