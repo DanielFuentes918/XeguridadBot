@@ -1,5 +1,3 @@
-
-
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
@@ -18,9 +16,9 @@ from DenunciasReclamos_SMTP import enviar_queja_anonima
 app = Flask("Xeguridad_Bot_Flask")
 
 VERIFY_TOKEN = "9189189189"
-WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL")
-WHATSAPP_API_TOKEN = ""
-NAMESPACE = ""
+WHATSAPP_API_URL = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_TOKEN = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
+NAMESPACE = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
 AUTH_FAILED_TEMPLATE = "auth_failed"
