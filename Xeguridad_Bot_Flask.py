@@ -97,6 +97,8 @@ def webhook():
         # Verificación del webhook
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
+        print("Token webhook:",token)
+        print("Challenge webhook:",challenge)
         if token == VERIFY_TOKEN:
             return str(challenge)
         return "Verificación de token fallida", 403
