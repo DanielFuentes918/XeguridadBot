@@ -1,5 +1,3 @@
-#Prueba
-
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
@@ -605,7 +603,7 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
-@app.route('/pull', methods=['POST'])
+@app.route('/pull', methods=['GET', 'POST'])
 def pull():
     if request.method == 'POST':
         repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"  # Cambia esta ruta si es necesario
