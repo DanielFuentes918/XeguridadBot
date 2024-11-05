@@ -38,10 +38,5 @@ jobs:
         fi
 
     - name: Deploy to Server
-      env:
-        WHATSAPP_API_TOKEN: ${{ env.WHATSAPP_API_TOKEN }}
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
-          cd /home/exasa/XeguridadBot-pruebas/XeguridadBot && \
-          git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git ${{ github.ref_name }}
-        "
+        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git ${{ github.ref_name }}
