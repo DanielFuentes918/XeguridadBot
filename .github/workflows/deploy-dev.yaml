@@ -37,6 +37,11 @@ jobs:
           echo "NAMESPACE=Xeguridad" >> $GITHUB_ENV
         fi
 
-    - name: Deploy to Server
+    - name: Push changes to GitHub
       run: |
-        git pull https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git ${{ github.ref_name }}
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git remote set-url origin https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git
+        git push origin ${{ github.ref_name }}
+
+

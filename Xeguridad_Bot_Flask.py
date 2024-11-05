@@ -3,6 +3,7 @@ import requests
 import re
 import os
 import bcrypt
+import subprocess
 from bson import ObjectId
 from urllib.parse import quote_plus
 from pymongo import MongoClient
@@ -602,6 +603,23 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
+@app.route('/pull', methods=['POST'])
+def pull():
+    if request.method == 'POST':
+        repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"  # Cambia esta ruta si es necesario
+        os.chdir(repo_path)
+        
+        # Ejecutar git pull
+        pull_result = subprocess.run(["git", "pull"], capture_output=True, text=True)
+        
+        # Reiniciar el servicio
+        restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
+        
+        return {
+            "status": "success",
+            "pull_output": pull_result.stdout,
+            "restart_output": restart_result.stdout
+        }, 200
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)
