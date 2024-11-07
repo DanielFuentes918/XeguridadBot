@@ -605,8 +605,10 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
-@app.route('/pull', methods=['POST'])
+@app.route('/pull', methods=['GET','POST'])
 def pull():
+    if request.method == 'GET':
+        return {"message": "Envía una solicitud POST para ejecutar git pull y reiniciar el servicio."}
     if request.method == 'POST':
         try:
             repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"  # Cambia esta ruta si es necesario
