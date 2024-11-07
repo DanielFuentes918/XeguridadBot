@@ -605,58 +605,42 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
-@app.route('/pull', methods=['GET', 'POST'])
+@app.route('/pull', methods=['POST'])
 def pull():
-    if request.method == 'GET':
-        return {"message": "Envía una solicitud POST para ejecutar git pull y reiniciar el servicio."}
-    if request.method == 'POST':
-        try:
-            repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"  # Cambia esta ruta si es necesario
-            os.chdir(repo_path)
-            
-            # Ejecutar git pull
-            pull_result = subprocess.run(["git", "pull"], capture_output=True, text=True)
-            print(f"Git pull stdout: {pull_result.stdout}")
-            print(f"Git pull stderr: {pull_result.stderr}")
-            
-            # Verificar si git pull tuvo éxito
-            if pull_result.returncode != 0:
-                print(f"Error al ejecutar git pull: {pull_result.stderr}")
-                return {
-                    "status": "error",
-                    "message": "Error al ejecutar git pull",
-                    "details": pull_result.stderr
-                }, 500
-            
-            # Reiniciar el servicio
-            restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
-            print(f"Restart stdout: {restart_result.stdout}")
-            print(f"Restart stderr: {restart_result.stderr}")
-            
-            # Verificar si el reinicio tuvo éxito
-            if restart_result.returncode != 0:
-                print(f"Error al reiniciar el servicio: {restart_result.stderr}")
-                return {
-                    "status": "error",
-                    "message": "Error al reiniciar el servicio",
-                    "details": restart_result.stderr
-                }, 500
-            
-            print("Operación completada con éxito")
-            return {
-                "status": "success",
-                "pull_output": pull_result.stdout,
-                "restart_output": restart_result.stdout
-            }, 200
-        except Exception as e:
-            print(f"Excepción: {e}")
-            return {
-                "status": "error",
-                "message": "Ocurrió un error inesperado",
-                "details": str(e)
-            }, 500
-    else:
-        return {"message": "Método no permitido. Usa POST."}, 405
+    # Responder inmediatamente al webhook
+    response = {"status": "success", "message": "Operación en proceso."}
+    
+    try:
+        repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"
+        os.chdir(repo_path)
+        
+        # Ejecutar git pull
+        pull_result = subprocess.run(["git", "pull"], capture_output=True, text=True)
+        print(f"Git pull stdout: {pull_result.stdout}")
+        print(f"Git pull stderr: {pull_result.stderr}")
+        
+        # Verificar si git pull tuvo éxito
+        if pull_result.returncode != 0:
+            print(f"Error al ejecutar git pull: {pull_result.stderr}")
+            # Puedes registrar o manejar este error como desees
+        
+        # Reiniciar el servicio
+        restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
+        print(f"Service restart stdout: {restart_result.stdout}")
+        print(f"Service restart stderr: {restart_result.stderr}")
+        
+        # Verificar si el reinicio tuvo éxito
+        if restart_result.returncode != 0:
+            print(f"Error al reiniciar el servicio: {restart_result.stderr}")
+            # Puedes registrar o manejar este error como desees
+
+    except Exception as e:
+        print(f"Excepción: {e}")
+        # Maneja la excepción según sea necesario
+    
+    # Retorna la respuesta inmediatamente
+    return response, 200
+
 
 
 
