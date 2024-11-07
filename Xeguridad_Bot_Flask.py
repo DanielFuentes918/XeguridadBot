@@ -603,7 +603,7 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
-@app.route('/pull', methods=['GET', 'POST'])
+@app.route('/pull', methods=['POST'])
 def pull():
     if request.method == 'POST':
         try:
