@@ -18,9 +18,9 @@ from DenunciasReclamos_SMTP import enviar_queja_anonima
 app = Flask("Xeguridad_Bot_Flask")
 
 VERIFY_TOKEN = "9189189189"
-WHATSAPP_API_URL = "https://graph.facebook.com/v21.0/407123635824758/messages" #El valor se obtiene directamente del pipeline bajo un secret de Github
-WHATSAPP_API_TOKEN = "EAARCdrR4dXkBO5CazxXO5pCWYGSQ7blM1QQWDZCBWhdZAaObL2vmnCgnZBB75jhpBQZBgJnW7XquYz5HAXju3jAfp5waPRo6rT2Faz1DrIbqMAGNcWoCZB5gAetoXdO2hXcBvmGyj7M2mg8hzZAGTS7JDmcZBQRYuZBZAiosZAdqdQswZAPy9QVJnQj4sbUBnAoxlsz" #El valor se obtiene directamente del pipeline bajo un secret de Github
-NAMESPACE = "Xeguridad2" #El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_URL = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_TOKEN = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
+NAMESPACE = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
 AUTH_FAILED_TEMPLATE = "auth_failed"
@@ -613,7 +613,8 @@ def pull():
         # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
         def execute_operations():
             try:
-                repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"
+                repo_path = ""
+                service = ""
                 os.chdir(repo_path)
 
                 # Ejecutar git pull
@@ -626,7 +627,7 @@ def pull():
                     print(f"Error al ejecutar git pull: {pull_result.stderr}")
 
                 # Reiniciar el servicio
-                restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
+                restart_result = subprocess.run(["sudo", "systemctl", "restart", service], capture_output=True, text=True)
                 print(f"Service restart stdout: {restart_result.stdout}")
                 print(f"Service restart stderr: {restart_result.stderr}")
 
