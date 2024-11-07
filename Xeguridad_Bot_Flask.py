@@ -1,10 +1,10 @@
-
-
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
 import os
 import bcrypt
+import subprocess
+from threading import Thread
 from bson import ObjectId
 from urllib.parse import quote_plus
 from pymongo import MongoClient
@@ -18,9 +18,9 @@ from DenunciasReclamos_SMTP import enviar_queja_anonima
 app = Flask("Xeguridad_Bot_Flask")
 
 VERIFY_TOKEN = "9189189189"
-WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL")
-WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
-NAMESPACE = ""
+WHATSAPP_API_URL = "https://graph.facebook.com/v21.0/407123635824758/messages" #El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_TOKEN = "EAARCdrR4dXkBO5CazxXO5pCWYGSQ7blM1QQWDZCBWhdZAaObL2vmnCgnZBB75jhpBQZBgJnW7XquYz5HAXju3jAfp5waPRo6rT2Faz1DrIbqMAGNcWoCZB5gAetoXdO2hXcBvmGyj7M2mg8hzZAGTS7JDmcZBQRYuZBZAiosZAdqdQswZAPy9QVJnQj4sbUBnAoxlsz" #El valor se obtiene directamente del pipeline bajo un secret de Github
+NAMESPACE = "Xeguridad2" #El valor se obtiene directamente del pipeline bajo un secret de Github
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
 AUTH_FAILED_TEMPLATE = "auth_failed"
@@ -99,6 +99,8 @@ def webhook():
         # Verificación del webhook
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
+        print("Token webhook:",token)
+        print("Challenge webhook:",challenge)
         if token == VERIFY_TOKEN:
             return str(challenge)
         return "Verificación de token fallida", 403
@@ -602,6 +604,44 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
+@app.route('/pull', methods=['POST'])
+def pull():
+    # Responder inmediatamente al webhook de GitHub
+    response = {"status": "success", "message": "Operación recibida y en proceso."}
+    # Enviar la respuesta inmediatamente
+    try:
+        # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
+        def execute_operations():
+            try:
+                repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"
+                os.chdir(repo_path)
 
+                # Ejecutar git pull
+                pull_result = subprocess.run(["git", "pull"], capture_output=True, text=True)
+                print(f"Git pull stdout: {pull_result.stdout}")
+                print(f"Git pull stderr: {pull_result.stderr}")
+
+                # Verificar si git pull tuvo éxito
+                if pull_result.returncode != 0:
+                    print(f"Error al ejecutar git pull: {pull_result.stderr}")
+
+                # Reiniciar el servicio
+                restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
+                print(f"Service restart stdout: {restart_result.stdout}")
+                print(f"Service restart stderr: {restart_result.stderr}")
+
+                if restart_result.returncode != 0:
+                    print(f"Error al reiniciar el servicio: {restart_result.stderr}")
+
+            except Exception as e:
+                print(f"Excepción al ejecutar operaciones: {e}")
+
+        # Ejecutar las operaciones en un hilo separado para no bloquear la respuesta
+        Thread(target=execute_operations).start()  # Usa hilos si quieres ejecutar en segundo plano
+
+        return jsonify(response), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Ocurrió un error: {str(e)}"}), 500
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)
