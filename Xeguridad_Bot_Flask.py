@@ -1,7 +1,3 @@
-#Prueba
-
-#Prueba 2
-
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
@@ -610,20 +606,46 @@ def obtener_datos_route():
 @app.route('/pull', methods=['GET', 'POST'])
 def pull():
     if request.method == 'POST':
-        repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"  # Cambia esta ruta si es necesario
-        os.chdir(repo_path)
-        
-        # Ejecutar git pull
-        pull_result = subprocess.run(["git", "pull"], capture_output=True, text=True)
-        
-        # Reiniciar el servicio
-        restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
-        
-        return {
-            "status": "success",
-            "pull_output": pull_result.stdout,
-            "restart_output": restart_result.stdout
-        }, 200
+        try:
+            repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"  # Cambia esta ruta si es necesario
+            os.chdir(repo_path)
+            
+            # Ejecutar git pull
+            pull_result = subprocess.run(["git", "pull"], capture_output=True, text=True)
+            
+            # Verificar si git pull tuvo éxito
+            if pull_result.returncode != 0:
+                return {
+                    "status": "error",
+                    "message": "Error al ejecutar git pull",
+                    "details": pull_result.stderr
+                }, 500
+            
+            # Reiniciar el servicio
+            restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
+            
+            # Verificar si el reinicio tuvo éxito
+            if restart_result.returncode != 0:
+                return {
+                    "status": "error",
+                    "message": "Error al reiniciar el servicio",
+                    "details": restart_result.stderr
+                }, 500
+            
+            return {
+                "status": "success",
+                "pull_output": pull_result.stdout,
+                "restart_output": restart_result.stdout
+            }, 200
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": "Ocurrió un error inesperado",
+                "details": str(e)
+            }, 500
+    else:
+        return {"message": "Método no permitido. Usa POST."}, 405
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)
