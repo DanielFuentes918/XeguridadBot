@@ -38,7 +38,7 @@ jobs:
           echo "WHATSAPP_API_URL=${{ secrets.XEGURIDAD_WB_API }}" >> $GITHUB_ENV
           echo "NAMESPACE=Xeguridad" >> $GITHUB_ENV
           echo "repo_path=/home/exasa/XeguridadBot-produccion/XeguridadBot" >> $GITHUB_ENV
-          echo "service=flask_main.service" >> $GITHUB_ENV 
+          echo "service=flask_main.service" >> $GITHUB_ENV
         fi
 
     - name: Push changes to GitHub
