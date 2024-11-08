@@ -18,9 +18,9 @@ from DenunciasReclamos_SMTP import enviar_queja_anonima
 app = Flask("Xeguridad_Bot_Flask")
 
 VERIFY_TOKEN = "9189189189"
-WHATSAPP_API_URL = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
-WHATSAPP_API_TOKEN = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
-NAMESPACE = "" #El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL") # El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN") # El valor se obtiene directamente del pipeline bajo un secret de Github
+NAMESPACE = os.getenv("NAMESPACE") # El valor se obtiene directamente del pipeline bajo un secret de Github
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
 AUTH_FAILED_TEMPLATE = "auth_failed"
@@ -613,8 +613,8 @@ def pull():
         # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
         def execute_operations():
             try:
-                repo_path = ""
-                service = ""
+                repo_path = os.getenv("repo_path")
+                service = os.getenv("service")
                 os.chdir(repo_path)
 
                 # Ejecutar git pull
