@@ -41,11 +41,18 @@ jobs:
           echo "service=flask_main.service" >> $GITHUB_ENV
         fi
 
+    - name: Verify environment variables
+      run: |
+        echo "Verificando variables configuradas:"
+        echo "WHATSAPP_API_TOKEN=$WHATSAPP_API_TOKEN"
+        echo "WHATSAPP_API_URL=$WHATSAPP_API_URL"
+        echo "NAMESPACE=$NAMESPACE"
+        echo "repo_path=$repo_path"
+        echo "service=$service"
+
     - name: Push changes to GitHub
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
         git remote set-url origin https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git
         git push origin ${{ github.ref_name }}
-
-
