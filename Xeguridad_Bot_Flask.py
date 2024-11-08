@@ -1,5 +1,3 @@
-#Pruebas
-
 from flask import Flask, request, jsonify, render_template
 import requests
 import re
@@ -62,6 +60,13 @@ usuarios_esperando_password = {}
 usuarios_en_starter_menu = {}
 
 uri = f"mongodb://{USUARIO_MONGO}:{PASSWORD_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
+
+print("Valores proporcionados por el pipeline:")
+print(f"WHATSAPP_API_URL: {os.getenv('WHATSAPP_API_URL')}")
+print(f"WHATSAPP_API_TOKEN: {os.getenv('WHATSAPP_API_TOKEN')}")
+print(f"NAMESPACE: {os.getenv('NAMESPACE')}")
+print(f"repo_path: {os.getenv('repo_path')}")
+print(f"service: {os.getenv('service')}")
 
 # Conexion a MongoDB con manejo de excepciones
 try:
