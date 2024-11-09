@@ -611,17 +611,45 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
-@app.route('/pull', methods=['POST'])
+@app.route('/pull', methods=['GET', 'POST'])
 def pull():
-    # Responder inmediatamente al webhook de GitHub
-    response = {"status": "success", "message": "Operación recibida y en proceso."}
-    # Enviar la respuesta inmediatamente
+    # Obtener valores de las variables de entorno proporcionadas
+    whatsapp_api_token = os.getenv("WHATSAPP_API_TOKEN")
+    whatsapp_api_url = os.getenv("WHATSAPP_API_URL")
+    namespace = os.getenv("NAMESPACE")
+    repo_path = os.getenv("repo_path")
+    service = os.getenv("service")
+
+    # Crear un archivo .env local con las variables
+    try:
+        with open(".env", "w") as env_file:
+            env_file.write(f"WHATSAPP_API_TOKEN={whatsapp_api_token}\n")
+            env_file.write(f"WHATSAPP_API_URL={whatsapp_api_url}\n")
+            env_file.write(f"NAMESPACE={namespace}\n")
+            env_file.write(f"repo_path={repo_path}\n")
+            env_file.write(f"service={service}\n")
+        print("Archivo .env creado exitosamente con las variables proporcionadas.")
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Error al crear el archivo .env: {str(e)}"}), 500
+
+    # Mostrar los valores actuales de las variables en la respuesta
+    response = {
+        "status": "success",
+        "message": "Operación recibida y en proceso. Archivo .env creado.",
+        "repo_path": repo_path,
+        "service": service
+    }
+
+    # Ejecutar la lógica en segundo plano para el git pull y reinicio del servicio
     try:
         # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
         def execute_operations():
             try:
-                repo_path = os.getenv("repo_path")
-                service = os.getenv("service")
+                if repo_path is None or service is None:
+                    print("Error: Las variables repo_path o service no están definidas.")
+                    return
+
                 os.chdir(repo_path)
 
                 # Ejecutar git pull
@@ -651,5 +679,8 @@ def pull():
 
     except Exception as e:
         return jsonify({"status": "error", "message": f"Ocurrió un error: {str(e)}"}), 500
+
+    
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)
