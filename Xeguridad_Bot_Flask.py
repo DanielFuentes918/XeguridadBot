@@ -16,6 +16,7 @@ from UnitsData import obtener_datos, obtener_unidades
 from bson.binary import Binary
 from flask import Flask, send_from_directory
 from DenunciasReclamos_SMTP import enviar_queja_anonima
+from dotenv import load_dotenv
 
 app = Flask("Xeguridad_Bot_Flask")
 
@@ -612,9 +613,6 @@ def obtener_datos_route():
         return jsonify(datos)  # Devuelve los datos en formato JSON
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
-
-from dotenv import load_dotenv
-import os
 
 @app.route('/pull', methods=['GET', 'POST'])
 def pull():
