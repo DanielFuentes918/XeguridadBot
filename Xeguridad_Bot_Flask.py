@@ -616,48 +616,47 @@ def obtener_datos_route():
 
 @app.route('/pull', methods=['GET', 'POST'])
 def pull():
-    # Obtener valores de las variables de entorno proporcionadas por GitHub Actions
+    # Obtener valores de las variables de entorno proporcionadas por GitHub Actions o sistema operativo
     whatsapp_api_token = os.getenv("WHATSAPP_API_TOKEN")
     whatsapp_api_url = os.getenv("WHATSAPP_API_URL")
     namespace = os.getenv("NAMESPACE")
     repo_path = os.getenv("repo_path")
     service = os.getenv("service")
 
-    # Crear un archivo .env local con las variables si no existe
-    try:
-        with open(".env", "w") as env_file:
-            env_file.write(f"WHATSAPP_API_TOKEN={whatsapp_api_token}\n")
-            env_file.write(f"WHATSAPP_API_URL={whatsapp_api_url}\n")
-            env_file.write(f"NAMESPACE={namespace}\n")
-            env_file.write(f"repo_path={repo_path}\n")
-            env_file.write(f"service={service}\n")
-        print("Archivo .env creado/actualizado exitosamente con las variables proporcionadas.")
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"Error al crear/actualizar el archivo .env: {str(e)}"}), 500
-
-    # Cargar variables desde el archivo .env
-    load_dotenv()
+    # Validar si las variables críticas están presentes
+    if not all([whatsapp_api_token, whatsapp_api_url, namespace, repo_path, service]):
+        response = {
+            "status": "error",
+            "message": "Faltan una o más variables de entorno críticas. Por favor, verifique la configuración de las variables de entorno.",
+            "WHATSAPP_API_TOKEN": whatsapp_api_token,
+            "WHATSAPP_API_URL": whatsapp_api_url,
+            "NAMESPACE": namespace,
+            "repo_path": repo_path,
+            "service": service
+        }
+        return jsonify(response), 400
 
     # Mostrar los valores actuales de las variables para verificar que se están cargando correctamente
     response = {
         "status": "success",
-        "message": "Operación recibida y en proceso. Archivo .env creado.",
-        "WHATSAPP_API_TOKEN": os.getenv("WHATSAPP_API_TOKEN"),
-        "WHATSAPP_API_URL": os.getenv("WHATSAPP_API_URL"),
-        "NAMESPACE": os.getenv("NAMESPACE"),
-        "repo_path": os.getenv("repo_path"),
-        "service": os.getenv("service")
+        "message": "Operación recibida y en proceso.",
+        "WHATSAPP_API_TOKEN": whatsapp_api_token,
+        "WHATSAPP_API_URL": whatsapp_api_url,
+        "NAMESPACE": namespace,
+        "repo_path": repo_path,
+        "service": service
     }
 
     # Ejecutar la lógica en segundo plano para el git pull y reinicio del servicio
     try:
-        # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
+        # Usar un hilo para ejecutar las operaciones si es necesario
         def execute_operations():
             try:
-                repo_path = os.getenv("repo_path")
-                service = os.getenv("service")
-                if repo_path is None or service is None:
-                    print("Error: Las variables repo_path o service no están definidas.")
+                if not os.path.exists(repo_path):
+                    print(f"Error: El directorio {repo_path} no existe.")
+                    return
+                if not os.access(repo_path, os.W_OK):
+                    print(f"Error: No se tienen permisos de escritura para el directorio {repo_path}.")
                     return
 
                 os.chdir(repo_path)
@@ -669,7 +668,8 @@ def pull():
 
                 # Verificar si git pull tuvo éxito
                 if pull_result.returncode != 0:
-                    print(f"Error al ejecutar git pull: {pull_result.stderr}")
+                    print(f"Error al ejecutar 'git pull': {pull_result.stderr}")
+                    return
 
                 # Reiniciar el servicio
                 restart_result = subprocess.run(["sudo", "systemctl", "restart", service], capture_output=True, text=True)
@@ -677,7 +677,12 @@ def pull():
                 print(f"Service restart stderr: {restart_result.stderr}")
 
                 if restart_result.returncode != 0:
-                    print(f"Error al reiniciar el servicio: {restart_result.stderr}")
+                    print(f"Error al reiniciar el servicio '{service}': {restart_result.stderr}")
+
+                # Verificar si el servicio está activo después del reinicio
+                check_service = subprocess.run(["systemctl", "is-active", service], capture_output=True, text=True)
+                if "inactive" in check_service.stdout or check_service.returncode != 0:
+                    print(f"Error: El servicio '{service}' no se está ejecutando después del reinicio.")
 
             except Exception as e:
                 print(f"Excepción al ejecutar operaciones: {e}")
