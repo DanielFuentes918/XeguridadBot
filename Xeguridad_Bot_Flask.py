@@ -43,6 +43,9 @@ PASSWORD_MONGO = os.getenv("PASSWORD_MONGO")
 PASSWORD_MONGO_ESCAPADA = quote_plus(PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
+repo_path = os.getenv("repo_path")
+service = os.getenv("service")
+
 
 # Diccionario para rastrear números de teléfono que esperan una placa
 esperando_placa = {}
@@ -616,20 +619,15 @@ def obtener_datos_route():
 @app.route('/pull', methods=['GET', 'POST'])
 def pull():
     # Obtener valores de las variables de entorno proporcionadas por GitHub Actions o sistema operativo
-    whatsapp_api_token = os.getenv("WHATSAPP_API_TOKEN")
-    whatsapp_api_url = os.getenv("WHATSAPP_API_URL")
-    namespace = os.getenv("NAMESPACE")
-    repo_path = os.getenv("repo_path")
-    service = os.getenv("service")
 
     # Validar si las variables críticas están presentes
-    if not all([whatsapp_api_token, whatsapp_api_url, namespace, repo_path, service]):
+    if not all([WHATSAPP_API_TOKEN, WHATSAPP_API_URL, NAMESPACE, repo_path, service]):
         response = {
             "status": "error",
             "message": "Faltan una o más variables de entorno críticas. Por favor, verifique la configuración de las variables de entorno.",
-            "WHATSAPP_API_TOKEN": whatsapp_api_token,
-            "WHATSAPP_API_URL": whatsapp_api_url,
-            "NAMESPACE": namespace,
+            "WHATSAPP_API_TOKEN": WHATSAPP_API_TOKEN,
+            "WHATSAPP_API_URL": WHATSAPP_API_URL,
+            "NAMESPACE": NAMESPACE,
             "repo_path": repo_path,
             "service": service
         }
@@ -639,9 +637,9 @@ def pull():
     response = {
         "status": "success",
         "message": "Operación recibida y en proceso.",
-        "WHATSAPP_API_TOKEN": whatsapp_api_token,
-        "WHATSAPP_API_URL": whatsapp_api_url,
-        "NAMESPACE": namespace,
+        "WHATSAPP_API_TOKEN": WHATSAPP_API_TOKEN,
+        "WHATSAPP_API_URL": WHATSAPP_API_URL,
+        "NAMESPACE": NAMESPACE,
         "repo_path": repo_path,
         "service": service
     }
