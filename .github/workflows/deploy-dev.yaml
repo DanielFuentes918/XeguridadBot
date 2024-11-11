@@ -29,6 +29,10 @@ jobs:
       run: |
         echo "WHATSAPP_API_TOKEN=${{ secrets.XEGURIDAD2_API_TOKEN }}" >> .env
         echo "WHATSAPP_API_URL=${{ secrets.XEGURIDAD2_WB_API }}" >> .env
+        echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
+        echo "XEGURIDAD_API_URL=${{ secrets.XEGURIDAD_API_URL }}" >> .env
+        echo "XEGURIDAD_PASSWORD=${{ secrets.XEGURIDAD_PASSWORD }}" >> .env
+        echo "PASSWORD_MONGO=${{ secrets.PASSWORD_MONGO }}" >> .env
         echo "NAMESPACE=Xeguridad2" >> .env
         echo "repo_path=/home/exasa/XeguridadBot-pruebas/XeguridadBot" >> .env
         echo "service=flask.service" >> .env
@@ -38,6 +42,10 @@ jobs:
       run: |
         echo "WHATSAPP_API_TOKEN=${{ secrets.XEGURIDAD_API_TOKEN }}" >> .env
         echo "WHATSAPP_API_URL=${{ secrets.XEGURIDAD_WB_API }}" >> .env
+        echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env
+        echo "XEGURIDAD_API_URL=${{ secrets.XEGURIDAD_API_URL }}" >> .env
+        echo "XEGURIDAD_PASSWORD=${{ secrets.XEGURIDAD_PASSWORD }}" >> .env
+        echo "PASSWORD_MONGO=${{ secrets.PASSWORD_MONGO }}" >> .env
         echo "NAMESPACE=Xeguridad" >> .env
         echo "repo_path=/home/exasa/XeguridadBot-produccion/XeguridadBot" >> .env
         echo "service=flask_main.service" >> .env
