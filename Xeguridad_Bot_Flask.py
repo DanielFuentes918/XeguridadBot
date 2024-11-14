@@ -14,13 +14,16 @@ from UnitsData import obtener_datos, obtener_unidades
 from bson.binary import Binary
 from flask import Flask, send_from_directory
 from DenunciasReclamos_SMTP import enviar_queja_anonima
+from dotenv import load_dotenv
 
 app = Flask("Xeguridad_Bot_Flask")
 
+load_dotenv()
+
 VERIFY_TOKEN = "9189189189"
-WHATSAPP_API_URL = "https://graph.facebook.com/v21.0/407123635824758/messages" #El valor se obtiene directamente del pipeline bajo un secret de Github
-WHATSAPP_API_TOKEN = "EAARCdrR4dXkBO5CazxXO5pCWYGSQ7blM1QQWDZCBWhdZAaObL2vmnCgnZBB75jhpBQZBgJnW7XquYz5HAXju3jAfp5waPRo6rT2Faz1DrIbqMAGNcWoCZB5gAetoXdO2hXcBvmGyj7M2mg8hzZAGTS7JDmcZBQRYuZBZAiosZAdqdQswZAPy9QVJnQj4sbUBnAoxlsz" #El valor se obtiene directamente del pipeline bajo un secret de Github
-NAMESPACE = "Xeguridad2" #El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL") # El valor se obtiene directamente del pipeline bajo un secret de Github
+WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN") # El valor se obtiene directamente del pipeline bajo un secret de Github
+NAMESPACE = os.getenv("NAMESPACE") # El valor se obtiene directamente del pipeline bajo un secret de Github
 STARTER_MENU_TEMPLATE = "starter_menu"
 AUTH_TEMPLATE = "auth_request"
 AUTH_FAILED_TEMPLATE = "auth_failed"
@@ -41,6 +44,9 @@ PASSWORD_MONGO = os.getenv("PASSWORD_MONGO")
 PASSWORD_MONGO_ESCAPADA = quote_plus(PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
+repo_path = os.getenv("repo_path")
+service = os.getenv("service")
+
 
 # Diccionario para rastrear números de teléfono que esperan una placa
 esperando_placa = {}
@@ -60,6 +66,13 @@ usuarios_esperando_password = {}
 usuarios_en_starter_menu = {}
 
 uri = f"mongodb://{USUARIO_MONGO}:{PASSWORD_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
+
+print("Valores proporcionados por el pipeline:")
+print(f"WHATSAPP_API_URL: {os.getenv('WHATSAPP_API_URL')}")
+print(f"WHATSAPP_API_TOKEN: {os.getenv('WHATSAPP_API_TOKEN')}")
+print(f"NAMESPACE: {os.getenv('NAMESPACE')}")
+print(f"repo_path: {os.getenv('repo_path')}")
+print(f"service: {os.getenv('service')}")
 
 # Conexion a MongoDB con manejo de excepciones
 try:
@@ -604,8 +617,10 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
-@app.route('/pull', methods=['POST'])
+@app.route('/pull', methods=['GET','POST'])
 def pull():
+    
+
     # Responder inmediatamente al webhook de GitHub
     response = {"status": "success", "message": "Operación recibida y en proceso."}
     # Enviar la respuesta inmediatamente
@@ -613,7 +628,8 @@ def pull():
         # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
         def execute_operations():
             try:
-                repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"
+                repo_path = os.getenv("repo_path")
+                service = os.getenv("service")
                 os.chdir(repo_path)
 
                 # Ejecutar git pull
@@ -626,7 +642,7 @@ def pull():
                     print(f"Error al ejecutar git pull: {pull_result.stderr}")
 
                 # Reiniciar el servicio
-                restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
+                restart_result = subprocess.run(["sudo", "systemctl", "restart", service], capture_output=True, text=True)
                 print(f"Service restart stdout: {restart_result.stdout}")
                 print(f"Service restart stderr: {restart_result.stderr}")
 
@@ -643,5 +659,6 @@ def pull():
 
     except Exception as e:
         return jsonify({"status": "error", "message": f"Ocurrió un error: {str(e)}"}), 500
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)

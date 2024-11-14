@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - dev
-      - master
+      - main
   pull_request:
     branches:
       - dev
-      - master
+      - main
 
 jobs:
   deploy:
@@ -25,23 +25,9 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Set environment variables
-      run: |
-        if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
-          echo "WHATSAPP_API_TOKEN=${{ secrets.XEGURIDAD_API_TOKEN }}" >> $GITHUB_ENV
-          echo "WHATSAPP_API_URL=${{ secrets.XEGURIDAD2_WB_API }}" >> $GITHUB_ENV
-          echo "NAMESPACE=Xeguridad2" >> $GITHUB_ENV
-        elif [ "${{ github.ref }}" == "refs/heads/master" ]; then
-          echo "WHATSAPP_API_TOKEN=${{ secrets.XEGURIDAD2_API_TOKEN }}" >> $GITHUB_ENV
-          echo "WHATSAPP_API_URL=${{ secrets.XEGURIDAD_WB_API }}" >> $GITHUB_ENV
-          echo "NAMESPACE=Xeguridad" >> $GITHUB_ENV
-        fi
-
     - name: Push changes to GitHub
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
         git remote set-url origin https://${{ secrets.ACCESS_TOKEN }}@github.com/DanielFuentes918/XeguridadBot.git
         git push origin ${{ github.ref_name }}
-
-
