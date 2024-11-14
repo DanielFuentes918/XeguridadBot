@@ -44,8 +44,6 @@ PASSWORD_MONGO = os.getenv("PASSWORD_MONGO")
 PASSWORD_MONGO_ESCAPADA = quote_plus(PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
-repo_path = os.getenv("repo_path")
-service = os.getenv("service")
 
 
 # Diccionario para rastrear números de teléfono que esperan una placa
