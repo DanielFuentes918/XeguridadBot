@@ -19,6 +19,8 @@ from dotenv import load_dotenv
 
 app = Flask("Xeguridad_Bot_Flask")
 
+load_dotenv()
+
 VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL") # El valor se obtiene directamente del pipeline bajo un secret de Github
 WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN") # El valor se obtiene directamente del pipeline bajo un secret de Github
@@ -616,46 +618,16 @@ def obtener_datos_route():
     else:
         return jsonify({'error': 'No se encontraron unidades o hubo un problema con la solicitud'}), 404
 
-@app.route('/pull', methods=['GET', 'POST'])
+@app.route('/pull', methods=['GET','POST'])
 def pull():
-    # Obtener valores de las variables de entorno proporcionadas por GitHub Actions o sistema operativo
-
-    # Validar si las variables críticas están presentes
-    if not all([WHATSAPP_API_TOKEN, WHATSAPP_API_URL, NAMESPACE, repo_path, service]):
-        response = {
-            "status": "error",
-            "message": "Faltan una o más variables de entorno críticas. Por favor, verifique la configuración de las variables de entorno.",
-            "WHATSAPP_API_TOKEN": WHATSAPP_API_TOKEN,
-            "WHATSAPP_API_URL": WHATSAPP_API_URL,
-            "NAMESPACE": NAMESPACE,
-            "repo_path": repo_path,
-            "service": service
-        }
-        return jsonify(response), 400
-
-    # Mostrar los valores actuales de las variables para verificar que se están cargando correctamente
-    response = {
-        "status": "success",
-        "message": "Operación recibida y en proceso.",
-        "WHATSAPP_API_TOKEN": WHATSAPP_API_TOKEN,
-        "WHATSAPP_API_URL": WHATSAPP_API_URL,
-        "NAMESPACE": NAMESPACE,
-        "repo_path": repo_path,
-        "service": service
-    }
-
-    # Ejecutar la lógica en segundo plano para el git pull y reinicio del servicio
+    # Responder inmediatamente al webhook de GitHub
+    response = {"status": "success", "message": "Operación recibida y en proceso."}
+    # Enviar la respuesta inmediatamente
     try:
-        # Usar un hilo para ejecutar las operaciones si es necesario
+        # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
         def execute_operations():
             try:
-                if not os.path.exists(repo_path):
-                    print(f"Error: El directorio {repo_path} no existe.")
-                    return
-                if not os.access(repo_path, os.W_OK):
-                    print(f"Error: No se tienen permisos de escritura para el directorio {repo_path}.")
-                    return
-
+                repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"
                 os.chdir(repo_path)
 
                 # Ejecutar git pull
@@ -665,21 +637,15 @@ def pull():
 
                 # Verificar si git pull tuvo éxito
                 if pull_result.returncode != 0:
-                    print(f"Error al ejecutar 'git pull': {pull_result.stderr}")
-                    return
+                    print(f"Error al ejecutar git pull: {pull_result.stderr}")
 
                 # Reiniciar el servicio
-                restart_result = subprocess.run(["sudo", "systemctl", "restart", service], capture_output=True, text=True)
+                restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
                 print(f"Service restart stdout: {restart_result.stdout}")
                 print(f"Service restart stderr: {restart_result.stderr}")
 
                 if restart_result.returncode != 0:
-                    print(f"Error al reiniciar el servicio '{service}': {restart_result.stderr}")
-
-                # Verificar si el servicio está activo después del reinicio
-                check_service = subprocess.run(["systemctl", "is-active", service], capture_output=True, text=True)
-                if "inactive" in check_service.stdout or check_service.returncode != 0:
-                    print(f"Error: El servicio '{service}' no se está ejecutando después del reinicio.")
+                    print(f"Error al reiniciar el servicio: {restart_result.stderr}")
 
             except Exception as e:
                 print(f"Excepción al ejecutar operaciones: {e}")
