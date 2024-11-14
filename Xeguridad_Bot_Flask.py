@@ -620,6 +620,8 @@ def obtener_datos_route():
 
 @app.route('/pull', methods=['GET','POST'])
 def pull():
+    
+
     # Responder inmediatamente al webhook de GitHub
     response = {"status": "success", "message": "Operación recibida y en proceso."}
     # Enviar la respuesta inmediatamente
@@ -627,7 +629,8 @@ def pull():
         # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
         def execute_operations():
             try:
-                repo_path = "/home/exasa/XeguridadBot-pruebas/XeguridadBot"
+                repo_path = os.getenv("repo_path")
+                service = os.getenv("service")
                 os.chdir(repo_path)
 
                 # Ejecutar git pull
@@ -640,7 +643,7 @@ def pull():
                     print(f"Error al ejecutar git pull: {pull_result.stderr}")
 
                 # Reiniciar el servicio
-                restart_result = subprocess.run(["sudo", "systemctl", "restart", "flask.service"], capture_output=True, text=True)
+                restart_result = subprocess.run(["sudo", "systemctl", "restart", service], capture_output=True, text=True)
                 print(f"Service restart stdout: {restart_result.stdout}")
                 print(f"Service restart stderr: {restart_result.stderr}")
 
