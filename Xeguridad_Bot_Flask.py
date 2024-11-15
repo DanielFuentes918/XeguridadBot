@@ -44,8 +44,7 @@ PASSWORD_MONGO = os.getenv("PASSWORD_MONGO")
 PASSWORD_MONGO_ESCAPADA = quote_plus(PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
-repo_path = os.getenv("repo_path")
-service = os.getenv("service")
+PORT = os.getenv("PORT")
 
 
 # Diccionario para rastrear números de teléfono que esperan una placa
@@ -661,4 +660,4 @@ def pull():
         return jsonify({"status": "error", "message": f"Ocurrió un error: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
