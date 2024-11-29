@@ -19,10 +19,10 @@ def enviar_queja_anonima(denuncia):
         msg = MIMEMultipart()
         msg['From'] = EMAIL_USER
         msg['To'] = 'sistemas2@exasa.net'  # Aquí va el destinatario
-        msg['Subject'] = 'Nueva Queja Anónima'
+        msg['Subject'] = 'Nueva Denuncia Anónima'
 
         # Cuerpo del correo
-        cuerpo = f"Se ha recibido la siguiente queja anónima:\n\n{denuncia}"
+        cuerpo = f"Se ha recibido la siguiente denuncia anónima:\n\n{denuncia}"
         msg.attach(MIMEText(cuerpo, 'plain'))
 
         # Conexión al servidor SMTP (SSL para el puerto 465)
