@@ -1,25 +1,28 @@
-from flask import Flask, request, jsonify, render_template
-import requests
+from flask import Flask, request, jsonify, render_template#main
+import requests #utils
 import re
-import os
-import bcrypt
+import os#config
+import bcrypt#users
 import subprocess
 from threading import Thread
 from bson import ObjectId
-from urllib.parse import quote_plus
-from pymongo import MongoClient
-from datetime import datetime, timedelta
+from urllib.parse import quote_plus #config
+from pymongo import MongoClient#main
+from datetime import datetime, timedelta#users
 from pruebaCrawler import execute_crawler
 from UnitsData import obtener_datos, obtener_unidades
 from bson.binary import Binary
 from flask import Flask, send_from_directory
 from DenunciasReclamos_SMTP import enviar_queja_anonima
-from dotenv import load_dotenv
+from dotenv import load_dotenv#config
 
 app = Flask("Xeguridad_Bot_Flask")
 
-load_dotenv()
+load_dotenv()#config
 
+
+###############################
+#CONFIG:
 VERIFY_TOKEN = "9189189189"
 WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL") # El valor se obtiene directamente del pipeline bajo un secret de Github
 WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN") # El valor se obtiene directamente del pipeline bajo un secret de Github
@@ -45,6 +48,7 @@ PASSWORD_MONGO_ESCAPADA = quote_plus(PASSWORD_MONGO)
 BASE_DATOS_MONGO = "XeguridadBotDB"
 AUTH_DB = "admin"
 PORT = os.getenv("PORT")
+#################################
 
 
 # Diccionario para rastrear números de teléfono que esperan una placa
@@ -66,12 +70,12 @@ usuarios_en_starter_menu = {}
 
 uri = f"mongodb://{USUARIO_MONGO}:{PASSWORD_MONGO_ESCAPADA}@localhost:27017/{BASE_DATOS_MONGO}?authSource={AUTH_DB}"
 
-print("Valores proporcionados por el pipeline:")
-print(f"WHATSAPP_API_URL: {os.getenv('WHATSAPP_API_URL')}")
-print(f"WHATSAPP_API_TOKEN: {os.getenv('WHATSAPP_API_TOKEN')}")
-print(f"NAMESPACE: {os.getenv('NAMESPACE')}")
-print(f"repo_path: {os.getenv('repo_path')}")
-print(f"service: {os.getenv('service')}")
+# print("Valores proporcionados por el pipeline:")
+# print(f"WHATSAPP_API_URL: {os.getenv('WHATSAPP_API_URL')}")
+# print(f"WHATSAPP_API_TOKEN: {os.getenv('WHATSAPP_API_TOKEN')}")
+# print(f"NAMESPACE: {os.getenv('NAMESPACE')}")
+# print(f"repo_path: {os.getenv('repo_path')}")
+# print(f"service: {os.getenv('service')}")
 
 # Conexion a MongoDB con manejo de excepciones
 try:
@@ -155,6 +159,7 @@ def manejar_mensaje_entrante(mensaje):
 
     print(usuarios_autenticados,usuarios_esperando_password, usuarios_en_starter_menu)
 
+    #users
     if (numero not in usuarios_autenticados) and (numero not in usuarios_esperando_password) and (numero not in usuarios_en_starter_menu):
         manejar_respuesta_usuario(numero, STARTER_MENU_TEMPLATE)
         print("Usuario no autenticado. Enviando menú inicial.")
@@ -260,6 +265,7 @@ def manejar_starter_menu_respuesta(numero, cuerpo_mensaje):
     else:
         print("Opción no válida del menú inicial.")
 
+# Utils
 def manejar_respuesta_usuario(numero, template_name):
     components = []  # Añadir los parámetros necesarios si los hay
     response_status = enviar_mensaje_whatsapp(numero, template_name, components)
@@ -364,6 +370,7 @@ def enviar_mensaje_auth(numero, AUTH_TEMPLATE, components):
         }
     }
 
+#utils
 def enviar_mensaje_whatsapp(numero, template_name, components):
     headers = {
         'Authorization': f'Bearer {WHATSAPP_API_TOKEN}',
