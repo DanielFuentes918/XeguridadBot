@@ -81,3 +81,6 @@ def manejar_mensaje_entrante(mensaje):
     else:
         print("Usuario no autenticado. Solicitando autenticación.")
 
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=config.PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
+
