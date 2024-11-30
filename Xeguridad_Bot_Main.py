@@ -21,6 +21,7 @@ except Exception as e:
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
+    print ("Webhook recibido")
     if request.method == 'GET':
         # Verificación del webhook
         token = request.args.get('hub.verify_token')
