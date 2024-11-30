@@ -8,7 +8,7 @@ config = Config()
 
 ultimos_mensajes = {}
 
-app = Flask("Xeguridad_Bot_Main")
+app = Flask("Xeguridad_Bot_Flask")
 
 # Conexion a MongoDB con manejo de excepciones
 try:
