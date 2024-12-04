@@ -90,7 +90,6 @@ def manejar_mensaje_entrante(mensaje):
         print(f"Denuncia recibida: {denuncia}")
         enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
         print("Llamada a enviar_queja_anonima realizada")
-        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, components)
         components = [
             {
                 "type": "body",
@@ -102,6 +101,7 @@ def manejar_mensaje_entrante(mensaje):
                     ]
             }
         ]
+        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, components)
         return jsonify({"status": "denuncia recibida y enviada por correo"}), 200
     else:
         print("El mensaje no es una denuncia o reclamo.")
