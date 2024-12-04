@@ -1,12 +1,15 @@
 from Config import Config
 from Users import UsuarioManager
 from Utils import envioTemplateTxt
+from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
 
 config = Config()
 
 ultimos_mensajes = {}
+
+esperando_denuncia = {}
 
 app = Flask("Xeguridad_Bot_Main")
 
@@ -54,14 +57,17 @@ def manejar_mensaje_entrante(mensaje):
     usuario = usuario_manager.buscar_usuario_por_telefono(numero)
     cuerpo_mensaje = ""
 
+    # Manejo de mensajes duplicados
     if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
         print(f"Mensaje duplicado detectado: {message_id}")
         return
     ultimos_mensajes[numero] = message_id 
 
+    # Detecta si es primera vez que el usuario envía un mensaje para enviar starter_menu
     if usuario_manager.manejar_inicio(numero):
         return
     
+    # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
         cuerpo_mensaje = mensaje['button']['payload']
     else:   
@@ -72,8 +78,34 @@ def manejar_mensaje_entrante(mensaje):
     if cuerpo_mensaje.strip().lower() == "xeguridad":
         if not usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje):
             return
-        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME)
+        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar menú principal
         return
+    
+    if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
+        print("El usuario ha seleccionado la opción de 'denuncias o reclamos'")
+        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncias/reclamos
+        esperando_denuncia[numero] = True
+    elif numero in esperando_denuncia:
+        denuncia= cuerpo_mensaje
+        print(f"Denuncia recibida: {denuncia}")
+        enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
+        print("Llamada a enviar_queja_anonima realizada")
+        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, components)
+        components = [
+            {
+                "type": "body",
+                    "parameters": components + [
+                        {
+                            "type": "text",
+                            "text": denuncia
+                        },
+                    ]
+            }
+        ]
+        return jsonify({"status": "denuncia recibida y enviada por correo"}), 200
+    else:
+        print("El mensaje no es una denuncia o reclamo.")
+        return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
 
     if usuario_manager.usuario_autenticado(numero):
         # Lógica para usuarios autenticados
