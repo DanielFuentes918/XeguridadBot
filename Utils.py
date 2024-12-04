@@ -4,7 +4,6 @@ import requests
 config = Config()
 
 def envioTemplateTxt(numero, template_name, components):
-    components = [components]  # Añadir los parámetros necesarios si los hay
     response_status = envioMsj(numero, template_name, components)
     print(f"Estado de la respuesta al enviar mensaje: {response_status}")
 
