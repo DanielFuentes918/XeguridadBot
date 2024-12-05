@@ -1,15 +1,20 @@
+from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
-
+from XeguridadCrawler import execute_crawler
 config = Config()
 
 ultimos_mensajes = {}
 
 esperando_denuncia = {}
+
+esperando_placa = {}
+
+user_requests = {}
 
 app = Flask("Xeguridad_Bot_Main")
 
@@ -93,7 +98,7 @@ def manejar_mensaje_entrante(mensaje):
         components = [
             {
                 "type": "body",
-                    "parameters": components + [
+                    "parameters": [
                         {
                             "type": "text",
                             "text": denuncia
@@ -107,12 +112,57 @@ def manejar_mensaje_entrante(mensaje):
         print("El mensaje no es una denuncia o reclamo.")
         return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
 
+    # Verificar autenticación del usuario
     if usuario_manager.usuario_autenticado(numero):
         # Lógica para usuarios autenticados
         #manejar_comandos_autenticados(numero, cuerpo_mensaje)
         print("Usuario autenticado. Procesando comandos.")
     else:
         print("Usuario no autenticado. Solicitando autenticación.")
+
+    # Manejo de comandos
+    if cuerpo_mensaje.strip(): 
+            if cuerpo_mensaje == "Mandar comandos a unidad":
+                envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
+                esperando_placa[numero] = True
+            elif numero in esperando_placa:
+                placa = cuerpo_mensaje.upper()
+                print(f"Placa detectada: {placa}")
+                unitnumber = buscar_unitnumber_por_placa(placa)
+                if unitnumber:
+                    print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+                    user_requests[numero] = {
+                        "placa": placa,
+                        "hora": datetime.now()
+                    }
+                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME)
+                    if execute_crawler(unitnumber):
+                        print("Crawler ejecutado correctamente.")
+                        obtener_ultima_transmision(unitnumber, numero)
+                    else:
+                        print("Error al ejecutar el crawler.")
+                else:
+                    print(f"No se encontró el unitnumber para la placa {placa}.")
+                    components = [
+                        {
+                            "type": "body",
+                            "parameters": components + [
+                                {
+                                    "type": "text",
+                                    "text": placa
+                                },
+                            ]
+                        }    
+                    ]
+                    envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE,components)
+                del esperando_placa[numero]  
+            else:
+                print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME)
+
+
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=config.PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
