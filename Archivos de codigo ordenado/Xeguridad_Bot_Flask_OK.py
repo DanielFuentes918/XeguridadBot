@@ -20,7 +20,6 @@ app = Flask("Xeguridad_Bot_Flask")
 
 load_dotenv()#config
 
-
 ###############################
 #CONFIG:
 VERIFY_TOKEN = "9189189189"
