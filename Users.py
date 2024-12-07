@@ -64,7 +64,7 @@ class UsuarioManager:
             self.usuarios_esperando_password[numero] = True
             #return
         else:
-            if autenticar_usuario(numero, cuerpo_mensaje):
+            if self.autenticar_usuario(numero, cuerpo_mensaje):
                 print("Autenticación exitosa. Bienvenido.")
                 envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
                 del self.usuarios_esperando_password[numero]
