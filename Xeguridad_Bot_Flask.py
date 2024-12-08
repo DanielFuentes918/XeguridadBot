@@ -126,7 +126,7 @@ def manejar_mensaje_entrante(mensaje):
     # Manejo de comandos
     if cuerpo_mensaje.strip(): 
             if cuerpo_mensaje == "Mandar comandos a unidad":
-                envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME)
+                envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
                 esperando_placa[numero] = True
             elif numero in esperando_placa:
                 placa = cuerpo_mensaje.upper()
@@ -138,7 +138,7 @@ def manejar_mensaje_entrante(mensaje):
                         "placa": placa,
                         "hora": datetime.now()
                     }
-                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME)
+                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME, [])
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
                         obtener_ultima_transmision(unitnumber, numero)
@@ -161,7 +161,7 @@ def manejar_mensaje_entrante(mensaje):
                 del esperando_placa[numero]  
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME)
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
 
 @app.route('/')
 def home():
