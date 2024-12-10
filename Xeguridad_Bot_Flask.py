@@ -92,6 +92,7 @@ def manejar_mensaje_entrante(mensaje):
         print("El usuario ha seleccionado la opción de 'denuncias o reclamos'")
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncias/reclamos
         esperando_denuncia[numero] = True
+        return
     elif numero in esperando_denuncia:
         denuncia= cuerpo_mensaje
         print(f"Denuncia recibida: {denuncia}")
@@ -117,8 +118,8 @@ def manejar_mensaje_entrante(mensaje):
 
     # Verificar autenticación del usuario
     if usuario_manager.usuario_autenticado(numero):
-        # Lógica para usuarios autenticados
-        #manejar_comandos_autenticados(numero, cuerpo_mensaje)
+        #Lógica para usuarios autenticados
+        manejar_comandos_autenticados(numero, cuerpo_mensaje)
         print("Usuario autenticado. Procesando comandos.")
     else:
         print("Usuario no autenticado. Solicitando autenticación.")
@@ -161,7 +162,7 @@ def manejar_mensaje_entrante(mensaje):
                 del esperando_placa[numero]  
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                #envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
 
     if cuerpo_mensaje.strip().lower() == "volver a menú principal":
         envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
