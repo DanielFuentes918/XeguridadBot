@@ -88,8 +88,7 @@ def manejar_mensaje_entrante(mensaje):
             return
         envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar menú principal
         return
-    
-    if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
+    elif cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
         print("El usuario ha seleccionado la opción de 'denuncias o reclamos'")
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncias/reclamos
         esperando_denuncia[numero] = True
@@ -112,6 +111,7 @@ def manejar_mensaje_entrante(mensaje):
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, components)
         return jsonify({"status": "denuncia recibida y enviada por correo"}), 200
     else:
+        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
         print("El mensaje no es una denuncia o reclamo.")
         return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
 
