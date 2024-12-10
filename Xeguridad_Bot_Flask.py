@@ -163,6 +163,10 @@ def manejar_mensaje_entrante(mensaje):
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
                 #envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
 
+    if cuerpo_mensaje.strip().lower() == "volver a menú principal":
+        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+        return
+
 @app.route('/')
 def home():
     return "Servidor Flask en funcionamiento."
