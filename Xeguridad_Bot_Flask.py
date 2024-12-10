@@ -161,7 +161,7 @@ def manejar_mensaje_entrante(mensaje):
                 del esperando_placa[numero]  
             else:
                 print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+                #envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
 
 @app.route('/')
 def home():
