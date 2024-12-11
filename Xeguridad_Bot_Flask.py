@@ -84,17 +84,24 @@ def manejar_mensaje_entrante(mensaje):
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
     if cuerpo_mensaje.strip().lower() == "xeguridad":
+        print("Llamando a manejar_respuesta_autenticacion...")
         if not usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje):
+            print("Usuario no autenticado o autenticación fallida.")
             return
+        print("Usuario autenticado. Enviando menú principal.")
         envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar menú principal
         return
-    elif cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
+
+    # Manejar opción de "Denuncias o reclamos"
+    if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
         print("El usuario ha seleccionado la opción de 'denuncias o reclamos'")
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncias/reclamos
         esperando_denuncia[numero] = True
-        return
-    elif numero in esperando_denuncia:
-        denuncia= cuerpo_mensaje
+        return  # Detener el flujo para evitar ejecuciones innecesarias
+
+    # Manejar recepción de denuncia
+    if numero in esperando_denuncia:
+        denuncia = cuerpo_mensaje
         print(f"Denuncia recibida: {denuncia}")
         enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
         print("Llamada a enviar_queja_anonima realizada")
@@ -111,62 +118,11 @@ def manejar_mensaje_entrante(mensaje):
         ]
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, components)
         return jsonify({"status": "denuncia recibida y enviada por correo"}), 200
-    else:
-        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-        print("El mensaje no es una denuncia o reclamo.")
-        return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
 
-    # Verificar autenticación del usuario
-    if usuario_manager.usuario_autenticado(numero):
-        #Lógica para usuarios autenticados
-        manejar_comandos_autenticados(numero, cuerpo_mensaje)
-        print("Usuario autenticado. Procesando comandos.")
-    else:
-        print("Usuario no autenticado. Solicitando autenticación.")
-
-    # Manejo de comandos
-    if cuerpo_mensaje.strip(): 
-            if cuerpo_mensaje == "Mandar comandos a unidad":
-                envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
-                esperando_placa[numero] = True
-            elif numero in esperando_placa:
-                placa = cuerpo_mensaje.upper()
-                print(f"Placa detectada: {placa}")
-                unitnumber = buscar_unitnumber_por_placa(placa)
-                if unitnumber:
-                    print(f"El unitnumber para la placa {placa} es {unitnumber}.")
-                    user_requests[numero] = {
-                        "placa": placa,
-                        "hora": datetime.now()
-                    }
-                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME, [])
-                    if execute_crawler(unitnumber):
-                        print("Crawler ejecutado correctamente.")
-                        obtener_ultima_transmision(unitnumber, numero)
-                    else:
-                        print("Error al ejecutar el crawler.")
-                else:
-                    print(f"No se encontró el unitnumber para la placa {placa}.")
-                    components = [
-                        {
-                            "type": "body",
-                            "parameters": components + [
-                                {
-                                    "type": "text",
-                                    "text": placa
-                                },
-                            ]
-                        }    
-                    ]
-                    envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE,components)
-                del esperando_placa[numero]  
-            else:
-                print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-
-    if cuerpo_mensaje.strip().lower() == "volver a menú principal":
-        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-        return
+    # Fallback para mensajes no reconocidos
+    envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+    print("El mensaje no es una denuncia o reclamo.")
+    return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
 
 @app.route('/')
 def home():

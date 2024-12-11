@@ -50,6 +50,7 @@ class UsuarioManager:
             return False
 
     def manejar_respuesta_autenticacion(self, numero, cuerpo_mensaje):
+        print(f"Manejando autenticación para {numero}. Mensaje: {cuerpo_mensaje}")
         if numero in self.usuarios_autenticados:
             hora_autenticacion = self.usuarios_autenticados[numero]
             
