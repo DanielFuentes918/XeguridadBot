@@ -87,10 +87,10 @@ def manejar_mensaje_entrante(mensaje):
         print("Llamando a manejar_respuesta_autenticacion...")
         if not usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje):
             print("Usuario no autenticado o autenticación fallida.")
-        else:
-            print("Usuario autenticado. Enviando menú principal.")
-            envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar menú principal
             return
+        print("Usuario autenticado. Enviando menú principal.")
+        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar menú principal
+        return
 
     # Manejar opción de "Denuncias o reclamos"
     if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
