@@ -101,8 +101,10 @@ def manejar_mensaje_entrante(mensaje):
 
     # Manejar recepción de denuncia
     if numero in esperando_denuncia:
-        denuncia = cuerpo_mensaje
+        denuncia = [cuerpo_mensaje]
         print(f"Denuncia recibida: {denuncia}")
+
+    if cuerpo_mensaje.strip().lower() == "enviar":
         enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
         print("Llamada a enviar_queja_anonima realizada")
         components = [
