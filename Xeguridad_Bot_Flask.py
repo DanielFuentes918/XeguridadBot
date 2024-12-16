@@ -97,7 +97,6 @@ def manejar_mensaje_entrante(mensaje):
         print("El usuario ha seleccionado la opción de 'denuncias o reclamos'")
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncias/reclamos
         esperando_denuncia[numero] = True
-        return  # Detener el flujo para evitar ejecuciones innecesarias
 
     # Manejar recepción de denuncia
     if numero in esperando_denuncia:
