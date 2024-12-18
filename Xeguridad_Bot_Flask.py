@@ -23,6 +23,8 @@ denuncia = {}
 
 imagenes = {}
 
+empresa = {}
+
 app = Flask("Xeguridad_Bot_Main")
     
 # Conexion a MongoDB con manejo de excepciones
@@ -102,15 +104,20 @@ def manejar_mensaje_entrante(mensaje):
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncia/reclamos
         esperando_denuncia[numero] = True
         denuncia[numero] = []  # Inicializar lista de denuncia
+        empresa[numero] = {}
         return  # Terminar el manejo de este mensaje para evitar conflictos con el menú inicial
 
     # Manejar recepción de denuncia
     if numero in esperando_denuncia and esperando_denuncia[numero]:
-        if cuerpo_mensaje.lower() == "enviar":
+        if cuerpo_mensaje.lower() == "EXA":
+            empresa[numero] = "EXA"
+        elif cuerpo_mensaje.lower() == "CONMOXA":
+            empresa[numero] = "CONMOXA"
+        elif cuerpo_mensaje.lower() == "enviar":
             if numero in denuncia and denuncia[numero]:
                 # Concatenar mensajes y enviar denuncia incluyendo imagenes
                 denuncia_concatenada = "\n".join(denuncia[numero])
-                enviar_queja_anonima(denuncia_concatenada, imagenes.get(numero, []))
+                enviar_queja_anonima(denuncia_concatenada, imagenes.get(numero, []),empresa[numero])
                 print("Denuncia enviada exitosamente.")
 
                 # Limpiar estado

@@ -15,7 +15,7 @@ EMAIL_USER = 'not-reply@exasa.net'
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Usa variables de entorno para la seguridad
 
 # Función para enviar el correo de queja
-def enviar_queja_anonima(denuncia, archivos=[]):
+def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
     try:
         # Configurar el correo
         msg = MIMEMultipart()
@@ -24,7 +24,7 @@ def enviar_queja_anonima(denuncia, archivos=[]):
         msg['Subject'] = 'Nueva Denuncia Anónima'
 
         # Concatenar mensajes de la denuncia
-        cuerpo = f"Se ha recibido la siguiente denuncia anónima:\n\n{denuncia}"
+        cuerpo = f"Se ha recibido la siguiente denuncia anónima interpuesta en la empresa {empresa}:\n\n{denuncia}"
         msg.attach(MIMEText(cuerpo, 'plain'))
 
         # Adjuntar archivos (imágenes)
