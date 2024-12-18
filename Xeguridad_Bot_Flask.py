@@ -76,21 +76,21 @@ def manejar_mensaje_entrante(mensaje):
     if mensaje['type'] == 'button':
         cuerpo_mensaje = mensaje['button']['payload']
     else:   
-        cuerpo_mensaje = mensaje.get('text', {}).get('body', '')
+        cuerpo_mensaje = mensaje.get('text', {}).get('body', '').strip()
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
     # Manejar opción de "denuncia o reclamos"
-    if cuerpo_mensaje.strip().lower() == "denuncia o reclamos":
+    if cuerpo_mensaje.lower() == "denuncia o reclamos":
         print("El usuario ha seleccionado la opción de 'denuncia o reclamos'")
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncia/reclamos
         esperando_denuncia[numero] = True
         denuncia[numero] = []  # Inicializar lista de denuncia
-        return
+        return  # Terminar el manejo de este mensaje para evitar conflictos con el menú inicial
 
     # Manejar recepción de denuncia
     if numero in esperando_denuncia and esperando_denuncia[numero]:
-        if cuerpo_mensaje.strip().lower() == "enviar":
+        if cuerpo_mensaje.lower() == "enviar":
             if numero in denuncia and denuncia[numero]:
                 # Concatenar mensajes y enviar denuncia
                 denuncia_concatenada = "\n".join(denuncia[numero])
@@ -124,8 +124,9 @@ def manejar_mensaje_entrante(mensaje):
         return
 
     # Fallback para mensajes no reconocidos
-    envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-    print("El mensaje no es una denuncia o reclamo.")
+    if numero not in esperando_denuncia or not esperando_denuncia[numero]:
+        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+        print("El mensaje no es una denuncia o reclamo.")
 
 @app.route('/')
 def home():
