@@ -109,6 +109,7 @@ def manejar_mensaje_entrante(mensaje):
 
     # Manejar recepción de denuncia
     if numero in esperando_denuncia and esperando_denuncia[numero]:
+        envioTemplateTxt(numero, config.COMPANY_SELECTION_TEMPLATE, [])  # Enviar plantilla de seleccion de compañia
         if cuerpo_mensaje.lower() == "EXA":
             empresa[numero] = "EXA"
         elif cuerpo_mensaje.lower() == "CONMOXA":
