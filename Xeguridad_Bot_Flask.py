@@ -70,6 +70,10 @@ def manejar_mensaje_entrante(mensaje):
     message_id = mensaje.get('id')
     cuerpo_mensaje = ""
 
+    if cuerpo_mensaje.lower().lstrip() == "Volver a menú principal":
+        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+        return
+
     # Manejo de mensajes duplicados
     if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
         print(f"Mensaje duplicado detectado: {message_id}")
