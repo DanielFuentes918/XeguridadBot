@@ -165,7 +165,7 @@ def obtener_ultima_transmision(unitnumber, numero):
         return "No se pudo obtener la última transmisión."
     
 def descargar_imagen(media_id, access_token):
-    url = f"https://graph.facebook.com/v16.0/{media_id}"
+    url = f"https://graph.facebook.com/v21.0/{media_id}"
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
