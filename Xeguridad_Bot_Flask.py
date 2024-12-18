@@ -5,7 +5,7 @@ from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
 from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision
-from denunciaReclamos_SMTP import enviar_queja_anonima
+from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
 from XeguridadCrawler import execute_crawler
