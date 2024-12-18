@@ -97,14 +97,13 @@ def manejar_mensaje_entrante(mensaje):
         print("El usuario ha seleccionado la opción de 'denuncias o reclamos'")
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncias/reclamos
         esperando_denuncia[numero] = True
-        return 
 
     # Manejar recepción de denuncia
-    elif numero in esperando_denuncia:
+    if numero in esperando_denuncia:
         denuncia = [cuerpo_mensaje]
         print(f"Denuncia recibida: {denuncia}")
 
-    elif cuerpo_mensaje.strip().lower() == "enviar":
+    if cuerpo_mensaje.strip().lower() == "enviar":
         enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
         print("Llamada a enviar_queja_anonima realizada")
         components = [
@@ -120,9 +119,6 @@ def manejar_mensaje_entrante(mensaje):
         ]
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, components)
         return jsonify({"status": "denuncia recibida y enviada por correo"}), 200
-    
-    else:
-        return
 
     # Fallback para mensajes no reconocidos
     envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
