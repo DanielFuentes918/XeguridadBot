@@ -120,6 +120,7 @@ def manejar_mensaje_entrante(mensaje):
                 denuncia_concatenada = "\n".join(denuncia[numero])
                 enviar_queja_anonima(denuncia_concatenada, imagenes.get(numero, []),empresa[numero])
                 print("Denuncia enviada exitosamente.")
+                envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, [])
 
                 # Limpiar estado
                 esperando_denuncia.pop(numero, None)
