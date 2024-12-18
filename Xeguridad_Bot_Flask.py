@@ -5,7 +5,7 @@ from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
 from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision
-from DenunciasReclamos_SMTP import enviar_queja_anonima
+from denunciaReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
 from XeguridadCrawler import execute_crawler
@@ -18,6 +18,8 @@ esperando_denuncia = {}
 esperando_placa = {}
 
 user_requests = {}
+
+denuncia = {}
 
 app = Flask("Xeguridad_Bot_Main")
 
@@ -62,19 +64,14 @@ def manejar_mensaje_entrante(mensaje):
     print(f"Manejando mensaje entrante: {mensaje}")
     numero = mensaje['from']
     message_id = mensaje.get('id')
-    usuario = usuario_manager.buscar_usuario_por_telefono(numero)
     cuerpo_mensaje = ""
 
     # Manejo de mensajes duplicados
     if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
         print(f"Mensaje duplicado detectado: {message_id}")
         return
-    ultimos_mensajes[numero] = message_id 
+    ultimos_mensajes[numero] = message_id
 
-    # Detecta si es primera vez que el usuario envía un mensaje para enviar starter_menu
-    if usuario_manager.manejar_inicio(numero):
-        return
-    
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
         cuerpo_mensaje = mensaje['button']['payload']
@@ -83,47 +80,52 @@ def manejar_mensaje_entrante(mensaje):
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
-    if cuerpo_mensaje.strip().lower() == "xeguridad":
-        print("Llamando a manejar_respuesta_autenticacion...")
-        if not usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje):
-            print("Usuario no autenticado o autenticación fallida.")
-            return
-        print("Usuario autenticado. Enviando menú principal.")
-        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar menú principal
+    # Manejar opción de "denuncia o reclamos"
+    if cuerpo_mensaje.strip().lower() == "denuncia o reclamos":
+        print("El usuario ha seleccionado la opción de 'denuncia o reclamos'")
+        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncia/reclamos
+        esperando_denuncia[numero] = True
+        denuncia[numero] = []  # Inicializar lista de denuncia
         return
 
-    # Manejar opción de "Denuncias o reclamos"
-    if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
-        print("El usuario ha seleccionado la opción de 'denuncias o reclamos'")
-        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncias/reclamos
-        esperando_denuncia[numero] = True
-
     # Manejar recepción de denuncia
-    if numero in esperando_denuncia:
-        denuncia = [cuerpo_mensaje]
-        print(f"Denuncia recibida: {denuncia}")
+    if numero in esperando_denuncia and esperando_denuncia[numero]:
+        if cuerpo_mensaje.strip().lower() == "enviar":
+            if numero in denuncia and denuncia[numero]:
+                # Concatenar mensajes y enviar denuncia
+                denuncia_concatenada = "\n".join(denuncia[numero])
+                enviar_queja_anonima(denuncia_concatenada)
+                print("Denuncia enviada exitosamente.")
 
-    if cuerpo_mensaje.strip().lower() == "enviar":
-        enviar_queja_anonima(denuncia)  # Llama a la función que envía la denuncia por correo
-        print("Llamada a enviar_queja_anonima realizada")
-        components = [
-            {
-                "type": "body",
-                    "parameters": [
-                        {
-                            "type": "text",
-                            "text": denuncia
-                        },
-                    ]
-            }
-        ]
-        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, components)
-        return jsonify({"status": "denuncia recibida y enviada por correo"}), 200
+                # Enviar notificación al usuario
+                components = [
+                    {
+                        "type": "body",
+                        "parameters": [
+                            {
+                                "type": "text",
+                                "text": denuncia_concatenada
+                            }
+                        ]
+                    }
+                ]
+                envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, components)
+
+                # Limpiar estado
+                esperando_denuncia[numero] = False
+                del denuncia[numero]
+            else:
+                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+                print("No hay mensajes para enviar como denuncia.")
+        else:
+            # Agregar el mensaje a la lista de denuncia
+            denuncia[numero].append(cuerpo_mensaje)
+            print(f"Mensaje agregado a la denuncia: {cuerpo_mensaje}")
+        return
 
     # Fallback para mensajes no reconocidos
     envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
     print("El mensaje no es una denuncia o reclamo.")
-    return jsonify({"error": "no se encontró el campo 'denuncia' en el request"}), 400
 
 @app.route('/')
 def home():

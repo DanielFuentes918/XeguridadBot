@@ -21,12 +21,12 @@ def enviar_queja_anonima(denuncia):
         msg['To'] = 'sistemas2@exasa.net'  # Aquí va el destinatario
         msg['Subject'] = 'Nueva Denuncia Anónima'
 
-        # Cuerpo del correo
+        # Concatenar mensajes de la denuncia
         cuerpo = f"Se ha recibido la siguiente denuncia anónima:\n\n{denuncia}"
         msg.attach(MIMEText(cuerpo, 'plain'))
 
         # Conexión al servidor SMTP (SSL para el puerto 465)
-        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)  # Usar SMTP_SSL en lugar de SMTP
+        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
         server.login(EMAIL_USER, EMAIL_PASSWORD)
 
         # Enviar correo
