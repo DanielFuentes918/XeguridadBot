@@ -163,3 +163,29 @@ def obtener_ultima_transmision(unitnumber, numero):
             return "No se encontró la última transmisión."
     else:
         return "No se pudo obtener la última transmisión."
+    
+def descargar_imagen(media_id, access_token):
+    url = f"https://graph.facebook.com/v16.0/{media_id}"
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        # Obtener la URL de descarga
+        download_url = response.json().get('url')
+        print(f"URL de descarga: {download_url}")
+
+        # Descargar la imagen desde la URL
+        image_response = requests.get(download_url)
+        if image_response.status_code == 200:
+            filename = f"{media_id}.jpg"
+            with open(filename, 'wb') as file:
+                file.write(image_response.content)
+            print(f"Imagen descargada exitosamente: {filename}")
+            return filename
+        else:
+            print(f"Error al descargar la imagen: {image_response.status_code}")
+    else:
+        print(f"Error al obtener la URL de descarga: {response.status_code}")
+    return None
