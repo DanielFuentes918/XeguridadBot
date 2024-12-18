@@ -81,7 +81,7 @@ def manejar_mensaje_entrante(mensaje):
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
     # Manejar opción de "denuncia o reclamos"
-    if cuerpo_mensaje.lower() == "denuncia o reclamos":
+    if cuerpo_mensaje.lower() == "denuncias o reclamos":
         print("El usuario ha seleccionado la opción de 'denuncia o reclamos'")
         envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncia/reclamos
         esperando_denuncia[numero] = True
