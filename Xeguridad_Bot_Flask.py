@@ -4,7 +4,7 @@ from threading import Thread
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision, descargar_imagen
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
@@ -20,6 +20,8 @@ esperando_placa = {}
 user_requests = {}
 
 denuncia = {}
+
+imagenes = {}
 
 app = Flask("Xeguridad_Bot_Main")
     
@@ -72,6 +74,20 @@ def manejar_mensaje_entrante(mensaje):
         return
     ultimos_mensajes[numero] = message_id
 
+    # Manejar diferentes tipos de mensajes
+    if mensaje['type'] == 'text':
+        cuerpo_mensaje = mensaje['text']['body']
+    elif mensaje['type'] == 'image':
+        media_id = mensaje['image']['id']
+        # Usar la función de descarga desde Utils
+        imagen_path = descargar_imagen(media_id, config.WHATSAPP_API_TOKEN)
+        if numero not in imagenes:
+            imagenes[numero] = []
+        if imagen_path:
+            imagenes[numero].append(imagen_path)
+        print(f"Imagen asociada al usuario {numero}: {imagen_path}")
+        return  # No procesar más si es una imagen
+
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
         cuerpo_mensaje = mensaje['button']['payload']
@@ -92,14 +108,19 @@ def manejar_mensaje_entrante(mensaje):
     if numero in esperando_denuncia and esperando_denuncia[numero]:
         if cuerpo_mensaje.lower() == "enviar":
             if numero in denuncia and denuncia[numero]:
-                # Concatenar mensajes y enviar denuncia
+                # Concatenar mensajes y enviar denuncia incluyendo imagenes
                 denuncia_concatenada = "\n".join(denuncia[numero])
-                enviar_queja_anonima(denuncia_concatenada)
+                enviar_queja_anonima(denuncia_concatenada, imagenes.get(numero, []))
                 print("Denuncia enviada exitosamente.")
 
                 # Limpiar estado
-                esperando_denuncia[numero] = False
-                del denuncia[numero]
+                esperando_denuncia.pop(numero, None)
+                denuncia.pop(numero, None)
+                # Eliminar imágenes temporales
+                for img in imagenes.pop(numero, []):
+                    os.remove(img)
+                print("Denuncia enviada exitosamente.")
+                return jsonify({'status': 'Denuncia enviada'}), 200
             else:
                 envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
                 print("No hay mensajes para enviar como denuncia.")
