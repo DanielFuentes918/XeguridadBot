@@ -100,21 +100,21 @@ def manejar_mensaje_entrante(mensaje):
 
     # Manejar opción de "denuncia o reclamos"
     if cuerpo_mensaje.lower() == "denuncias o reclamos":
-        print("El usuario ha seleccionado la opción de 'denuncia o reclamos'")
-        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncia/reclamos
-        esperando_denuncia[numero] = True
-        denuncia[numero] = []  # Inicializar lista de denuncia
         empresa[numero] = {}
-        return  # Terminar el manejo de este mensaje para evitar conflictos con el menú inicial
-
-    # Manejar recepción de denuncia
-    if numero in esperando_denuncia and esperando_denuncia[numero]:
+        print("El usuario ha seleccionado la opción de 'denuncia o reclamos'")
         envioTemplateTxt(numero, config.COMPANY_SELECTION_TEMPLATE, [])  # Enviar plantilla de seleccion de compañia
         if cuerpo_mensaje.lower() == "EXA":
             empresa[numero] = "EXA"
         elif cuerpo_mensaje.lower() == "CONMOXA":
             empresa[numero] = "CONMOXA"
-        elif cuerpo_mensaje.lower() == "enviar":
+        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncia/reclamos
+        esperando_denuncia[numero] = True
+        denuncia[numero] = []  # Inicializar lista de denuncia
+        return  # Terminar el manejo de este mensaje para evitar conflictos con el menú inicial
+
+    # Manejar recepción de denuncia
+    if numero in esperando_denuncia and esperando_denuncia[numero]:
+        if cuerpo_mensaje.lower() == "enviar":
             if numero in denuncia and denuncia[numero]:
                 # Concatenar mensajes y enviar denuncia incluyendo imagenes
                 denuncia_concatenada = "\n".join(denuncia[numero])
@@ -125,6 +125,7 @@ def manejar_mensaje_entrante(mensaje):
                 # Limpiar estado
                 esperando_denuncia.pop(numero, None)
                 denuncia.pop(numero, None)
+
                 # Eliminar imágenes temporales
                 for img in imagenes.pop(numero, []):
                     os.remove(img)
