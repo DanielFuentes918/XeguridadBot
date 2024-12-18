@@ -165,27 +165,30 @@ def obtener_ultima_transmision(unitnumber, numero):
         return "No se pudo obtener la última transmisión."
     
 def descargar_imagen(media_id, access_token):
+    # Endpoint para obtener la URL del archivo
     url = f"https://graph.facebook.com/v21.0/{media_id}"
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
-    response = requests.get(url, headers=headers)
+    headers = {"Authorization": f"Bearer {access_token}"}
 
-    if response.status_code == 200:
+    try:
         # Obtener la URL de descarga
-        download_url = response.json().get('url')
-        print(f"URL de descarga: {download_url}")
-
-        # Descargar la imagen desde la URL
-        image_response = requests.get(download_url)
-        if image_response.status_code == 200:
-            filename = f"{media_id}.jpg"
-            with open(filename, 'wb') as file:
-                file.write(image_response.content)
-            print(f"Imagen descargada exitosamente: {filename}")
-            return filename
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            download_url = response.json().get('url')
+            if download_url:
+                # Descargar la imagen desde la URL obtenida
+                image_response = requests.get(download_url, headers=headers)
+                if image_response.status_code == 200:
+                    filename = f"/tmp/{media_id}.jpg"
+                    with open(filename, 'wb') as file:
+                        file.write(image_response.content)
+                    print(f"Imagen descargada exitosamente: {filename}")
+                    return filename
+                else:
+                    print(f"Error al descargar la imagen: {image_response.status_code}")
+            else:
+                print("No se pudo obtener la URL de descarga.")
         else:
-            print(f"Error al descargar la imagen: {image_response.status_code}")
-    else:
-        print(f"Error al obtener la URL de descarga: {response.status_code}")
+            print(f"Error al obtener la URL de descarga: {response.status_code} {response.text}")
+    except Exception as e:
+        print(f"Excepción al intentar descargar la imagen: {e}")
     return None
