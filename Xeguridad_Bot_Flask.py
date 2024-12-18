@@ -4,7 +4,7 @@ from threading import Thread
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision, descargar_imagen
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
@@ -21,10 +21,8 @@ user_requests = {}
 
 denuncia = {}
 
-imagenes = {}
-
 app = Flask("Xeguridad_Bot_Main")
-
+    
 # Conexion a MongoDB con manejo de excepciones
 try:
     client = MongoClient(config.mongo_uri())
@@ -36,66 +34,80 @@ except Exception as e:
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
-    data = request.json
-    print(f"Datos recibidos: {data}")
-    for entry in data.get('entry', []):
-        for change in entry.get('changes', []):
-            message = change.get('value', {}).get('messages', [])[0]
-            numero = message['from']
-            message_id = message.get('id')
-            cuerpo_mensaje = ""
+    print ("Webhook recibido")
+    if request.method == 'GET':
+        # Verificación del webhook
+        token = request.args.get('hub.verify_token')
+        challenge = request.args.get('hub.challenge')
+        print("Token webhook:",token)
+        print("Challenge webhook:",challenge)
+        if token == config.VERIFY_TOKEN:
+            return str(challenge)
+        return "Verificación de token fallida", 403
+    elif request.method == 'POST':
+        # Manejo de mensajes entrantes
+        data = request.json
+        print(f"Datos recibidos: {data}")
 
-            # Manejo de mensajes duplicados
-            if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
-                print(f"Mensaje duplicado detectado: {message_id}")
-                return
-            ultimos_mensajes[numero] = message_id
+        if 'entry' in data:
+            for entry in data['entry']:
+                if 'changes' in entry:
+                    for change in entry['changes']:
+                        if 'value' in change:
+                            value = change['value']
+                            if 'messages' in value:
+                                for message in value['messages']:
+                                    manejar_mensaje_entrante(message)
+        return jsonify({'status': 'success'}), 200
+    
+def manejar_mensaje_entrante(mensaje):
+    print(f"Manejando mensaje entrante: {mensaje}")
+    numero = mensaje['from']
+    message_id = mensaje.get('id')
+    cuerpo_mensaje = ""
 
-            # Manejar diferentes tipos de mensajes
-            if message['type'] == 'text':
-                cuerpo_mensaje = message['text']['body']
-            elif message['type'] == 'image':
-                media_id = message['image']['id']
-                imagen_path = descargar_imagen(media_id, config.WHATSAPP_API_TOKEN)
-                if numero not in imagenes:
-                    imagenes[numero] = []
-                if imagen_path:
-                    imagenes[numero].append(imagen_path)
-                print(f"Imagen asociada al usuario {numero}: {imagen_path}")
-                continue  # No procesamos texto si es una imagen
+    # Manejo de mensajes duplicados
+    if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
+        print(f"Mensaje duplicado detectado: {message_id}")
+        return
+    ultimos_mensajes[numero] = message_id
 
-            # Flujo de denuncias
-            if cuerpo_mensaje.strip().lower() == "denuncias o reclamos":
-                print("El usuario ha seleccionado 'denuncias o reclamos'")
-                envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])
-                esperando_denuncia[numero] = True
-                denuncia[numero] = []
-                if numero not in imagenes:
-                    imagenes[numero] = []
-                return jsonify({'status': 'Plantilla enviada'}), 200
+    # Detectar tipo de mensaje y obtener el cuerpo del mensaje
+    if mensaje['type'] == 'button':
+        cuerpo_mensaje = mensaje['button']['payload']
+    else:   
+        cuerpo_mensaje = mensaje.get('text', {}).get('body', '').strip()
 
-            if numero in esperando_denuncia and esperando_denuncia[numero]:
-                if cuerpo_mensaje.strip().lower() == "enviar":
-                    if numero in denuncia and denuncia[numero]:
-                        # Concatenar denuncia y enviar
-                        denuncia_texto = "\n".join(denuncia[numero])
-                        enviar_queja_anonima(denuncia_texto, imagenes[numero])
+    print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
-                        # Limpiar estado
-                        esperando_denuncia.pop(numero, None)
-                        denuncia.pop(numero, None)
-                        for img in imagenes.pop(numero, []):
-                            os.remove(img)  # Eliminar imágenes temporales
-                        return jsonify({'status': 'Denuncia enviada'}), 200
-                    else:
-                        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-                        print("No hay mensajes para enviar como denuncia.")
-                else:
-                    denuncia[numero].append(cuerpo_mensaje)
-                    print(f"Mensaje agregado a la denuncia: {cuerpo_mensaje}")
-                return
+    # Manejar opción de "denuncia o reclamos"
+    if cuerpo_mensaje.lower() == "denuncias o reclamos":
+        print("El usuario ha seleccionado la opción de 'denuncia o reclamos'")
+        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncia/reclamos
+        esperando_denuncia[numero] = True
+        denuncia[numero] = []  # Inicializar lista de denuncia
+        return  # Terminar el manejo de este mensaje para evitar conflictos con el menú inicial
 
-    return jsonify({'status': 'success'}), 200
+    # Manejar recepción de denuncia
+    if numero in esperando_denuncia and esperando_denuncia[numero]:
+        if cuerpo_mensaje.lower() == "enviar":
+            if numero in denuncia and denuncia[numero]:
+                # Concatenar mensajes y enviar denuncia
+                denuncia_concatenada = "\n".join(denuncia[numero])
+                enviar_queja_anonima(denuncia_concatenada)
+                print("Denuncia enviada exitosamente.")
+
+                # Limpiar estado
+                esperando_denuncia[numero] = False
+                del denuncia[numero]
+            else:
+                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+                print("No hay mensajes para enviar como denuncia.")
+        else:
+            # Agregar el mensaje a la lista de denuncia
+            denuncia[numero].append(cuerpo_mensaje)
+            print(f"Mensaje agregado a la denuncia: {cuerpo_mensaje}")
+        return
 
     # Fallback para mensajes no reconocidos
     if numero not in esperando_denuncia or not esperando_denuncia[numero]:
