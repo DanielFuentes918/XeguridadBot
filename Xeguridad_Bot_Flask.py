@@ -100,42 +100,48 @@ def manejar_mensaje_entrante(mensaje):
 
     # Manejar opción de "denuncia o reclamos"
     if cuerpo_mensaje.lower() == "denuncias o reclamos":
-        empresa[numero] = {}
-        print("El usuario ha seleccionado la opción de 'denuncia o reclamos'")
-        envioTemplateTxt(numero, config.COMPANY_SELECTION_TEMPLATE, [])  # Enviar plantilla de seleccion de compañia
-        if cuerpo_mensaje.lower() == "EXA":
-            empresa[numero] = "EXA"
-        elif cuerpo_mensaje.lower() == "CONMOXA":
-            empresa[numero] = "CONMOXA"
-        envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Enviar plantilla de denuncia/reclamos
-        esperando_denuncia[numero] = True
-        denuncia[numero] = []  # Inicializar lista de denuncia
-        return  # Terminar el manejo de este mensaje para evitar conflictos con el menú inicial
+        print("Enviando plantilla de selección de compañía...")
+        envioTemplateTxt(numero, config.COMPANY_SELECTION_TEMPLATE, [])
+        empresa[numero] = None  # Estado de selección de empresa
+        esperando_denuncia[numero] = False
+        denuncia[numero] = []
+        imagenes[numero] = []
+        return
 
-    # Manejar recepción de denuncia
+    # Manejar selección de compañía
+    if numero in empresa and empresa[numero] is None:
+        if cuerpo_mensaje.lower() in ["exa", "conmoxa"]:
+            empresa[numero] = cuerpo_mensaje.upper()
+            print(f"Empresa seleccionada: {empresa[numero]}")
+            envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Solicitar denuncia/reclamo
+            esperando_denuncia[numero] = True
+            return
+        else:
+            envioTemplateTxt(numero, config.COMPANY_SELECTION_TEMPLATE, [])
+            print("Respuesta inválida para selección de empresa.")
+            return
+
+    # Recepción de denuncia o reclamo
     if numero in esperando_denuncia and esperando_denuncia[numero]:
         if cuerpo_mensaje.lower() == "enviar":
-            if numero in denuncia and denuncia[numero]:
-                # Concatenar mensajes y enviar denuncia incluyendo imagenes
+            if denuncia[numero] or imagenes[numero]:
+                # Concatenar mensajes de denuncia
                 denuncia_concatenada = "\n".join(denuncia[numero])
-                enviar_queja_anonima(denuncia_concatenada, imagenes.get(numero, []),empresa[numero])
-                print("Denuncia enviada exitosamente.")
-                envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, [])
+                enviar_queja_anonima(denuncia_concatenada, imagenes[numero], empresa[numero])
+                print(f"Denuncia enviada para empresa {empresa[numero]}.")
 
                 # Limpiar estado
-                esperando_denuncia.pop(numero, None)
-                denuncia.pop(numero, None)
-
-                # Eliminar imágenes temporales
+                del esperando_denuncia[numero]
+                del empresa[numero]
+                del denuncia[numero]
                 for img in imagenes.pop(numero, []):
                     os.remove(img)
-                print("Denuncia enviada exitosamente.")
-                return jsonify({'status': 'Denuncia enviada'}), 200
+                envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE, [])
+                return
             else:
                 envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-                print("No hay mensajes para enviar como denuncia.")
+                print("No hay mensajes o imágenes para enviar.")
         else:
-            # Agregar el mensaje a la lista de denuncia
             denuncia[numero].append(cuerpo_mensaje)
             print(f"Mensaje agregado a la denuncia: {cuerpo_mensaje}")
         return
