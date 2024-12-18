@@ -85,7 +85,6 @@ def manejar_mensaje_entrante(mensaje):
         cuerpo_mensaje = mensaje['text']['body']
     elif mensaje['type'] == 'image':
         media_id = mensaje['image']['id']
-        cuerpo_mensaje = mensaje['image']['caption']
         # Usar la función de descarga desde Utils
         imagen_path = descargar_imagen(media_id, config.WHATSAPP_API_TOKEN)
         if numero not in imagenes:
