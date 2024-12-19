@@ -114,7 +114,7 @@ def manejar_mensaje_entrante(mensaje):
 
     # Manejar selección de compañía
     if numero in empresa and empresa[numero] is None:
-        if cuerpo_mensaje.lower() in ["exa", "conmoxa"]:
+        if cuerpo_mensaje.lower() in ["exa s.a.", "conmoxa", "la mega", "trexa", "otra empresa del grupo", "volver a menú principal"]:
             empresa[numero] = cuerpo_mensaje.upper()
             print(f"Empresa seleccionada: {empresa[numero]}")
             envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Solicitar denuncia/reclamo
