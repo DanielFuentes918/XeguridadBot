@@ -80,19 +80,19 @@ def manejar_mensaje_entrante(mensaje):
         return
     ultimos_mensajes[numero] = message_id
 
-    # Manejar diferentes tipos de mensajes
-    if mensaje['type'] == 'text':
-        cuerpo_mensaje = mensaje['text']['body']
-    elif mensaje['type'] == 'image':
-        media_id = mensaje['image']['id']
-        # Usar la función de descarga desde Utils
-        imagen_path = descargar_multimedia(media_id, config.WHATSAPP_API_TOKEN)
-        if numero not in imagenes:
-            imagenes[numero] = []
-        if imagen_path:
-            imagenes[numero].append(imagen_path)
-        print(f"Imagen asociada al usuario {numero}: {imagen_path}")
-        return  # No procesar más si es una imagen
+    # # Manejar diferentes tipos de mensajes
+    # if mensaje['type'] == 'text':
+    #     cuerpo_mensaje = mensaje['text']['body']
+    # elif mensaje['type'] == 'image':
+    #     media_id = mensaje['image']['id']
+    #     # Usar la función de descarga desde Utils
+    #     imagen_path = descargar_multimedia(media_id, config.WHATSAPP_API_TOKEN)
+    #     if numero not in imagenes:
+    #         imagenes[numero] = []
+    #     if imagen_path:
+    #         imagenes[numero].append(imagen_path)
+    #     print(f"Imagen asociada al usuario {numero}: {imagen_path}")
+    #     return  # No procesar más si es una imagen
 
     # Detectar tipo de mensaje
     if mensaje['type'] == 'text':
