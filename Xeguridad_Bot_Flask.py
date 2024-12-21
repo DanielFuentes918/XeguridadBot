@@ -102,7 +102,6 @@ def manejar_mensaje_entrante(mensaje):
         print(f"Video descargado para {numero}: {video_path}")
         return
 
-    print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
         cuerpo_mensaje = mensaje['button']['payload']
