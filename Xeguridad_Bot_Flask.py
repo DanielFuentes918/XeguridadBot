@@ -4,7 +4,7 @@ from threading import Thread
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision, descargar_imagen
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision, descargar_multimedia
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
@@ -86,7 +86,7 @@ def manejar_mensaje_entrante(mensaje):
     elif mensaje['type'] == 'image':
         media_id = mensaje['image']['id']
         # Usar la función de descarga desde Utils
-        imagen_path = descargar_imagen(media_id, config.WHATSAPP_API_TOKEN)
+        imagen_path = descargar_multimedia(media_id, config.WHATSAPP_API_TOKEN)
         if numero not in imagenes:
             imagenes[numero] = []
         if imagen_path:
@@ -94,11 +94,27 @@ def manejar_mensaje_entrante(mensaje):
         print(f"Imagen asociada al usuario {numero}: {imagen_path}")
         return  # No procesar más si es una imagen
 
-    # Detectar tipo de mensaje y obtener el cuerpo del mensaje
-    if mensaje['type'] == 'button':
-        cuerpo_mensaje = mensaje['button']['payload']
-    else:   
-        cuerpo_mensaje = mensaje.get('text', {}).get('body', '').strip()
+    # Detectar tipo de mensaje
+    if mensaje['type'] == 'text':
+        cuerpo_mensaje = mensaje['text']['body'].strip()
+    elif mensaje['type'] == 'image':
+        media_id = mensaje['image']['id']
+        imagen_path = descargar_multimedia(media_id, config.WHATSAPP_API_TOKEN, "imagen")
+        if numero not in imagenes:
+            imagenes[numero] = []
+        if imagen_path:
+            imagenes[numero].append(imagen_path)
+        print(f"Imagen descargada para {numero}: {imagen_path}")
+        return
+    elif mensaje['type'] == 'video':
+        media_id = mensaje['video']['id']
+        video_path = descargar_multimedia(media_id, config.WHATSAPP_API_TOKEN, "video")
+        if numero not in imagenes:
+            imagenes[numero] = []
+        if video_path:
+            imagenes[numero].append(video_path)
+        print(f"Video descargado para {numero}: {video_path}")
+        return
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
