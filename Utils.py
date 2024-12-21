@@ -164,7 +164,7 @@ def obtener_ultima_transmision(unitnumber, numero):
     else:
         return "No se pudo obtener la última transmisión."
     
-def descargar_media(media_id, access_token, tipo="imagen"):
+def descargar_multimedia(media_id, access_token, tipo="imagen"):
     # Endpoint para obtener la URL del archivo
     url = f"https://graph.facebook.com/v21.0/{media_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
