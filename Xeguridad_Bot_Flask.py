@@ -80,21 +80,7 @@ def manejar_mensaje_entrante(mensaje):
         return
     ultimos_mensajes[numero] = message_id
 
-    # # Manejar diferentes tipos de mensajes
-    # if mensaje['type'] == 'text':
-    #     cuerpo_mensaje = mensaje['text']['body']
-    # elif mensaje['type'] == 'image':
-    #     media_id = mensaje['image']['id']
-    #     # Usar la función de descarga desde Utils
-    #     imagen_path = descargar_multimedia(media_id, config.WHATSAPP_API_TOKEN)
-    #     if numero not in imagenes:
-    #         imagenes[numero] = []
-    #     if imagen_path:
-    #         imagenes[numero].append(imagen_path)
-    #     print(f"Imagen asociada al usuario {numero}: {imagen_path}")
-    #     return  # No procesar más si es una imagen
-
-    # Detectar tipo de mensaje
+    # Manejar diferentes tipos de mensajes
     if mensaje['type'] == 'text':
         cuerpo_mensaje = mensaje['text']['body'].strip()
     elif mensaje['type'] == 'image':
@@ -115,6 +101,13 @@ def manejar_mensaje_entrante(mensaje):
             imagenes[numero].append(video_path)
         print(f"Video descargado para {numero}: {video_path}")
         return
+
+    print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
+    # Detectar tipo de mensaje y obtener el cuerpo del mensaje
+    if mensaje['type'] == 'button':
+        cuerpo_mensaje = mensaje['button']['payload']
+    else:   
+        cuerpo_mensaje = mensaje.get('text', {}).get('body', '').strip()
 
     print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
 
