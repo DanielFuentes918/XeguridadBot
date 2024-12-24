@@ -27,6 +27,8 @@ empresa = {}
 
 app = Flask("Xeguridad_Bot_Main")
     
+
+#Prueba
 # Conexion a MongoDB con manejo de excepciones
 try:
     client = MongoClient(config.mongo_uri())
