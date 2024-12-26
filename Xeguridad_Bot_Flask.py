@@ -1,5 +1,3 @@
-#Prueba
-
 import os
 import subprocess
 from threading import Thread
