@@ -1,8 +1,4 @@
-#prueba 3
-
 import os
-import subprocess
-from threading import Thread
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
@@ -172,49 +168,6 @@ def home():
 @app.route('/politica_privacidad', methods=['GET'])
 def politica_privacidad():
     return render_template('PoliticasSeguridad.html')
-
-# @app.route('/pull', methods=['GET','POST'])
-# def pull():    
-
-#     # Responder inmediatamente al webhook de GitHub
-#     response = {"status": "success", "message": "Operación recibida y en proceso."}
-#     # Enviar la respuesta inmediatamente
-#     try:
-#         # Usar un hilo para ejecutar las operaciones si es necesario (alternativa)
-#         def execute_operations():
-#             try:
-#                 repo_path = os.getenv("repo_path")
-#                 service = os.getenv("service")
-#                 os.chdir(repo_path)
-
-#                 # Ejecutar git pull
-#                 pull_result = subprocess.run(["git", "pull"], capture_output=True, text=True)
-#                 print(f"Git pull stdout: {pull_result.stdout}")
-#                 print(f"Git pull stderr: {pull_result.stderr}")
-
-#                 # Verificar si git pull tuvo éxito
-#                 if pull_result.returncode != 0:
-#                     print(f"Error al ejecutar git pull: {pull_result.stderr}")
-
-#                 # Reiniciar el servicio
-#                 restart_result = subprocess.run(["sudo", "systemctl", "restart", service], capture_output=True, text=True)
-#                 print(f"Service restart stdout: {restart_result.stdout}")
-#                 print(f"Service restart stderr: {restart_result.stderr}")
-
-#                 if restart_result.returncode != 0:
-#                     print(f"Error al reiniciar el servicio: {restart_result.stderr}")
-
-#             except Exception as e:
-#                 print(f"Excepción al ejecutar operaciones: {e}")
-
-#         # Ejecutar las operaciones en un hilo separado para no bloquear la respuesta
-#         Thread(target=execute_operations).start()  # Usa hilos si quieres ejecutar en segundo plano
-
-#         return jsonify(response), 200
-
-#     except Exception as e:
-#         return jsonify({"status": "error", "message": f"Ocurrió un error: {str(e)}"}), 500
-
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=config.PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
