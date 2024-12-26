@@ -23,7 +23,7 @@ class Config:
         self.PORT = os.getenv("PORT")
 
         # Plantillas
-        self.STARTER_MENU_TEMPLATE = "starter_menu"
+        self.STARTER_MENU_TEMPLATE = "start_menu"
         self.AUTH_TEMPLATE = "auth_request"
         self.AUTH_FAILED_TEMPLATE = "auth_failed"
         self.MENU_TEMPLATE_NAME = "xeguridad_menu"
