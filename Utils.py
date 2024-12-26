@@ -164,7 +164,7 @@ def obtener_ultima_transmision(unitnumber, numero):
     else:
         return "No se pudo obtener la última transmisión."
     
-def descargar_imagen(media_id, access_token):
+def descargar_multimedia(media_id, access_token, tipo="imagen"):
     # Endpoint para obtener la URL del archivo
     url = f"https://graph.facebook.com/v21.0/{media_id}"
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -175,20 +175,21 @@ def descargar_imagen(media_id, access_token):
         if response.status_code == 200:
             download_url = response.json().get('url')
             if download_url:
-                # Descargar la imagen desde la URL obtenida
-                image_response = requests.get(download_url, headers=headers)
-                if image_response.status_code == 200:
-                    filename = f"/tmp/{media_id}.jpg"
+                # Descargar el archivo desde la URL obtenida
+                extension = "mp4" if tipo == "video" else "jpg"
+                filename = f"/tmp/{media_id}.{extension}"
+                media_response = requests.get(download_url, headers=headers)
+                if media_response.status_code == 200:
                     with open(filename, 'wb') as file:
-                        file.write(image_response.content)
-                    print(f"Imagen descargada exitosamente: {filename}")
+                        file.write(media_response.content)
+                    print(f"{tipo.capitalize()} descargado exitosamente: {filename}")
                     return filename
                 else:
-                    print(f"Error al descargar la imagen: {image_response.status_code}")
+                    print(f"Error al descargar el {tipo}: {media_response.status_code}")
             else:
                 print("No se pudo obtener la URL de descarga.")
         else:
             print(f"Error al obtener la URL de descarga: {response.status_code} {response.text}")
     except Exception as e:
-        print(f"Excepción al intentar descargar la imagen: {e}")
+        print(f"Excepción al intentar descargar el {tipo}: {e}")
     return None

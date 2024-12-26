@@ -23,7 +23,7 @@ class Config:
         self.PORT = os.getenv("PORT")
 
         # Plantillas
-        self.STARTER_MENU_TEMPLATE = "starter_menu2"
+        self.STARTER_MENU_TEMPLATE = "start_menu"
         self.AUTH_TEMPLATE = "auth_request"
         self.AUTH_FAILED_TEMPLATE = "auth_failed"
         self.MENU_TEMPLATE_NAME = "xeguridad_menu"
@@ -32,10 +32,10 @@ class Config:
         self.RESPUESTA_COMANDOS_TEMPLATE = "lt_command__response"
         self.COMANDO_NO_RECIBIDO_TEMPLATE = "lt_command__failed"
         self.PLACA_NO_ENCONTRADA_TEMPLATE = "plate_number_wasnt_find"
-        self.COMPLAINT_CLAIMS_TEMPLATE = "complaint_claims_request2"
+        self.COMPLAINT_CLAIMS_TEMPLATE = "complaint_claims_request"
         self.COMPLAINT_CLAIMS_COPY_TEMPLATE = "complaint_claims_copy"
-        self.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE = "complaint_claims_confirmation"
-        self.COMPANY_SELECTION_TEMPLATE = "company_selection2"
+        self.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE = "complaint_claims_notification"
+        self.COMPANY_SELECTION_TEMPLATE = "company_selection"
 
     def mongo_uri(self):
         return f"mongodb://{self.USUARIO_MONGO}:{self.PASSWORD_MONGO_ESCAPADA}@localhost:27017/{self.BASE_DATOS_MONGO}?authSource={self.AUTH_DB}"
