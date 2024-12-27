@@ -69,6 +69,7 @@ def manejar_mensaje_entrante(mensaje):
     cuerpo_mensaje = ""
 
     if cuerpo_mensaje.lower().lstrip() == "Volver a menú principal":
+        esperando_denuncia[numero] = True
         envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
         return
 
@@ -155,6 +156,10 @@ def manejar_mensaje_entrante(mensaje):
             denuncia[numero].append(cuerpo_mensaje)
             print(f"Mensaje agregado a la denuncia: {cuerpo_mensaje}")
         return
+    
+    # Manejar opción de "Xeguridad"
+    if cuerpo_mensaje.lower() == "xeguridad":
+        usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje)
 
     # Fallback para mensajes no reconocidos
     if numero not in esperando_denuncia or not esperando_denuncia[numero]:
