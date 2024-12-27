@@ -21,7 +21,7 @@ def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
         # Configurar el correo
         msg = MIMEMultipart()
         msg['From'] = EMAIL_USER
-        msg['To'] = 'sistemas@exasa.net'  # Aquí va el destinatario
+        msg['To'] = EMAIL_DESTINATION  # Aquí va el destinatario
         msg['Subject'] = 'Nueva Denuncia Anónima'
 
         # Concatenar mensajes de la denuncia
@@ -46,7 +46,7 @@ def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
         server.login(EMAIL_USER, EMAIL_PASSWORD)
 
         # Enviar correo
-        server.sendmail(EMAIL_USER, 'sistemas2@exasa.net', msg.as_string())
+        server.sendmail(EMAIL_USER, EMAIL_DESTINATION, msg.as_string())
         server.quit()
 
         print("Correo enviado exitosamente.")
