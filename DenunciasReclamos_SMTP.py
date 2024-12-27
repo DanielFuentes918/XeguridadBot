@@ -12,7 +12,6 @@ load_dotenv()
 SMTP_SERVER = 'mail.exasa.net'  # Cambia esto a tu servidor SMTP
 SMTP_PORT = 465 # Puerto seguro para el servidor SMTP
 EMAIL_USER = 'not-reply@exasa.net'
-EMAIL_DESTINATION = os.getenv("EMAIL_DESTINATION")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Usa variables de entorno para la seguridad
 
 # Función para enviar el correo de queja
@@ -20,8 +19,8 @@ def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
     try:
         # Configurar el correo
         msg = MIMEMultipart()
-        msg['From'] = EMAIL_USER # Aquí va el remitente
-        msg['To'] = 'sistemas2@exasa.net'  # Aquí va el destinatario
+        msg['From'] = EMAIL_USER
+        msg['To'] = 'sistemas@exasa.net'  # Aquí va el destinatario
         msg['Subject'] = 'Nueva Denuncia Anónima'
 
         # Concatenar mensajes de la denuncia
@@ -46,7 +45,7 @@ def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
         server.login(EMAIL_USER, EMAIL_PASSWORD)
 
         # Enviar correo
-        server.sendmail(EMAIL_USER, EMAIL_DESTINATION, msg.as_string())
+        server.sendmail(EMAIL_USER, 'sistemas2@exasa.net', msg.as_string())
         server.quit()
 
         print("Correo enviado exitosamente.")
