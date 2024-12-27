@@ -69,10 +69,7 @@ def manejar_mensaje_entrante(mensaje):
     cuerpo_mensaje = ""
 
     if cuerpo_mensaje.lower().lstrip() == "Volver a menú principal":
-        usuarios_autenticados = False
-        usuarios_esperando_password = False
-        usuarios_en_starter_menu = False
-        esperando_denuncia[numero] = False
+        esperando_denuncia[numero] = True
         envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
         return
 
@@ -162,6 +159,7 @@ def manejar_mensaje_entrante(mensaje):
     
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad":
+        esperando_denuncia[numero] = False
         envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
 
     # Fallback para mensajes no reconocidos
