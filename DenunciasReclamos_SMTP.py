@@ -21,7 +21,7 @@ def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
         # Configurar el correo
         msg = MIMEMultipart()
         msg['From'] = EMAIL_USER # Aquí va el remitente
-        msg['To'] = EMAIL_DESTINATION  # Aquí va el destinatario
+        msg['To'] = 'sistemas2@exasa.net'  # Aquí va el destinatario
         msg['Subject'] = 'Nueva Denuncia Anónima'
 
         # Concatenar mensajes de la denuncia
