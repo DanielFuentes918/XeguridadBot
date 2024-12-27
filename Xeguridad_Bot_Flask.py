@@ -159,8 +159,7 @@ def manejar_mensaje_entrante(mensaje):
     
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad":
-        esperando_denuncia[numero] = False
-        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+        usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje)
 
     # Fallback para mensajes no reconocidos
     if numero not in esperando_denuncia or not esperando_denuncia[numero]:
