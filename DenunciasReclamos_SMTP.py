@@ -10,12 +10,11 @@ load_dotenv()
 
 # Configuración del servidor SMTP
 SMTP_SERVER = 'mail.exasa.net'  # Cambia esto a tu servidor SMTP
-SMTP_PORT = 465 # Puerto seguro para el servidor SMTP
+SMTP_PORT = 465  # Puerto seguro para el servidor SMTP
 EMAIL_USER = 'not-reply@exasa.net'
 EMAIL_DESTINATION = os.getenv("EMAIL_DESTINATION")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # Usa variables de entorno para la seguridad
 
-# Función para enviar el correo de queja
 def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
     try:
         # Configurar el correo
@@ -52,3 +51,14 @@ def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
         print("Correo enviado exitosamente.")
     except Exception as e:
         print(f"Error al enviar el correo: {e}")
+    finally:
+        # Eliminar los archivos después de enviarlos
+        for archivo in archivos:
+            try:
+                if os.path.exists(archivo):
+                    os.remove(archivo)
+                    print(f"Archivo eliminado: {archivo}")
+                else:
+                    print(f"El archivo no existe: {archivo}")
+            except Exception as e:
+                print(f"Error al eliminar el archivo {archivo}: {e}")
