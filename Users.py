@@ -52,29 +52,51 @@ class UsuarioManager:
             return True
         return False
 
-    def manejar_respuesta_autenticacion(self, numero, cuerpo_mensaje):
-        print(f"Manejando autenticación para {numero}. Mensaje: {cuerpo_mensaje}")
-        if numero in self.usuarios_autenticados:
-            hora_autenticacion = self.usuarios_autenticados[numero]
+    # def manejar_respuesta_autenticacion(self, numero, cuerpo_mensaje):
+    #     print(f"Manejando autenticación para {numero}. Mensaje: {cuerpo_mensaje}")
+    #     if numero in self.usuarios_autenticados:
+    #         hora_autenticacion = self.usuarios_autenticados[numero]
             
-            if datetime.now() - hora_autenticacion > timedelta(hours=24):
-                print("Sesión expirada. El usuario necesita autenticarse de nuevo.")
-                del self.usuarios_autenticados[numero]
-                envioTemplateTxt(numero, config.AUTH_TEMPLATE, [])
-                return False
-            return True
+    #         if datetime.now() - hora_autenticacion > timedelta(hours=24):
+    #             print("Sesión expirada. El usuario necesita autenticarse de nuevo.")
+    #             del self.usuarios_autenticados[numero]
+    #             envioTemplateTxt(numero, config.AUTH_TEMPLATE, [])
+    #             return False
+    #         return True
         
-        if numero not in self.usuarios_esperando_password:
+    #     if numero not in self.usuarios_esperando_password:
+    #         envioTemplateTxt(numero, config.AUTH_TEMPLATE, [])
+    #         self.usuarios_esperando_password[numero] = True
+    #         return
+    #     else:
+    #         if self.autenticar_usuario(numero, cuerpo_mensaje):
+    #             print("Autenticación exitosa. Bienvenido.")
+    #             envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+    #             del self.usuarios_esperando_password[numero]
+    #         else:
+    #             print("Autenticación fallida. Usuario o contraseña incorrectos.")
+    #             envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])
+    #             del self.usuarios_esperando_password[numero]
+    #     return False
+
+    def iniciar_autenticacion(self, numero):
+        if numero not in self.usuarios_autenticados and numero not in self.usuarios_esperando_password:
+            print(f"Enviando solicitud de autenticación para {numero}")
             envioTemplateTxt(numero, config.AUTH_TEMPLATE, [])
             self.usuarios_esperando_password[numero] = True
-            return
-        else:
+            return False
+        return True
+    
+    def procesar_credenciales(self, numero, cuerpo_mensaje):
+        if numero in self.usuarios_esperando_password:
             if self.autenticar_usuario(numero, cuerpo_mensaje):
-                print("Autenticación exitosa. Bienvenido.")
+                print(f"Autenticación exitosa para {numero}")
                 envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
                 del self.usuarios_esperando_password[numero]
+                self.usuarios_autenticados[numero] = datetime.now()
+                return True
             else:
-                print("Autenticación fallida. Usuario o contraseña incorrectos.")
+                print(f"Autenticación fallida para {numero}")
                 envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])
                 del self.usuarios_esperando_password[numero]
         return False

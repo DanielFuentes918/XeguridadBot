@@ -160,13 +160,16 @@ def manejar_mensaje_entrante(mensaje):
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad":
         #Manejo de autenticacion
-        if numero in usuario_manager.usuarios_esperando_password or cuerpo_mensaje.lower() == "xeguridad":
-            autenticado = usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje)
+        if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password:
+            if not usuario_manager.iniciar_autenticacion(numero):
+                return  # Ya se envió la plantilla de autenticación, espera respuesta.
+
+            # Procesar credenciales si ya se solicitó autenticación
+            autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
             if autenticado:
                 print(f"Usuario {numero} autenticado correctamente.")
-                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar el menú principal
             else:
-                print(f"Autenticación en proceso o fallida para {numero}.")
+                print(f"Usuario {numero} en proceso de autenticación o fallido.")
             return
 
 
