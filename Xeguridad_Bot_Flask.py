@@ -159,11 +159,7 @@ def manejar_mensaje_entrante(mensaje):
     
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad":
-        if not usuario_manager.usuario_autenticado(numero):
-            # Si el usuario no está autenticado, iniciar autenticación
-            if not usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje):
-                return  # Esperar la respuesta del usuario para la autenticación
-        else:
+        if usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje):
             # Usuario ya autenticado, manejar flujos posteriores
             if numero in esperando_placa:
                 placa = cuerpo_mensaje.upper()
