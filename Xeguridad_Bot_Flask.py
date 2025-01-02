@@ -159,7 +159,42 @@ def manejar_mensaje_entrante(mensaje):
     
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad":
-        usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje)
+        if not usuario_manager.usuario_autenticado(numero):
+            # Usuario no autenticado
+            usuario_manager.manejar_inicio(numero)
+        else:
+            # Usuario autenticado, manejar lógica específica
+            if not usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje):
+                return
+            
+            # Flujos adicionales después de autenticación
+            if numero in esperando_placa:
+                placa = cuerpo_mensaje.upper()
+                print(f"Placa detectada: {placa}")
+                unitnumber = buscar_unitnumber_por_placa(placa)
+                if unitnumber:
+                    print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+                    user_requests[numero] = {
+                        "placa": placa,
+                        "hora": datetime.now()
+                    }
+                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME, [])
+                    if execute_crawler(unitnumber):
+                        print("Crawler ejecutado correctamente.")
+                        obtener_ultima_transmision(unitnumber, numero)
+                    else:
+                        print("Error al ejecutar el crawler.")
+                else:
+                    envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, [])
+                del esperando_placa[numero]
+            else:
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+
+        return
+
+    # Fallback para mensajes no reconocidos
+    envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+    print("El mensaje no corresponde a una acción válida.")
 
     # Fallback para mensajes no reconocidos
     if numero not in esperando_denuncia or not esperando_denuncia[numero]:
