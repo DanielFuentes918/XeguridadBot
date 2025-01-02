@@ -159,22 +159,15 @@ def manejar_mensaje_entrante(mensaje):
     
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad":
-        if usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje):
-            # Usuario ya autenticado, manejar flujos posteriores
-            if numero in esperando_placa:
-                placa = cuerpo_mensaje.upper()
-                unitnumber = buscar_unitnumber_por_placa(placa)
-                if unitnumber:
-                    user_requests[numero] = {"placa": placa, "hora": datetime.now()}
-                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME, [])
-                    if execute_crawler(unitnumber):
-                        obtener_ultima_transmision(unitnumber, numero)
-                    else:
-                        envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, [])
-                esperando_placa.pop(numero, None)
+        #Manejo de autenticacion
+        if numero in usuario_manager.usuarios_esperando_password or cuerpo_mensaje.lower() == "xeguridad":
+            autenticado = usuario_manager.manejar_respuesta_autenticacion(numero, cuerpo_mensaje)
+            if autenticado:
+                print(f"Usuario {numero} autenticado correctamente.")
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar el menú principal
             else:
-                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-        return
+                print(f"Autenticación en proceso o fallida para {numero}.")
+            return
 
 
     # Fallback para mensajes no reconocidos
