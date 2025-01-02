@@ -16,6 +16,7 @@ class UsuarioManager:
         self.usuarios_en_starter_menu = {}
 
     def autenticar_usuario(self, username: str, password: str) -> bool:
+        print(f"Autenticando usuario {username}...")
         # Busca el usuario por el número de teléfono
         usuario = self.collection.find_one({'telefono': username})
         # Verifica si se encontró el usuario
@@ -38,6 +39,8 @@ class UsuarioManager:
         return bcrypt.checkpw(provided_password.encode('utf-8'), stored_hash)
 
     def manejar_inicio(self, numero):
+        print(f"Manejando inicio para {numero}")
+        print(self.usuarios_autenticados, self.usuarios_esperando_password, self.usuarios_en_starter_menu)
         #Gestiona el flujo inicial para usuarios no autenticados.
         if numero not in self.usuarios_autenticados and \
         numero not in self.usuarios_esperando_password and \
