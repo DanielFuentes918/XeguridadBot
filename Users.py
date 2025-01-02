@@ -91,6 +91,7 @@ class UsuarioManager:
         if numero in self.usuarios_esperando_password:
             if self.autenticar_usuario(numero, cuerpo_mensaje):
                 print(f"Autenticación exitosa para {numero}")
+                self.usuarios_esperando_password[numero] = False
                 envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
                 del self.usuarios_esperando_password[numero]
                 self.usuarios_autenticados[numero] = datetime.now()
