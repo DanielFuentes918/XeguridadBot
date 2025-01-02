@@ -158,19 +158,17 @@ def manejar_mensaje_entrante(mensaje):
         return
     
     # Manejar opción de "Xeguridad"
-    if cuerpo_mensaje.lower() == "xeguridad":
-        #Manejo de autenticacion
-        if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password:
-            if not usuario_manager.iniciar_autenticacion(numero):
-                return  # Ya se envió la plantilla de autenticación, espera respuesta.
+    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password:
+        if not usuario_manager.iniciar_autenticacion(numero):
+            return  # Ya se envió la plantilla de autenticación, espera respuesta.
 
-            # Procesar credenciales si ya se solicitó autenticación
-            autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
-            if autenticado:
-                print(f"Usuario {numero} autenticado correctamente.")
-            else:
-                print(f"Usuario {numero} en proceso de autenticación o fallido.")
-            return
+        # Procesar credenciales si ya se solicitó autenticación
+        autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
+        if autenticado:
+            print(f"Usuario {numero} autenticado correctamente.")
+        else:
+            print(f"Usuario {numero} en proceso de autenticación o fallido.")
+        return
 
 
     # Fallback para mensajes no reconocidos
