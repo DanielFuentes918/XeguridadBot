@@ -38,16 +38,16 @@ class UsuarioManager:
         return bcrypt.checkpw(provided_password.encode('utf-8'), stored_hash)
 
     def manejar_inicio(self, numero):
-            #Gestiona el flujo inicial para usuarios no autenticados.
-            if numero not in self.usuarios_autenticados and \
-            numero not in self.usuarios_esperando_password and \
-            numero not in self.usuarios_en_starter_menu:
-                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-                print("Usuario no autenticado. Enviando menú inicial.")
-                print(self.usuarios_autenticados, self.usuarios_esperando_password, self.usuarios_en_starter_menu)
-                self.usuarios_en_starter_menu[numero] = True
-                return True
-            return False
+        #Gestiona el flujo inicial para usuarios no autenticados.
+        if numero not in self.usuarios_autenticados and \
+        numero not in self.usuarios_esperando_password and \
+        numero not in self.usuarios_en_starter_menu:
+            envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+            print("Usuario no autenticado. Enviando menú inicial.")
+            print(self.usuarios_autenticados, self.usuarios_esperando_password, self.usuarios_en_starter_menu)
+            self.usuarios_en_starter_menu[numero] = True
+            return True
+        return False
 
     def manejar_respuesta_autenticacion(self, numero, cuerpo_mensaje):
         print(f"Manejando autenticación para {numero}. Mensaje: {cuerpo_mensaje}")
