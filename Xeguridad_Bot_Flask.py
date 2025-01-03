@@ -159,63 +159,58 @@ def manejar_mensaje_entrante(mensaje):
     
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa:
-        if not usuario_manager.iniciar_autenticacion(numero):
+        if numero in usuario_manager.usuarios_autenticados:
+            print(f"Usuario {numero} ya autenticado. Continuando flujo.")
+        elif not usuario_manager.iniciar_autenticacion(numero):
             return  # Ya se envió la plantilla de autenticación, espera respuesta.
 
-        # Procesar credenciales si ya se solicitó autenticación
         autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
         print(f"Usuario autenticado: {autenticado}")
         print(f"Usuarios autenticados: {usuario_manager.usuarios_autenticados}")
 
         if autenticado:
             print("cuerpo_mensaje.strip():", cuerpo_mensaje.strip())
-            print("sin strip cuerpo_mensaje:", cuerpo_mensaje)
-
-            if cuerpo_mensaje.strip():
-                print(f"Usuarios autenticados: {usuario_manager.usuarios_autenticados}")
-                if cuerpo_mensaje == "Mandar comandos a unidad" and numero in usuario_manager.usuarios_autenticados:
-                    print(f"Usuario autenticado: {numero} puede mandar comandos.")
-                    envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
-                    esperando_placa[numero] = True
-                elif numero in esperando_placa:
-                    placa = cuerpo_mensaje.upper()
-                    print(f"Placa detectada: {placa}")
-                    unitnumber = buscar_unitnumber_por_placa(placa)
-                    if unitnumber:
-                        print(f"El unitnumber para la placa {placa} es {unitnumber}.")
-                        user_requests[numero] = {
-                            "placa": placa,
-                            "hora": datetime.now()
-                        }
-                        envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME)
-                        if execute_crawler(unitnumber):
-                            print("Crawler ejecutado correctamente.")
-                            obtener_ultima_transmision(unitnumber, numero)
-                        else:
-                            print("Error al ejecutar el crawler.")
+            if cuerpo_mensaje.strip().lower() == "mandar comandos a unidad":
+                print(f"Usuario autenticado: {numero} puede mandar comandos.")
+                envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
+                esperando_placa[numero] = True
+            elif numero in esperando_placa:
+                placa = cuerpo_mensaje.upper()
+                print(f"Placa detectada: {placa}")
+                unitnumber = buscar_unitnumber_por_placa(placa)
+                if unitnumber:
+                    print(f"El unitnumber para la placa {placa} es {unitnumber}.")
+                    user_requests[numero] = {
+                        "placa": placa,
+                        "hora": datetime.now()
+                    }
+                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME)
+                    if execute_crawler(unitnumber):
+                        print("Crawler ejecutado correctamente.")
+                        obtener_ultima_transmision(unitnumber, numero)
                     else:
-                        print(f"No se encontró el unitnumber para la placa {placa}.")
-                        components = [
-                            {
-                                "type": "body",
-                                "parameters": [
-                                    {
-                                        "type": "text",
-                                        "text": placa
-                                    },
-                                ]
-                            }
-                        ]
-                        envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
-                    del esperando_placa[numero]  # Limpia estado
+                        print("Error al ejecutar el crawler.")
                 else:
-                    print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                    if numero not in usuario_manager.usuarios_autenticados:  # Evitar repetición
-                        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-            print(f"Usuario {numero} autenticado correctamente.")
+                    print(f"No se encontró el unitnumber para la placa {placa}.")
+                    components = [
+                        {
+                            "type": "body",
+                            "parameters": [
+                                {
+                                    "type": "text",
+                                    "text": placa
+                                },
+                            ]
+                        }
+                    ]
+                    envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
+                del esperando_placa[numero]
+            else:
+                print(f"Usuario {numero} autenticado correctamente.")
         else:
             print(f"Usuario {numero} en proceso de autenticación o fallido.")
         return
+
 
 
 
