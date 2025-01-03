@@ -64,7 +64,7 @@ def extraer_placa(nombre):
         print("No se encontró una placa en el nombre")
     return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra placa
 
-def obtener_ultima_transmision(unitnumber, numero):
+def obtener_ultima_transmision(unitnumber, numero, user_requests):
     params = {
         'commandname': 'get_last_transmit',
         'unitnumber': unitnumber,

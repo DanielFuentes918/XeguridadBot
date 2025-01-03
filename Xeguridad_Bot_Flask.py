@@ -189,7 +189,7 @@ def manejar_mensaje_entrante(mensaje):
                     envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME, [])
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
-                        obtener_ultima_transmision(unitnumber, numero)
+                        obtener_ultima_transmision(unitnumber, numero, user_requests)
                     else:
                         print("Error al ejecutar el crawler.")
                 else:
