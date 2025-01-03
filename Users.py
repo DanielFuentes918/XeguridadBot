@@ -26,11 +26,11 @@ class UsuarioManager:
             
             # Verifica si la contraseña ingresada coincide con el hash almacenado
             if self.check_password(stored_hash, password):
-                self.usuarios_autenticados[username] = datetime.now()
-                return True
-        
+                return True  # Solo retorna True si la contraseña es correcta
+            
         # Si el usuario no se encuentra o la contraseña no coincide, retorna False
         return False
+
 
     @staticmethod
     def check_password(stored_hash: bytes, provided_password: str) -> bool:
@@ -89,9 +89,10 @@ class UsuarioManager:
     
     def procesar_credenciales(self, numero, cuerpo_mensaje):
         if numero in self.usuarios_esperando_password:
-            if self.autenticar_usuario(numero, cuerpo_mensaje):
+            if self.autenticar_usuario(numero, cuerpo_mensaje):  # Verifica las credenciales
                 print(f"Autenticación exitosa para {numero}")
                 self.usuarios_autenticados[numero] = datetime.now()  # Actualiza estado correctamente
+                print(f"Usuarios autenticados: {self.usuarios_autenticados}")  # Depuración
                 envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
                 del self.usuarios_esperando_password[numero]
                 return True
@@ -100,6 +101,7 @@ class UsuarioManager:
                 envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])
                 del self.usuarios_esperando_password[numero]
         return False
+
 
 
 
