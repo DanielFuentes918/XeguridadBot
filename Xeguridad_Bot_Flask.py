@@ -158,7 +158,7 @@ def manejar_mensaje_entrante(mensaje):
         return
     
     # Manejar opción de "Xeguridad"
-    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados:
+    if cuerpo_mensaje.lower() == "xeguridad" or numero in esperando_placa:
         if not usuario_manager.iniciar_autenticacion(numero):
             return  # Ya se envió la plantilla de autenticación, espera respuesta.
 
