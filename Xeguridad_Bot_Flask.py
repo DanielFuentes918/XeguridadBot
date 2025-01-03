@@ -165,15 +165,18 @@ def manejar_mensaje_entrante(mensaje):
         # Procesar credenciales si ya se solicitó autenticación
         autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
         print(f"Usuario autenticado: {autenticado}")
+        print(f"Usuarios autenticados: {usuario_manager.usuarios_autenticados}")
+
         if autenticado:
             print("cuerpo_mensaje.strip():", cuerpo_mensaje.strip())
             print("sin strip cuerpo_mensaje:", cuerpo_mensaje)
 
-            if cuerpo_mensaje.strip(): 
+            if cuerpo_mensaje.strip():
+                print(f"Usuarios autenticados: {usuario_manager.usuarios_autenticados}")
                 if cuerpo_mensaje == "Mandar comandos a unidad" and numero in usuario_manager.usuarios_autenticados:
-                    if numero not in esperando_placa:  # Evitar múltiples envíos de la misma plantilla
-                        envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
-                        esperando_placa[numero] = True
+                    print(f"Usuario autenticado: {numero} puede mandar comandos.")
+                    envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
+                    esperando_placa[numero] = True
                 elif numero in esperando_placa:
                     placa = cuerpo_mensaje.upper()
                     print(f"Placa detectada: {placa}")

@@ -91,8 +91,7 @@ class UsuarioManager:
         if numero in self.usuarios_esperando_password:
             if self.autenticar_usuario(numero, cuerpo_mensaje):
                 print(f"Autenticación exitosa para {numero}")
-                self.usuarios_autenticados[numero] = datetime.now()
-                self.usuarios_esperando_password[numero] = False
+                self.usuarios_autenticados[numero] = datetime.now()  # Actualiza estado correctamente
                 envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
                 del self.usuarios_esperando_password[numero]
                 return True
@@ -101,6 +100,7 @@ class UsuarioManager:
                 envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])
                 del self.usuarios_esperando_password[numero]
         return False
+
 
 
     def buscar_usuario_por_telefono(self, telefono):
