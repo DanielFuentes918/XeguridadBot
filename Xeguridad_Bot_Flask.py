@@ -165,6 +165,9 @@ def manejar_mensaje_entrante(mensaje):
         # Procesar credenciales si ya se solicitó autenticación
         autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
         if autenticado:
+            print("cuerpo_mensaje.strip():",cuerpo_mensaje.strip())
+            print("sin strip cuerpo_mensaje:",cuerpo_mensaje)
+            
             if cuerpo_mensaje.strip() and numero in usuario_manager.usuarios_autenticados: 
                 if cuerpo_mensaje == "Mandar comandos a unidad" and numero in usuario_manager.usuarios_autenticados:
                     envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
