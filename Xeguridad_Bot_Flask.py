@@ -166,13 +166,14 @@ def manejar_mensaje_entrante(mensaje):
         autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
         print(f"Usuario autenticado: {autenticado}")
         if autenticado:
-            print("cuerpo_mensaje.strip():",cuerpo_mensaje.strip())
-            print("sin strip cuerpo_mensaje:",cuerpo_mensaje)
-            
-            if cuerpo_mensaje.strip() and numero in usuario_manager.usuarios_autenticados: 
+            print("cuerpo_mensaje.strip():", cuerpo_mensaje.strip())
+            print("sin strip cuerpo_mensaje:", cuerpo_mensaje)
+
+            if cuerpo_mensaje.strip(): 
                 if cuerpo_mensaje == "Mandar comandos a unidad" and numero in usuario_manager.usuarios_autenticados:
-                    envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
-                    esperando_placa[numero] = True
+                    if numero not in esperando_placa:  # Evitar múltiples envíos de la misma plantilla
+                        envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
+                        esperando_placa[numero] = True
                 elif numero in esperando_placa:
                     placa = cuerpo_mensaje.upper()
                     print(f"Placa detectada: {placa}")
@@ -203,14 +204,16 @@ def manejar_mensaje_entrante(mensaje):
                             }
                         ]
                         envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
-                    del esperando_placa[numero]  
+                    del esperando_placa[numero]  # Limpia estado
                 else:
                     print("Cuerpo del mensaje no coincide con la expresión regular o no se está esperando una placa.")
-                    envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+                    if numero not in usuario_manager.usuarios_autenticados:  # Evitar repetición
+                        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
             print(f"Usuario {numero} autenticado correctamente.")
         else:
             print(f"Usuario {numero} en proceso de autenticación o fallido.")
         return
+
 
 
     # Fallback para mensajes no reconocidos
