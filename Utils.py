@@ -142,7 +142,7 @@ def obtener_ultima_transmision(unitnumber, numero):
                     },
                     {
                         "type": "body",
-                        "parameters": components + [
+                        "parameters": [
                             {
                                 "type": "text",
                                 "text": placa
