@@ -186,7 +186,7 @@ def manejar_mensaje_entrante(mensaje):
                         "placa": placa,
                         "hora": datetime.now()
                     }
-                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME)
+                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME, [])
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
                         obtener_ultima_transmision(unitnumber, numero)
