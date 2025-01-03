@@ -149,7 +149,7 @@ def obtener_ultima_transmision(unitnumber, numero, user_requests):
                             },
                             {
                                 "type": "text",
-                                "text": datetime_actual.strftime("%Y-%m-%d %H:%M:%S")  # Convertir a cadena de texto
+                                "text": datetime_actual
                             },
                             {
                                 "type": "text",
