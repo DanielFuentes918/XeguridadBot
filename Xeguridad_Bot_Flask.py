@@ -164,6 +164,7 @@ def manejar_mensaje_entrante(mensaje):
 
         # Procesar credenciales si ya se solicitó autenticación
         autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
+        print(f"Usuario autenticado: {autenticado}")
         if autenticado:
             print("cuerpo_mensaje.strip():",cuerpo_mensaje.strip())
             print("sin strip cuerpo_mensaje:",cuerpo_mensaje)
