@@ -170,7 +170,7 @@ def manejar_mensaje_entrante(mensaje):
         print(f"Usuario autenticado: {autenticado}")
         print(f"Usuarios autenticados: {usuario_manager.usuarios_autenticados}")
 
-        if usuario_manager.usuarios_autenticados(numero):
+        if usuario_manager.usuarios_autenticados.get(numero):
             print("cuerpo_mensaje.strip():", cuerpo_mensaje.strip())
             if cuerpo_mensaje.strip().lower() == "mandar comandos a unidad":
                 print(f"Usuario autenticado: {numero} puede mandar comandos.")
