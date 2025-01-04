@@ -66,7 +66,7 @@ def extraer_placa(nombre):
 
 def extraer_genset(nombre):
     print(f"Extrayendo genset del nombre: {nombre}")
-    match = re.search(r'\bGN-[A-Z]\d{5}\b', nombre)
+    match = re.search(r'GN-([A-Z]\d{5})\b', nombre)
     if match:
         print(f"Genset encontrado: {match.group(0)}")
     else:

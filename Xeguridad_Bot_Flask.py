@@ -19,6 +19,10 @@ esperando_unit_type = {}
 
 esperando_plate_request = {}
 
+esperando_genset_request = {}
+
+esperando_genset = {}
+
 user_requests = {}
 
 denuncia = {}
@@ -188,7 +192,8 @@ def manejar_mensaje_entrante(mensaje):
                     del esperando_unit_type[numero]
                     print(f"usuarios seleccionando plate request: {esperando_plate_request}")
                 elif cuerpo_mensaje.strip().lower() == "genset":
-                    return
+                    esperando_genset_request[numero] = True
+                    del esperando_unit_type[numero]
                 elif cuerpo_mensaje.strip().lower() == "chasis":
                     return
 
@@ -227,6 +232,43 @@ def manejar_mensaje_entrante(mensaje):
                     ]
                     envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
                 del esperando_placa[numero]
+
+            if numero in esperando_genset_request:
+                envioTemplateTxt(numero, config.GENSET_REQUEST_TEMPLATE, [])
+                esperando_genset[numero] = True
+                del esperando_genset_request[numero]
+            elif esperando_genset.get(numero):
+                genset = cuerpo_mensaje.upper()
+                print(f"Genset detectado: {genset}")
+                unitnumber = buscar_unitnumber_por_placa(genset)
+                if unitnumber:
+                    print(f"El unitnumber para el genset {genset} es {unitnumber}.")
+                    user_requests[numero] = {
+                        "placa": genset,
+                        "hora": datetime.now()
+                    }
+                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME, [])
+                    if execute_crawler(unitnumber):
+                        print("Crawler ejecutado correctamente.")
+                        obtener_ultima_transmision(unitnumber, numero, user_requests)
+                    else:
+                        print("Error al ejecutar el crawler.")
+                else:
+                    print(f"No se encontró el unitnumber para el genset {genset}.")
+                    components = [
+                        {
+                            "type": "body",
+                            "parameters": [
+                                {
+                                    "type": "text",
+                                    "text": genset
+                                },
+                            ]
+                        }
+                    ]
+                    envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
+                del esperando_genset[numero]
+
             else:
                 print(f"Usuario {numero} autenticado correctamente.")
         else:
