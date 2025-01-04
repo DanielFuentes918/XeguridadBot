@@ -196,7 +196,7 @@ def manejar_mensaje_entrante(mensaje):
                 envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
                 esperando_placa[numero] = True
                 del esperando_plate_request[numero]
-            if esperando_placa.get(numero):
+            elif esperando_placa.get(numero):
                 placa = cuerpo_mensaje.upper()
                 print(f"Placa detectada: {placa}")
                 unitnumber = buscar_unitnumber_por_placa(placa)
