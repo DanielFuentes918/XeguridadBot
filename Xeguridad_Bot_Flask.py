@@ -186,11 +186,13 @@ def manejar_mensaje_entrante(mensaje):
                     print(f"Usuario {numero} seleccionó vehículo.")
                     esperando_plate_request[numero] = True
                     del esperando_unit_type[numero]
+                    print(f"usuarios seleccionando plate request: {esperando_plate_request}")
                     return
                 elif cuerpo_mensaje.strip().lower() == "genset":
                     return
                 elif cuerpo_mensaje.strip().lower() == "chasis":
                     return
+
             elif numero in esperando_plate_request:
                 envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
                 esperando_placa[numero] = True
