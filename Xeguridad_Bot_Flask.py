@@ -162,7 +162,7 @@ def manejar_mensaje_entrante(mensaje):
         return
     
     # Manejar opción de "Xeguridad"
-    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa:
+    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type:
         if numero in usuario_manager.usuarios_autenticados:
             print(f"Usuario {numero} ya autenticado. Continuando flujo.")
         elif not usuario_manager.iniciar_autenticacion(numero):
