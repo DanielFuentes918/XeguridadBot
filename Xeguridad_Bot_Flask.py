@@ -181,6 +181,7 @@ def manejar_mensaje_entrante(mensaje):
                 print(f"usuarios seleccionando unit type: {esperando_unit_type}")
             elif numero in esperando_unit_type:
                 if cuerpo_mensaje.strip().lower() == "vehículo":
+                    print(f"Usuario {numero} seleccionó vehículo.")
                     esperando_placa[numero] = True
                     esperando_unit_type[numero] = False
                 elif cuerpo_mensaje.strip().lower() == "genset":
