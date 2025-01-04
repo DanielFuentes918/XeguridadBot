@@ -185,7 +185,7 @@ def manejar_mensaje_entrante(mensaje):
                 if cuerpo_mensaje.strip().lower() == "vehículo":
                     print(f"Usuario {numero} seleccionó vehículo.")
                     esperando_plate_request[numero] = True
-                    esperando_unit_type[numero] = False
+                    del esperando_unit_type[numero]
                 elif cuerpo_mensaje.strip().lower() == "genset":
                     return
                 elif cuerpo_mensaje.strip().lower() == "chasis":
