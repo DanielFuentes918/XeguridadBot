@@ -17,6 +17,8 @@ esperando_placa = {}
 
 esperando_unit_type = {}
 
+esperando_plate_request = {}
+
 user_requests = {}
 
 denuncia = {}
@@ -162,7 +164,7 @@ def manejar_mensaje_entrante(mensaje):
         return
     
     # Manejar opción de "Xeguridad"
-    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type:
+    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request:
         if numero in usuario_manager.usuarios_autenticados:
             print(f"Usuario {numero} ya autenticado. Continuando flujo.")
         elif not usuario_manager.iniciar_autenticacion(numero):
@@ -182,13 +184,16 @@ def manejar_mensaje_entrante(mensaje):
             elif numero in esperando_unit_type:
                 if cuerpo_mensaje.strip().lower() == "vehículo":
                     print(f"Usuario {numero} seleccionó vehículo.")
-                    esperando_placa[numero] = True
+                    esperando_plate_request[numero] = True
                     esperando_unit_type[numero] = False
                 elif cuerpo_mensaje.strip().lower() == "genset":
                     return
                 elif cuerpo_mensaje.strip().lower() == "chasis":
                     return
-            elif numero in esperando_placa:
+            elif numero in esperando_plate_request:
+                envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
+                esperando_placa[numero] = True
+            elif esperando_placa.get(numero):
                 placa = cuerpo_mensaje.upper()
                 print(f"Placa detectada: {placa}")
                 unitnumber = buscar_unitnumber_por_placa(placa)
