@@ -15,6 +15,8 @@ esperando_denuncia = {}
 
 esperando_placa = {}
 
+esperando_unit_type = {}
+
 user_requests = {}
 
 denuncia = {}
@@ -172,10 +174,18 @@ def manejar_mensaje_entrante(mensaje):
 
         if usuario_manager.usuarios_autenticados.get(numero):
             print("cuerpo_mensaje.strip():", cuerpo_mensaje.strip())
-            if cuerpo_mensaje.strip().lower() == "mandar comandos a unidad":
-                print(f"Usuario autenticado: {numero} puede mandar comandos.")
-                envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
-                esperando_placa[numero] = True
+            if cuerpo_mensaje.strip().lower() == "ubicación de una unidad":
+                print(f"Usuario autenticado: {numero} puede solicitar ubucacion.")
+                envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
+                esperando_unit_type[numero] = True
+            elif numero in esperando_unit_type:
+                if cuerpo_mensaje.strip().lower() == "vehículo":
+                    esperando_placa[numero] = True
+                    esperando_unit_type[numero] = False
+                elif cuerpo_mensaje.strip().lower() == "genset":
+                    return
+                elif cuerpo_mensaje.strip().lower() == "chasis":
+                    return
             elif numero in esperando_placa:
                 placa = cuerpo_mensaje.upper()
                 print(f"Placa detectada: {placa}")
