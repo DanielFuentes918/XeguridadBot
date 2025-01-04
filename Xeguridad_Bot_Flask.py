@@ -178,6 +178,7 @@ def manejar_mensaje_entrante(mensaje):
                 print(f"Usuario autenticado: {numero} puede solicitar ubucacion.")
                 envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
                 esperando_unit_type[numero] = True
+                print(f"usuarios seleccionando unit type: {esperando_unit_type}")
             elif numero in esperando_unit_type:
                 if cuerpo_mensaje.strip().lower() == "vehículo":
                     esperando_placa[numero] = True
