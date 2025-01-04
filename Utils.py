@@ -88,10 +88,10 @@ def extraer_genset(nombre):
     print(f"Extrayendo genset del nombre: {nombre}")
     match = re.search(r'GN-([A-Z]\d{5})\b', nombre)
     if match:
-        print(f"Genset encontrado: {match.group(0)}")
+        print(f"Genset encontrado: {match.group(1)}")
     else:
         print("No se encontró un genset en el nombre")
-    return match.group(0) if match else nombre  # Retorna el nombre completo si no se encuentra Genset
+    return match.group(1) if match else nombre  # Retorna el nombre completo si no se encuentra Genset
 
 
 def obtener_ultima_transmision(unitnumber, numero, user_requests):
