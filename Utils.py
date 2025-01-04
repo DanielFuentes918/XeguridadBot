@@ -55,6 +55,26 @@ def buscar_unitnumber_por_placa(placa):
                 return unidad['unitnumber']
     return None
 
+def buscar_unitnumber_por_genset(genset):
+    params = {
+        'commandname': 'get_units',
+        'user': config.XEGURIDAD_USERNAME,
+        'pass': config.XEGURIDAD_PASSWORD,
+        'format': 'json1'
+    }
+    response = requests.get(config.XEGURIDAD_API_URL, params=params)
+    print(f"Estado de la respuesta de la API: {response.status_code}")
+    if response.status_code == 200:
+        unidades = response.json()
+        print(f"Unidades recibidas: {unidades}")
+        for unidad in unidades:
+            nombre_genset = extraer_genset(unidad['name'])
+            print(f"Nombre de la unidad: {unidad['name']}, Placa extraída: {nombre_genset}")
+            if nombre_genset == genset:
+                print(f"Unitnumber encontrado: {unidad['unitnumber']} para la placa {genset}")
+                return unidad['unitnumber']
+    return None
+
 def extraer_placa(nombre):
     print(f"Extrayendo placa del nombre: {nombre}")
     match = re.search(r'\b[A-Z]{3}\d{4}\b', nombre)

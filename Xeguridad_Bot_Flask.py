@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt, buscar_unitnumber_por_placa, obtener_ultima_transmision, descargar_multimedia
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
@@ -240,7 +240,7 @@ def manejar_mensaje_entrante(mensaje):
             elif esperando_genset.get(numero):
                 genset = cuerpo_mensaje.upper()
                 print(f"Genset detectado: {genset}")
-                unitnumber = buscar_unitnumber_por_placa(genset)
+                unitnumber = buscar_unitnumber_por_genset(genset)
                 if unitnumber:
                     print(f"El unitnumber para el genset {genset} es {unitnumber}.")
                     user_requests[numero] = {
