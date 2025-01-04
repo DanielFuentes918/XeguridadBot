@@ -175,9 +175,9 @@ def manejar_mensaje_entrante(mensaje):
         if usuario_manager.usuarios_autenticados.get(numero):
             print("cuerpo_mensaje.strip():", cuerpo_mensaje.strip())
             if cuerpo_mensaje.strip().lower() == "ubicación de una unidad":
+                esperando_unit_type[numero] = True
                 print(f"Usuario autenticado: {numero} puede solicitar ubucacion.")
                 envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
-                esperando_unit_type[numero] = True
                 print(f"usuarios seleccionando unit type: {esperando_unit_type}")
             elif numero in esperando_unit_type:
                 if cuerpo_mensaje.strip().lower() == "vehículo":
