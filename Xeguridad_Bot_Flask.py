@@ -281,7 +281,7 @@ def manejar_mensaje_entrante(mensaje):
             elif esperando_chasis.get(numero):
                 chasis= cuerpo_mensaje.upper()
                 # Obtén la ubicación
-                resultado = obtener_ubicacion_tile_sync(chasis, config.TILE_USER, config.TILE_PASSWORD)
+                resultado = obtener_ubicacion_tile_sync(chasis, numero, config.TILE_USER, config.TILE_PASSWORD)
                 if "error" in resultado:
                     print(resultado["error"])
                 else:

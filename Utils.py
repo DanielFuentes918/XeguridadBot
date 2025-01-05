@@ -228,7 +228,22 @@ def descargar_multimedia(media_id, access_token, tipo="imagen"):
         print(f"Excepción al intentar descargar el {tipo}: {e}")
     return None
 
-async def obtener_ubicacion_tile(tile_name: str, email: str, password: str) -> dict:
+async def enviar_ubicacion_tile(tile_name, numero, email, password):
+    """
+    Envía la ubicación de un Tile específico como plantilla de WhatsApp.
+    
+    Args:
+        tile_name (str): Nombre del Tile a buscar.
+        numero (str): Número de teléfono del usuario para WhatsApp.
+        email (str): Correo electrónico para la API de Tile.
+        password (str): Contraseña para la API de Tile.
+    """
+    from aiohttp import ClientSession
+    from pytile import async_login
+    import pytz
+
+    local_tz = pytz.timezone('America/Tegucigalpa')
+    utc_tz = pytz.UTC
 
     async with ClientSession() as session:
         try:
@@ -238,43 +253,66 @@ async def obtener_ubicacion_tile(tile_name: str, email: str, password: str) -> d
             # Obtén todas las balizas asociadas
             tiles = await api.async_get_tiles()
 
-            # Define la zona horaria local
-            local_tz = pytz.timezone('America/Tegucigalpa')
-            utc_tz = pytz.UTC
-
-            # Busca el Tile específico por nombre
+            # Busca el Tile específico
             tile = next((t for t in tiles.values() if t.name == tile_name), None)
 
             if not tile:
-                return {"error": f"Tile con nombre '{tile_name}' no encontrado."}
+                print(f"Tile con nombre '{tile_name}' no encontrado.")
+                components = [
+                    {
+                        "type": "body",
+                        "parameters": [
+                            {"type": "text", "text": f"Tile '{tile_name}' no encontrado."}
+                        ]
+                    }
+                ]
+                envioTemplateTxt(numero, config.TEMPLATE_ERROR_TILE, components)
+                return
 
-            # Convertir la última marca de tiempo de UTC a la zona horaria local
+            # Convertir la última marca de tiempo
             last_timestamp_utc = tile.last_timestamp.replace(tzinfo=utc_tz)
             last_timestamp_local = last_timestamp_utc.astimezone(local_tz)
 
-            # Retornar la información de ubicación como diccionario
-            return {
-                "tile_name": tile.name,
-                "latitude": tile.latitude,
-                "longitude": tile.longitude,
-                "accuracy": tile.accuracy,
-                "timestamp": last_timestamp_local.strftime('%Y-%m-%d %H:%M:%S')
-            }
+            # Crear los componentes de la plantilla
+            components = [
+                {
+                    "type": "header",
+                    "parameters": [
+                        {
+                            "type": "location",
+                            "location": {
+                                "longitude": tile.longitude,
+                                "latitude": tile.latitude,
+                                "name": f"{tile.latitude}, {tile.longitude}",
+                                "address": f"{tile.latitude}, {tile.longitude}"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "body",
+                    "parameters": [
+                        {"type": "text", "text": last_timestamp_local.strftime('%Y-%m-%d %H:%M:%S')},
+                        {"type": "text", "text": tile.name}
+                    ]
+                }
+            ]
 
+            # Envía la plantilla de WhatsApp
+            envioTemplateTxt(numero, config.RESPUESTA_TILE_TEMPLATE, components)
+            print(f"Ubicación del Tile '{tile_name}' enviada a {numero}.")
         except Exception as e:
-            return {"error": f"Error al obtener la ubicación: {str(e)}"}
+            print(f"Error al enviar la ubicación del Tile: {str(e)}")
+            components = [
+                {
+                    "type": "body",
+                    "parameters": [
+                        {"type": "text", "text": f"Error al procesar la solicitud: {str(e)}"}
+                    ]
+                }
+            ]
+            envioTemplateTxt(numero, config.TEMPLATE_ERROR_TILE, components)
 
-# Función auxiliar para ejecutar el código asincrónico desde un entorno síncrono
-def obtener_ubicacion_tile_sync(tile_name: str, email: str, password: str) -> dict:
-    """
-    Versión síncrona para obtener la ubicación de un Tile.
-    
-    Args:
-        tile_name (str): Nombre del Tile.
-        email (str): Correo electrónico para la API.
-        password (str): Contraseña para la API.
-    
-    Returns:
-        dict: Diccionario con información de ubicación o error.
-    """
-    return asyncio.run(obtener_ubicacion_tile(tile_name, email, password))
+# Función auxiliar para ejecutarlo desde un entorno síncrono
+def enviar_ubicacion_tile_sync(tile_name, numero, email, password):
+    asyncio.run(enviar_ubicacion_tile(tile_name, numero, email, password))
