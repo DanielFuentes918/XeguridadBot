@@ -2,6 +2,10 @@ from Config import Config
 import requests
 import re
 from datetime import datetime
+import asyncio
+import pytz
+from aiohttp import ClientSession
+from pytile import async_login
 
 config = Config()
 
@@ -223,3 +227,54 @@ def descargar_multimedia(media_id, access_token, tipo="imagen"):
     except Exception as e:
         print(f"Excepción al intentar descargar el {tipo}: {e}")
     return None
+
+async def obtener_ubicacion_tile(tile_name: str, email: str, password: str) -> dict:
+
+    async with ClientSession() as session:
+        try:
+            # Inicia sesión en la API de Tile
+            api = await async_login(email, password, session)
+
+            # Obtén todas las balizas asociadas
+            tiles = await api.async_get_tiles()
+
+            # Define la zona horaria local
+            local_tz = pytz.timezone('America/Tegucigalpa')
+            utc_tz = pytz.UTC
+
+            # Busca el Tile específico por nombre
+            tile = next((t for t in tiles.values() if t.name == tile_name), None)
+
+            if not tile:
+                return {"error": f"Tile con nombre '{tile_name}' no encontrado."}
+
+            # Convertir la última marca de tiempo de UTC a la zona horaria local
+            last_timestamp_utc = tile.last_timestamp.replace(tzinfo=utc_tz)
+            last_timestamp_local = last_timestamp_utc.astimezone(local_tz)
+
+            # Retornar la información de ubicación como diccionario
+            return {
+                "tile_name": tile.name,
+                "latitude": tile.latitude,
+                "longitude": tile.longitude,
+                "accuracy": tile.accuracy,
+                "timestamp": last_timestamp_local.strftime('%Y-%m-%d %H:%M:%S')
+            }
+
+        except Exception as e:
+            return {"error": f"Error al obtener la ubicación: {str(e)}"}
+
+# Función auxiliar para ejecutar el código asincrónico desde un entorno síncrono
+def obtener_ubicacion_tile_sync(tile_name: str, email: str, password: str) -> dict:
+    """
+    Versión síncrona para obtener la ubicación de un Tile.
+    
+    Args:
+        tile_name (str): Nombre del Tile.
+        email (str): Correo electrónico para la API.
+        password (str): Contraseña para la API.
+    
+    Returns:
+        dict: Diccionario con información de ubicación o error.
+    """
+    return asyncio.run(obtener_ubicacion_tile(tile_name, email, password))

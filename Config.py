@@ -21,6 +21,8 @@ class Config:
         self.BASE_DATOS_MONGO = "XeguridadBotDB"
         self.AUTH_DB = "admin"
         self.PORT = os.getenv("PORT")
+        self.TILE_USER = os.getenv("TILE_USER")
+        self.TILE_PASSWORD = os.getenv("TILE_PASSWORD")
 
         # Plantillas
         self.STARTER_MENU_TEMPLATE = "start_menu"
@@ -38,6 +40,7 @@ class Config:
         self.COMPANY_SELECTION_TEMPLATE = "company_selection"
         self.UNIT_TYPE_TEMPLATE = "unit_type"
         self.GENSET_REQUEST_TEMPLATE = "genset_request"
+        self.CHASIS_REQUEST_TEMPLATE = "chasis_request"
 
     def mongo_uri(self):
         return f"mongodb://{self.USUARIO_MONGO}:{self.PASSWORD_MONGO_ESCAPADA}@localhost:27017/{self.BASE_DATOS_MONGO}?authSource={self.AUTH_DB}"

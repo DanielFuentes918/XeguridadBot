@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia, obtener_ubicacion_tile_sync
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
@@ -22,6 +22,10 @@ esperando_plate_request = {}
 esperando_genset_request = {}
 
 esperando_genset = {}
+
+esperando_chasis_request = {}
+
+esperando_chasis = {}
 
 user_requests = {}
 
@@ -195,7 +199,8 @@ def manejar_mensaje_entrante(mensaje):
                     esperando_genset_request[numero] = True
                     del esperando_unit_type[numero]
                 elif cuerpo_mensaje.strip().lower() == "chasis":
-                    return
+                    esperando_chasis_request[numero] = True
+                    del esperando_unit_type[numero]
 
             if numero in esperando_plate_request:
                 envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
@@ -268,6 +273,23 @@ def manejar_mensaje_entrante(mensaje):
                     ]
                     envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
                 del esperando_genset[numero]
+            
+            if numero in esperando_chasis_request:
+                envioTemplateTxt(numero, config.CHASIS_REQUEST_TEMPLATE, [])
+                esperando_chasis[numero] = True
+                del esperando_chasis_request[numero]
+            elif esperando_chasis.get(numero):
+                chasis= cuerpo_mensaje.upper()
+                # Obtén la ubicación
+                resultado = obtener_ubicacion_tile_sync(chasis, config.TILE_USER, config.TILE_PASSWORD)
+                if "error" in resultado:
+                    print(resultado["error"])
+                else:
+                    print(f"Ubicación de {resultado['tile_name']}:")
+                    print(f"  Latitud: {resultado['latitude']}")
+                    print(f"  Longitud: {resultado['longitude']}")
+                    print(f"  Precisión: {resultado['accuracy']} metros")
+                    print(f"  Timestamp: {resultado['timestamp']}")
 
             else:
                 print(f"Usuario {numero} autenticado correctamente.")
