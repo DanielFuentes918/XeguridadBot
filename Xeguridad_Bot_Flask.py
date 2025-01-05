@@ -280,17 +280,8 @@ def manejar_mensaje_entrante(mensaje):
                 del esperando_chasis_request[numero]
             elif esperando_chasis.get(numero):
                 chasis= cuerpo_mensaje.upper()
-                # Obtén la ubicación
-                resultado = enviar_ubicacion_tile_sync(chasis, numero, config.TILE_USER, config.TILE_PASSWORD)
-                if "error" in resultado:
-                    print(resultado["error"])
-                else:
-                    print(f"Ubicación de {resultado['tile_name']}:")
-                    print(f"  Latitud: {resultado['latitude']}")
-                    print(f"  Longitud: {resultado['longitude']}")
-                    print(f"  Precisión: {resultado['accuracy']} metros")
-                    print(f"  Timestamp: {resultado['timestamp']}")
-
+                # Eviar la ubicación
+                enviar_ubicacion_tile_sync(chasis, numero, config.TILE_USER, config.TILE_PASSWORD)
             else:
                 print(f"Usuario {numero} autenticado correctamente.")
         else:
