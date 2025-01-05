@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia, obtener_ubicacion_tile_sync
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia, enviar_ubicacion_tile_sync
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
@@ -281,7 +281,7 @@ def manejar_mensaje_entrante(mensaje):
             elif esperando_chasis.get(numero):
                 chasis= cuerpo_mensaje.upper()
                 # Obtén la ubicación
-                resultado = obtener_ubicacion_tile_sync(chasis, numero, config.TILE_USER, config.TILE_PASSWORD)
+                resultado = enviar_ubicacion_tile_sync(chasis, numero, config.TILE_USER, config.TILE_PASSWORD)
                 if "error" in resultado:
                     print(resultado["error"])
                 else:
