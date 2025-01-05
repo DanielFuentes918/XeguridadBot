@@ -41,6 +41,7 @@ class Config:
         self.UNIT_TYPE_TEMPLATE = "unit_type"
         self.GENSET_REQUEST_TEMPLATE = "genset_request"
         self.CHASIS_REQUEST_TEMPLATE = "chasis_request"
+        self.TILE_LOCATION_TEMPLATE = "tile_location"
 
     def mongo_uri(self):
         return f"mongodb://{self.USUARIO_MONGO}:{self.PASSWORD_MONGO_ESCAPADA}@localhost:27017/{self.BASE_DATOS_MONGO}?authSource={self.AUTH_DB}"

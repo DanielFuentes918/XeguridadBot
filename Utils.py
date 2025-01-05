@@ -272,6 +272,7 @@ async def enviar_ubicacion_tile(tile_name, numero, email, password):
             # Convertir la última marca de tiempo
             last_timestamp_utc = tile.last_timestamp.replace(tzinfo=utc_tz)
             last_timestamp_local = last_timestamp_utc.astimezone(local_tz)
+            last_transmission = last_timestamp_local.strftime('%Y-%m-%d %H:%M:%S')
 
             # Crear los componentes de la plantilla
             components = [
@@ -292,14 +293,16 @@ async def enviar_ubicacion_tile(tile_name, numero, email, password):
                 {
                     "type": "body",
                     "parameters": [
-                        {"type": "text", "text": last_timestamp_local.strftime('%Y-%m-%d %H:%M:%S')},
-                        {"type": "text", "text": tile.name}
+                        {
+                        "type": "text",
+                        "text": last_transmission
+                        }
                     ]
                 }
             ]
 
             # Envía la plantilla de WhatsApp
-            envioTemplateTxt(numero, config.RESPUESTA_TILE_TEMPLATE, components)
+            envioTemplateTxt(numero, config.TILE_LOCATION_TEMPLATE, components)
             print(f"Ubicación del Tile '{tile_name}' enviada a {numero}.")
         except Exception as e:
             print(f"Error al enviar la ubicación del Tile: {str(e)}")
