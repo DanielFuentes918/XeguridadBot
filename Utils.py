@@ -155,7 +155,7 @@ def obtener_ultima_transmision(unitnumber, numero, user_requests):
 
             hora_envio_placa = user_requests[numero]['hora']
             if fecha_hora_obj >= hora_envio_placa:
-                envioTemplateTxt(numero, config.RESPUESTA_COMANDOS_TEMPLATE,components)
+                envioTemplateTxt(numero, config.ACTUAL_LOCATION_TEMPLATE,components)
             else:
                 
                 print("PLACA::",placa)
