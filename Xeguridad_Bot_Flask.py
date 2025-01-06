@@ -304,6 +304,7 @@ def manejar_mensaje_entrante(mensaje):
                 volver_menu_xeguridad[numero] = False
                 user_requests[numero] = False
                 xeguridad_menu[numero] = False
+                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
                 return
             else:
                 print(f"Usuario {numero} no seleccionó volver al menú.")
