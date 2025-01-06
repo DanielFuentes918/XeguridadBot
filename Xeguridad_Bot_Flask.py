@@ -291,7 +291,7 @@ def manejar_mensaje_entrante(mensaje):
             else:
                 print(f"Usuario {numero} autenticado correctamente.")
 
-            if cuerpo_mensaje.lower().lstrip() == "Volver a menú":
+            if cuerpo_mensaje.strip().lower() == "Volver a menú":
                 print(f"Usuario {numero} seleccionó volver al menú.")
                 volver_menu_xeguridad[numero] = True
                 esperando_placa[numero] = False
