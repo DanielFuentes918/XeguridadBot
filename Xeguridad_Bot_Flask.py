@@ -29,6 +29,8 @@ esperando_chasis = {}
 
 volver_menu_xeguridad = {}
 
+xeguridad_menu = {}
+
 user_requests = {}
 
 denuncia = {}
@@ -174,7 +176,8 @@ def manejar_mensaje_entrante(mensaje):
         return
     
     # Manejar opción de "Xeguridad"
-    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request or numero in volver_menu_xeguridad:
+    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request or numero in volver_menu_xeguridad or numero in xeguridad_menu:
+        xeguridad_menu[numero] = True
         if numero in usuario_manager.usuarios_autenticados:
             print(f"Usuario {numero} ya autenticado. Continuando flujo.")
         elif not usuario_manager.iniciar_autenticacion(numero):
@@ -288,6 +291,7 @@ def manejar_mensaje_entrante(mensaje):
                 print(f"Usuario {numero} autenticado correctamente.")
 
             if cuerpo_mensaje.lower().lstrip() == "Volver a menú":
+                print(f"Usuario {numero} seleccionó volver al menú.")
                 volver_menu_xeguridad[numero] = True
                 esperando_placa[numero] = False
                 esperando_unit_type[numero] = False
@@ -298,6 +302,7 @@ def manejar_mensaje_entrante(mensaje):
                 esperando_chasis[numero] = False
                 volver_menu_xeguridad[numero] = False
                 user_requests[numero] = False
+                xeguridad_menu[numero] = False
             else:
                 print(f"Usuario {numero} no seleccionó volver al menú.")
 
