@@ -192,7 +192,107 @@ def obtener_ultima_transmision(unitnumber, numero, user_requests):
                         ]
                     }
                 ]
-                envioTemplateTxt(numero, config.COMANDO_NO_RECIBIDO_TEMPLATE, components)
+                envioTemplateTxt(numero, config.ACTUAL_LOCATION_FAILED_TEMPLATE, components)
+        else:
+            return "No se encontró la última transmisión."
+    else:
+        return "No se pudo obtener la última transmisión."
+    
+def obtener_ultima_transmision_genset(unitnumber, numero, user_requests):
+    params = {
+        'commandname': 'get_last_transmit',
+        'unitnumber': unitnumber,
+        'user': config.XEGURIDAD_USERNAME,
+        'pass': config.XEGURIDAD_PASSWORD,
+        'format': 'json1'
+    }
+    response = requests.get(config.XEGURIDAD_API_URL, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        if data:
+            transmision = data[0]
+            latitud = transmision.get("latitude")
+            longitud = transmision.get("longitude")
+            address = transmision.get("address")
+            perimeter = transmision.get("perimeter", "No definido")
+            datetime_actual = transmision.get("datetime_actual")
+
+            # Convertir datetime_actual a formato legible
+            datetime_actual = datetime.strptime(datetime_actual, "%Y%m%d%H%M%S")
+            datetime_actual = datetime_actual.strftime("%Y-%m-%d %H:%M:%S")
+
+            fecha_hora_obj = datetime.strptime(datetime_actual, "%Y-%m-%d %H:%M:%S") 
+            placa = user_requests[numero]['placa']
+            components = [
+                {
+                    "type": "header",
+                    "parameters": [
+                        {
+                            "type": "location",
+                            "location": {
+                                "longitude": longitud,
+                                "latitude": latitud,
+                                "name": str(latitud)+","+str(longitud),
+                                "address": str(latitud)+","+str(longitud)
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "body",
+                    "parameters": [
+                        {
+                            "type": "text",
+                            "text": address
+                        },
+                        {
+                            "type": "text",
+                            "text": datetime_actual
+                        }
+                    ]
+                }
+            ]
+
+            hora_envio_placa = user_requests[numero]['hora']
+            if fecha_hora_obj >= hora_envio_placa:
+                envioTemplateTxt(numero, config.GENSET_ACTUAL_LOCATION_TEMPLATE,components)
+            else:
+                
+                print("PLACA::",placa)
+                components = [
+                    {
+                        "type": "header",
+                        "parameters": [
+                            {
+                                "type": "location",
+                                "location": {
+                                    "longitude": longitud,
+                                    "latitude": latitud,
+                                    "name": str(latitud)+","+str(longitud),
+                                    "address": str(latitud)+","+str(longitud)
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "body",
+                        "parameters": [
+                            {
+                                "type": "text",
+                                "text": placa
+                            },
+                            {
+                                "type": "text",
+                                "text": datetime_actual
+                            },
+                            {
+                                "type": "text",
+                                "text": address
+                            }
+                        ]
+                    }
+                ]
+                envioTemplateTxt(numero, config.GENSET_ACTUAL_LOCATION_FAILED_TEMPLATE, components)
         else:
             return "No se encontró la última transmisión."
     else:
