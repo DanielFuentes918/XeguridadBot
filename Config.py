@@ -43,6 +43,8 @@ class Config:
         self.CHASIS_REQUEST_TEMPLATE = "chasis_request"
         self.TILE_LOCATION_TEMPLATE = "tile_location"
         self.ACTUAL_LOCATION_TEMPLATE = "actual_location"
+        self.ACTUAL_LOCATION_LOADING_TEMPLATE = "actual_location_loading"
+        self.ACTUAL_LOCATION_FAILED_TEMPLATE = "actual_location_failed"
 
     def mongo_uri(self):
         return f"mongodb://{self.USUARIO_MONGO}:{self.PASSWORD_MONGO_ESCAPADA}@localhost:27017/{self.BASE_DATOS_MONGO}?authSource={self.AUTH_DB}"

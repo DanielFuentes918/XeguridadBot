@@ -216,7 +216,7 @@ def manejar_mensaje_entrante(mensaje):
                         "placa": placa,
                         "hora": datetime.now()
                     }
-                    envioTemplateTxt(numero, config.CARGANDO_COMANDOS_TEMPLATE_NAME, [])
+                    envioTemplateTxt(numero, config.ACTUAL_LOCATION_LOADING_TEMPLATE, [])
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
                         obtener_ultima_transmision(unitnumber, numero, user_requests)
@@ -235,7 +235,7 @@ def manejar_mensaje_entrante(mensaje):
                             ]
                         }
                     ]
-                    envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
+                    envioTemplateTxt(numero, config.ACTUAL_LOCATION_FAILED_TEMPLATE, components)
                 del esperando_placa[numero]
 
             if numero in esperando_genset_request:
