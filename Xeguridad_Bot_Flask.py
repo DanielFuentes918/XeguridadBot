@@ -309,6 +309,14 @@ def manejar_mensaje_entrante(mensaje):
             else:
                 print(f"Usuario {numero} no seleccionó volver al menú.")
 
+            if cuerpo_mensaje.strip().lower() == "volver al menú":
+                print(f"Usuario {numero} seleccionó volver al menú.")
+                esperando_denuncia[numero] = True
+                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+                return
+            else:
+                print(f"Usuario {numero} no seleccionó volver al menú.")
+
         else:
             print(f"Usuario {numero} en proceso de autenticación o fallido.")
         return
