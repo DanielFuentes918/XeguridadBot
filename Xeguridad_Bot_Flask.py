@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia, enviar_ubicacion_tile_sync
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia, enviar_ubicacion_tile_sync, obtener_ultima_transmision_genset
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
@@ -260,7 +260,7 @@ def manejar_mensaje_entrante(mensaje):
                     envioTemplateTxt(numero, config.GENSET_ACTUAL_LOCATION_LOADING_TEMPLATE, [])
                     if execute_crawler(unitnumber):
                         print("Crawler ejecutado correctamente.")
-                        obtener_ultima_transmision(unitnumber, numero, user_requests)
+                        obtener_ultima_transmision_genset(unitnumber, numero, user_requests)
                     else:
                         print("Error al ejecutar el crawler.")
                 else:
