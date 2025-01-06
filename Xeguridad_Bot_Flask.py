@@ -27,6 +27,8 @@ esperando_chasis_request = {}
 
 esperando_chasis = {}
 
+volver_menu_xeguridad = {}
+
 user_requests = {}
 
 denuncia = {}
@@ -172,7 +174,7 @@ def manejar_mensaje_entrante(mensaje):
         return
     
     # Manejar opción de "Xeguridad"
-    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request:
+    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request or numero in volver_menu_xeguridad:
         if numero in usuario_manager.usuarios_autenticados:
             print(f"Usuario {numero} ya autenticado. Continuando flujo.")
         elif not usuario_manager.iniciar_autenticacion(numero):
@@ -284,6 +286,21 @@ def manejar_mensaje_entrante(mensaje):
                 enviar_ubicacion_tile_sync(chasis, numero, config.TILE_USER, config.TILE_PASSWORD)
             else:
                 print(f"Usuario {numero} autenticado correctamente.")
+
+            if cuerpo_mensaje.lower().lstrip() == "Volver a menú":
+                volver_menu_xeguridad[numero] = True
+                esperando_placa[numero] = False
+                esperando_unit_type[numero] = False
+                esperando_plate_request[numero] = False
+                esperando_genset_request[numero] = False
+                esperando_genset[numero] = False
+                esperando_chasis_request[numero] = False
+                esperando_chasis[numero] = False
+                volver_menu_xeguridad[numero] = False
+                user_requests[numero] = False
+            else:
+                print(f"Usuario {numero} no seleccionó volver al menú.")
+
         else:
             print(f"Usuario {numero} en proceso de autenticación o fallido.")
         return
