@@ -293,18 +293,18 @@ def manejar_mensaje_entrante(mensaje):
 
             if cuerpo_mensaje.strip().lower() == "volver al menú":
                 print(f"Usuario {numero} seleccionó volver al menú.")
-                volver_menu_xeguridad[numero] = True
-                esperando_placa[numero] = False
-                esperando_unit_type[numero] = False
-                esperando_plate_request[numero] = False
-                esperando_genset_request[numero] = False
-                esperando_genset[numero] = False
-                esperando_chasis_request[numero] = False
-                esperando_chasis[numero] = False
-                volver_menu_xeguridad[numero] = False
-                user_requests[numero] = False
-                xeguridad_menu[numero] = False
-                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+                # volver_menu_xeguridad[numero] = True
+                # esperando_placa[numero] = False
+                # esperando_unit_type[numero] = False
+                # esperando_plate_request[numero] = False
+                # esperando_genset_request[numero] = False
+                # esperando_genset[numero] = False
+                # esperando_chasis_request[numero] = False
+                # esperando_chasis[numero] = False
+                # volver_menu_xeguridad[numero] = False
+                # user_requests[numero] = False
+                # xeguridad_menu[numero] = False
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
                 return
             else:
                 print(f"Usuario {numero} no seleccionó volver al menú.")
