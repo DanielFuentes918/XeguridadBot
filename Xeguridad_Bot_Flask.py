@@ -289,6 +289,7 @@ def manejar_mensaje_entrante(mensaje):
                 enviar_ubicacion_tile_sync(chasis, numero, config.TILE_USER, config.TILE_PASSWORD)
             else:
                 print(f"Usuario {numero} autenticado correctamente.")
+                del esperando_chasis[numero]
 
             if cuerpo_mensaje.lower().lstrip() == "Volver a menú":
                 print(f"Usuario {numero} seleccionó volver al menú.")
