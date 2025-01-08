@@ -337,6 +337,26 @@ def home():
 def politica_privacidad():
     return render_template('PoliticasSeguridad.html')
 
+@app.route('/send_notification' , methods=['POST'])
+def send_notification():
+    try:
+        data = request.json
+        phone_number = data.get('phone_number')
+        template_name = data.get('template_name')
+        components = data.get('components', [])
+
+        # Validar los datos recibidos
+        if not phone_number or not template_name:
+            return jsonify({"error": "El número y el nombre de la plantilla son obligatorios"}), 400
+        if not isinstance(components, list):
+            return jsonify({"error": "Los componentes deben ser una lista"}), 400
+
+        envioTemplateTxt(phone_number, template_name, components)
+        
+        return jsonify({"status": "Mensaje enviado exitosamente"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=config.PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
 
