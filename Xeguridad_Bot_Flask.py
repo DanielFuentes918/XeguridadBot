@@ -341,6 +341,7 @@ def politica_privacidad():
 
 @app.route('/send_notification' , methods=['POST'])
 def send_notification():
+    print("Enviando notificación...")
     try:
         data = request.json
         phone_number = data.get('phone_number')
