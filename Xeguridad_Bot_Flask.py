@@ -354,9 +354,10 @@ def send_notification():
         if not isinstance(components, list):
             return jsonify({"error": "Los componentes deben ser una lista"}), 400
 
-        envioTemplateTxt(phone_number, template_name, components)
-        
-        return jsonify({"status": "Mensaje enviado exitosamente"}), 200
+        if envioTemplateTxt(phone_number, template_name, components):
+            return jsonify({"status": "Mensaje enviado exitosamente"}), 200
+        else:
+            return jsonify({"error": "Error al enviar el mensaje"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
         
