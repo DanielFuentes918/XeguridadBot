@@ -7,6 +7,8 @@ from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
 from XeguridadCrawler import execute_crawler
+import requests
+import re
 config = Config()
 
 ultimos_mensajes = {}
@@ -337,25 +339,58 @@ def home():
 def politica_privacidad():
     return render_template('PoliticasSeguridad.html')
 
-@app.route('/send_notification' , methods=['POST'])
+@app.route('/send_notification' , methods=['POST', 'GET'])
 def send_notification():
-    try:
-        data = request.json
-        phone_number = data.get('phone_number')
-        template_name = data.get('template_name')
-        components = data.get('components', [])
+    if request.method == 'POST':
+        try:
+            data = request.json
+            phone_number = data.get('phone_number')
+            template_name = data.get('template_name')
+            components = data.get('components', [])
 
-        # Validar los datos recibidos
-        if not phone_number or not template_name:
-            return jsonify({"error": "El número y el nombre de la plantilla son obligatorios"}), 400
-        if not isinstance(components, list):
-            return jsonify({"error": "Los componentes deben ser una lista"}), 400
+            # Validar los datos recibidos
+            if not phone_number or not template_name:
+                return jsonify({"error": "El número y el nombre de la plantilla son obligatorios"}), 400
+            if not isinstance(components, list):
+                return jsonify({"error": "Los componentes deben ser una lista"}), 400
 
-        envioTemplateTxt(phone_number, template_name, components)
+            envioTemplateTxt(phone_number, template_name, components)
+            
+            return jsonify({"status": "Mensaje enviado exitosamente"}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    if request.method == 'GET':
+
+        doc_type = "Work order"
+        doc_id = "12345"
+
+        data = {
+            "phone_number": "50497338021",
+            "template_name": "send_notification",
+            "components": [
+                {
+                    {
+                        "type": "body",
+                        "parameters": [
+                            {
+                                "type": "text",
+                                "text": doc_type
+                            },
+                            {
+                                "type": "text",
+                                "text": doc_id
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+
+        response = requests.post(phone_number, template_name, components)
+        print(f"Estado de la respuesta: {response.status_code}")
+        print(f"Contenido de la respuesta: {response.text}")
+        return response.status_code
         
-        return jsonify({"status": "Mensaje enviado exitosamente"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=config.PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
