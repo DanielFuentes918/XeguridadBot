@@ -339,57 +339,25 @@ def home():
 def politica_privacidad():
     return render_template('PoliticasSeguridad.html')
 
-@app.route('/send_notification' , methods=['POST', 'GET'])
+@app.route('/send_notification' , methods=['POST'])
 def send_notification():
-    if request.method == 'POST':
-        try:
-            data = request.json
-            phone_number = data.get('phone_number')
-            template_name = data.get('template_name')
-            components = data.get('components', [])
+    try:
+        data = request.json
+        phone_number = data.get('phone_number')
+        template_name = data.get('template_name')
+        components = data.get('components', [])
 
-            # Validar los datos recibidos
-            if not phone_number or not template_name:
-                return jsonify({"error": "El número y el nombre de la plantilla son obligatorios"}), 400
-            if not isinstance(components, list):
-                return jsonify({"error": "Los componentes deben ser una lista"}), 400
+        # Validar los datos recibidos
+        if not phone_number or not template_name:
+            return jsonify({"error": "El número y el nombre de la plantilla son obligatorios"}), 400
+        if not isinstance(components, list):
+            return jsonify({"error": "Los componentes deben ser una lista"}), 400
 
-            envioTemplateTxt(phone_number, template_name, components)
-            
-            return jsonify({"status": "Mensaje enviado exitosamente"}), 200
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-    if request.method == 'GET':
-
-        doc_type = "Work order"
-        doc_id = "12345"
-
-        data = {
-            "phone_number": "50497338021",
-            "template_name": "send_notification",
-            "components": [
-                {
-                    {
-                        "type": "body",
-                        "parameters": [
-                            {
-                                "type": "text",
-                                "text": doc_type
-                            },
-                            {
-                                "type": "text",
-                                "text": doc_id
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
-
-        response = requests.post(phone_number, template_name, components)
-        print(f"Estado de la respuesta: {response.status_code}")
-        print(f"Contenido de la respuesta: {response.text}")
-        return response.status_code
+        envioTemplateTxt(phone_number, template_name, components)
+        
+        return jsonify({"status": "Mensaje enviado exitosamente"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
         
 
 if __name__ == "__main__":
