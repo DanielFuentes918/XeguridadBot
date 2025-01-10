@@ -329,19 +329,6 @@ def descargar_multimedia(media_id, access_token, tipo="imagen"):
     return None
 
 async def enviar_ubicacion_tile(tile_name, numero, email, password):
-    """
-    Envía la ubicación de un Tile específico como plantilla de WhatsApp.
-    
-    Args:
-        tile_name (str): Nombre del Tile a buscar.
-        numero (str): Número de teléfono del usuario para WhatsApp.
-        email (str): Correo electrónico para la API de Tile.
-        password (str): Contraseña para la API de Tile.
-    """
-    from aiohttp import ClientSession
-    from pytile import async_login
-    import pytz
-
     local_tz = pytz.timezone('America/Tegucigalpa')
     utc_tz = pytz.UTC
 

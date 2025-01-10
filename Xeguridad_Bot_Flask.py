@@ -12,35 +12,20 @@ import re
 config = Config()
 
 ultimos_mensajes = {}
-
 esperando_denuncia = {}
-
 esperando_placa = {}
-
 esperando_unit_type = {}
-
 esperando_plate_request = {}
-
 esperando_genset_request = {}
-
 esperando_genset = {}
-
 esperando_chasis_request = {}
-
 esperando_chasis = {}
-
 volver_menu_xeguridad = {}
-
 xeguridad_menu = {}
-
 user_requests = {}
-
 denuncia = {}
-
 imagenes = {}
-
 empresa = {}
-
 autenticado = {}
 
 app = Flask("Xeguridad_Bot_Main")
