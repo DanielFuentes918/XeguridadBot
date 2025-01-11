@@ -20,8 +20,8 @@ class UsuarioManager:
         # Busca el usuario por el número de teléfono
         usuario = self.collection.find_one({'telefono': username})
         if usuario and 'rol' in usuario:
-            return usuario['rol']
-        print(f"Rol del usuario: {usuario['rol']}")
+            print(f"Rol del usuario: {usuario['rol']}")
+            rol = usuario['rol']
         # Verifica si se encontró el usuario
         if usuario:
             stored_hash = usuario['password']

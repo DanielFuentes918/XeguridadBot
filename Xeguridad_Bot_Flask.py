@@ -39,6 +39,9 @@ try:
 except Exception as e:
     print(f"Error al conectar a MongoDB: {e}")
 
+# Conexion a DB de EMS
+
+
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     print ("Webhook recibido")
