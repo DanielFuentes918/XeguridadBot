@@ -48,6 +48,9 @@ class Config:
         self.GENSET_ACTUAL_LOCATION_TEMPLATE = "genset_actual_location"
         self.GENSET_ACTUAL_LOCATION_LOADING_TEMPLATE = "genset_actual_location_loading"
         self.GENSET_ACTUAL_LOCATION_FAILED_TEMPLATE = "genset_actual_location_failed"
+        #Conexion a base de datos MySQL
+        self.SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
+        self.SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     def mongo_uri(self):
         return f"mongodb://{self.USUARIO_MONGO}:{self.PASSWORD_MONGO_ESCAPADA}@localhost:27017/{self.BASE_DATOS_MONGO}?authSource={self.AUTH_DB}"
