@@ -8,9 +8,11 @@ from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
 from XeguridadCrawler import execute_crawler
 from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 from models import db, AllTruckDetails
 
 config = Config()
+
 
 ultimos_mensajes = {}
 esperando_denuncia = {}
