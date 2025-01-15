@@ -7,8 +7,9 @@ from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
 from XeguridadCrawler import execute_crawler
-import requests
-import re
+from flask_sqlalchemy import SQLAlchemy
+from models import db, AllTruckDetails
+
 config = Config()
 
 ultimos_mensajes = {}
@@ -30,6 +31,10 @@ autenticado = {}
 
 app = Flask("Xeguridad_Bot_Main")
 
+app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = config.SQLALCHEMY_TRACK_MODIFICATIONS
+db.init_app(app)
+
 # Conexion a MongoDB con manejo de excepciones
 try:
     client = MongoClient(config.mongo_uri())
@@ -38,8 +43,6 @@ try:
     print("Conexión a MongoDB exitosa.")
 except Exception as e:
     print(f"Error al conectar a MongoDB: {e}")
-
-# Conexion a DB de EMS
 
 
 @app.route('/webhook', methods=['GET', 'POST'])
@@ -342,6 +345,28 @@ def send_notification():
         else:
             envioTemplateTxt(phone_number, template_name, components)
             return jsonify({"status": "Mensaje enviado exitosamente"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/all_truck_details', methods=['GET'])
+def get_all_truck_details():
+    """Ejemplo de ruta para obtener datos de la vista vwAllTruckDetails."""
+    try:
+        # Realiza la consulta
+        detalles_camiones = AllTruckDetails.query.all()
+        resultado = [
+            {
+                "assetsid": detalle.assetsid,
+                "moduleid": detalle.moduleid,
+                "truck_plate": detalle.truck_plate,
+                "brand": detalle.brand,
+                "color": detalle.color,
+                "model": detalle.model,
+                # Agrega más campos según sea necesario
+            }
+            for detalle in detalles_camiones
+        ]
+        return jsonify(resultado), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
         
