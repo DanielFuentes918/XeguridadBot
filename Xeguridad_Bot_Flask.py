@@ -364,7 +364,7 @@ def get_all_truck_details():
                 "brand": detalle.brand,
                 "color": detalle.color,
                 "model": detalle.model,
-                # Agrega más campos según sea necesario
+                "subdivision": detalle.subdivision,
             }
             for detalle in detalles_camiones
         ]
