@@ -9,11 +9,13 @@ from pytile import async_login
 from models.UserAllowedTrucks import UserAllowedTrucks
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from Users import buscar_correo_por_telefono
+from pymongo import MongoClient
 
 config = Config()
 
 user_requests = {}
+
+mongo_client = MongoClient(config.mongo_uri())
 
 mysql_engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
 Session = sessionmaker(bind=mysql_engine)
@@ -414,6 +416,15 @@ async def enviar_ubicacion_tile(tile_name, numero, email, password):
 # Función auxiliar para ejecutarlo desde un entorno síncrono
 def enviar_ubicacion_tile_sync(tile_name, numero, email, password):
     asyncio.run(enviar_ubicacion_tile(tile_name, numero, email, password))
+
+# Función para obtener el correo desde MongoDB
+    def buscar_correo_por_telefono(telefono):
+        db_mongo = mongo_client[config.BASE_DATOS_MONGO]
+        usuarios_collection = db_mongo['usuarios']
+        user = usuarios_collection.find_one({"telefono": telefono}, {"correo": 1, "_id": 0})
+        if user and "correo" in user:
+            return user["correo"]
+        return None
 
 #Consulta a la vista para obtener todos los camiones permitidos para un usuario
 def get_trucks_for_user(telefono):
