@@ -179,6 +179,7 @@ def manejar_mensaje_entrante(mensaje):
             return  # Ya se envió la plantilla de autenticación, espera respuesta.
 
         autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
+        rol = usuario_manager.rol_usuario(numero)
         print(f"Usuario autenticado: {autenticado}")
         print(f"Usuarios autenticados: {usuario_manager.usuarios_autenticados}")
 
@@ -187,7 +188,10 @@ def manejar_mensaje_entrante(mensaje):
             if cuerpo_mensaje.strip().lower() == "ubicación de una unidad":
                 esperando_unit_type[numero] = True
                 print(f"Usuario autenticado: {numero} puede solicitar ubucacion.")
-                envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
+                if rol == "admin":
+                    envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
+                elif rol == "usuario":
+                    envioTemplateTxt(numero, config.UNIT_TYPE_USUARIO_TEMPLATE, [])
                 print(f"usuarios seleccionando unit type: {esperando_unit_type}")
             elif numero in esperando_unit_type:
                 if cuerpo_mensaje.strip().lower() == "vehículo":
@@ -313,17 +317,6 @@ def manejar_mensaje_entrante(mensaje):
 
             if cuerpo_mensaje.strip().lower() == "volver al menú":
                 print(f"Usuario {numero} seleccionó volver al menú.")
-                # volver_menu_xeguridad[numero] = True
-                # esperando_placa[numero] = False
-                # esperando_unit_type[numero] = False
-                # esperando_plate_request[numero] = False
-                # esperando_genset_request[numero] = False
-                # esperando_genset[numero] = False
-                # esperando_chasis_request[numero] = False
-                # esperando_chasis[numero] = False
-                # volver_menu_xeguridad[numero] = False
-                # user_requests[numero] = False
-                # xeguridad_menu[numero] = False
                 envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
                 return
             else:

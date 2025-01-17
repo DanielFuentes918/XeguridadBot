@@ -20,9 +20,6 @@ class UsuarioManager:
         print(f"Autenticando usuario {username}...")
         # Busca el usuario por el número de teléfono
         usuario = self.collection.find_one({'telefono': username})
-        if usuario and 'rol' in usuario:
-            print(f"Rol del usuario: {usuario['rol']}")
-            rol = usuario['rol']
         # Verifica si se encontró el usuario
         if usuario:
             stored_hash = usuario['password']
@@ -87,6 +84,11 @@ class UsuarioManager:
         """Elimina un usuario de la lista de autenticados."""
         if numero in self.usuarios_autenticados:
             del self.usuarios_autenticados[numero]
+
+    def rol_usuario(self, numero):
+        """Obtiene el rol de un usuario."""
+        usuario = self.collection.find_one({'telefono': numero})
+        return usuario['rol']
 
 
 

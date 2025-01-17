@@ -48,6 +48,8 @@ class Config:
         self.GENSET_ACTUAL_LOCATION_TEMPLATE = "genset_actual_location"
         self.GENSET_ACTUAL_LOCATION_LOADING_TEMPLATE = "genset_actual_location_loading"
         self.GENSET_ACTUAL_LOCATION_FAILED_TEMPLATE = "genset_actual_location_failed"
+        self.UNIT_TYPE_USUARIO_TEMPLATE = "unit_type_usuario"
+
         #Conexion a base de datos MySQL
         self.SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
         self.SQLALCHEMY_TRACK_MODIFICATIONS = False
