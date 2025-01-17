@@ -435,7 +435,9 @@ def get_trucks_for_user(telefono):
             return {"error": "No se encontró el correo del usuario en MongoDB"}
 
         # Consultar los camiones en MySQL
-        trucks = db_session.query(UserAllowedTrucks).filter_by(userEmail=user_email).all()
+        trucks = db_session.query(UserAllowedTrucks).filter_by(userEmail=user_email).all()  # Usa .all() para obtener todos los registros
+        print(f"Camiones encontrados en la consulta: {trucks}")  # Debug: Imprime los resultados de la consulta crudos
+
         if not trucks:
             return {"error": "No se encontraron camiones para este usuario"}
 
