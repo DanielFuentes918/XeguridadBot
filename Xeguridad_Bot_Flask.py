@@ -208,19 +208,32 @@ def manejar_mensaje_entrante(mensaje):
                 user_email = buscar_correo_por_telefono(numero)
                 print(f"Correo encontrado: {user_email}")
                 
-                result = get_trucks_for_user(numero)
-                print(f"Resultado de camiones: {result}")  # Imprime todos los resultados
+                # Obtener los camiones permitidos para el usuario
+                trucks_list = get_trucks_for_user(numero)
+                print(f"Resultado de camiones: {trucks_list}")  # Imprime todos los resultados
                 
-                if "error" in result:
-                    print(result["error"])
+                if "error" in trucks_list:
+                    print(trucks_list["error"])
                 else:
-                    for truck in result:
+                    # Mostrar las placas permitidas al usuario
+                    for truck in trucks_list:
                         print(f"Placa: {truck['truckPlate']}, Subdivisión: {truck['subdivisionName']}")
+                
                 del esperando_plate_request[numero]
+
             elif esperando_placa.get(numero):
                 placa = cuerpo_mensaje.upper()
                 print(f"Placa detectada: {placa}")
-                unitnumber = buscar_unitnumber_por_placa(placa)
+                
+                # Buscar unitnumber filtrando por trucks_list
+                trucks_list = get_trucks_for_user(numero)  # Asegúrate de reutilizar la lista si ya se obtuvo
+                if "error" in trucks_list:
+                    print(f"No se encontraron camiones para el usuario: {trucks_list['error']}")
+                    envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, [])
+                    del esperando_placa[numero]
+                    return
+                
+                unitnumber = buscar_unitnumber_por_placa(placa, trucks_list)
                 if unitnumber:
                     print(f"El unitnumber para la placa {placa} es {unitnumber}.")
                     user_requests[numero] = {
@@ -234,7 +247,7 @@ def manejar_mensaje_entrante(mensaje):
                     else:
                         print("Error al ejecutar el crawler.")
                 else:
-                    print(f"No se encontró el unitnumber para la placa {placa}.")
+                    print(f"No se encontró el unitnumber para la placa {placa} o no tiene permiso.")
                     components = [
                         {
                             "type": "body",
@@ -248,6 +261,7 @@ def manejar_mensaje_entrante(mensaje):
                     ]
                     envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
                 del esperando_placa[numero]
+
 
             if numero in esperando_genset_request:
                 envioTemplateTxt(numero, config.GENSET_REQUEST_TEMPLATE, [])

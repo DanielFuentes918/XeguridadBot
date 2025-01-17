@@ -49,7 +49,10 @@ def envioMsj(numero, template_name, components):
     print(f"Contenido de la respuesta: {response.text}")
     return response.status_code
 
-def buscar_unitnumber_por_placa(placa):
+def buscar_unitnumber_por_placa(placa, trucks_list):
+    """
+    Busca el unitnumber de una placa, limitando las unidades según trucks_list del usuario.
+    """
     params = {
         'commandname': 'get_units',
         'user': config.XEGURIDAD_USERNAME,
@@ -58,16 +61,27 @@ def buscar_unitnumber_por_placa(placa):
     }
     response = requests.get(config.XEGURIDAD_API_URL, params=params)
     print(f"Estado de la respuesta de la API: {response.status_code}")
+    
     if response.status_code == 200:
         unidades = response.json()
         print(f"Unidades recibidas: {unidades}")
+        
+        # Crear un set de placas permitidas según trucks_list
+        placas_permitidas = {truck['truckPlate'] for truck in trucks_list}
+        print(f"Placas permitidas para el usuario: {placas_permitidas}")
+        
         for unidad in unidades:
             nombre_placa = extraer_placa(unidad['name'])
             print(f"Nombre de la unidad: {unidad['name']}, Placa extraída: {nombre_placa}")
-            if nombre_placa == placa:
+            
+            # Verificar si la placa pertenece a las placas permitidas
+            if nombre_placa == placa and nombre_placa in placas_permitidas:
                 print(f"Unitnumber encontrado: {unidad['unitnumber']} para la placa {placa}")
                 return unidad['unitnumber']
+    
+    print(f"No se encontró un unitnumber para la placa {placa} dentro de las unidades permitidas.")
     return None
+
 
 def buscar_unitnumber_por_genset(genset):
     params = {
