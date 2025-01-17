@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from Config import Config
 from Users import UsuarioManager
-from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia, enviar_ubicacion_tile_sync, obtener_ultima_transmision_genset
+from Utils import envioTemplateTxt, buscar_unitnumber_por_placa,buscar_unitnumber_por_genset, obtener_ultima_transmision, descargar_multimedia, enviar_ubicacion_tile_sync, obtener_ultima_transmision_genset, get_trucks_for_user
 from DenunciasReclamos_SMTP import enviar_queja_anonima
 from flask import Flask, request, jsonify, render_template
 from pymongo import MongoClient
@@ -205,6 +205,12 @@ def manejar_mensaje_entrante(mensaje):
             if numero in esperando_plate_request:
                 envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
                 esperando_placa[numero] = True
+                result = get_trucks_for_user(numero)
+                if "error" in result:
+                    print(result["error"])
+                else:
+                    for truck in result:
+                        print(truck["truckPlate"], truck["subdivisionName"])
                 del esperando_plate_request[numero]
             elif esperando_placa.get(numero):
                 placa = cuerpo_mensaje.upper()

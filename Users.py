@@ -3,8 +3,12 @@ from Utils import envioTemplateTxt
 from Config import Config
 from pymongo import MongoClient
 import bcrypt
+from Config import Config
+
 
 config = Config()
+
+mongo_client = MongoClient(config.mongo_uri())
 
 class UsuarioManager:
     def __init__(self, db):
@@ -77,13 +81,15 @@ class UsuarioManager:
                 envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])
                 del self.usuarios_esperando_password[numero]
         return False
-
-
-
-
-    def buscar_usuario_por_telefono(self, telefono):
-        #Busca un usuario en la base de datos por su número de teléfono.
-        return self.collection.find_one({'telefono': telefono})
+    
+    # Función para obtener el correo desde MongoDB
+    def buscar_correo_por_telefono(telefono):
+        db_mongo = mongo_client[config.BASE_DATOS_MONGO]
+        usuarios_collection = db_mongo['usuarios']
+        user = usuarios_collection.find_one({"telefono": telefono}, {"correo": 1, "_id": 0})
+        if user and "correo" in user:
+            return user["correo"]
+        return None
 
     def usuario_autenticado(self, numero):
         """Verifica si un usuario está autenticado."""

@@ -6,10 +6,18 @@ import asyncio
 import pytz
 from aiohttp import ClientSession
 from pytile import async_login
+from models.UserAllowedTrucks import UserAllowedTrucks
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from Users import buscar_correo_por_telefono
 
 config = Config()
 
 user_requests = {}
+
+mysql_engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
+Session = sessionmaker(bind=mysql_engine)
+db_session = Session()
 
 def envioTemplateTxt(numero, template_name, components):
     response_status = envioMsj(numero, template_name, components)
@@ -406,3 +414,32 @@ async def enviar_ubicacion_tile(tile_name, numero, email, password):
 # Función auxiliar para ejecutarlo desde un entorno síncrono
 def enviar_ubicacion_tile_sync(tile_name, numero, email, password):
     asyncio.run(enviar_ubicacion_tile(tile_name, numero, email, password))
+
+#Consulta a la vista para obtener todos los camiones permitidos para un usuario
+def get_trucks_for_user(telefono):
+    try:
+        # Consultar el correo en MongoDB
+        user_email = buscar_correo_por_telefono(telefono)
+        if not user_email:
+            return {"error": "No se encontró el correo del usuario en MongoDB"}
+
+        # Consultar los camiones en MySQL
+        trucks = db_session.query(UserAllowedTrucks).filter_by(userEmail=user_email).all()
+        if not trucks:
+            return {"error": "No se encontraron camiones para este usuario"}
+
+        # Formatear los resultados
+        trucks_list = [
+            {
+                "truckId": truck.truckId,
+                "truckPlate": truck.truckPlate,
+                "subdivisionName": truck.subdivisionName,
+                "brand": truck.brand,
+                "model": truck.model,
+            }
+            for truck in trucks
+        ]
+        return trucks_list
+
+    except Exception as e:
+        return {"error": str(e)}
