@@ -418,13 +418,13 @@ def enviar_ubicacion_tile_sync(tile_name, numero, email, password):
     asyncio.run(enviar_ubicacion_tile(tile_name, numero, email, password))
 
 # Función para obtener el correo desde MongoDB
-    def buscar_correo_por_telefono(telefono):
-        db_mongo = mongo_client[config.BASE_DATOS_MONGO]
-        usuarios_collection = db_mongo['usuarios']
-        user = usuarios_collection.find_one({"telefono": telefono}, {"correo": 1, "_id": 0})
-        if user and "correo" in user:
-            return user["correo"]
-        return None
+def buscar_correo_por_telefono(telefono):
+    db_mongo = mongo_client[config.BASE_DATOS_MONGO]
+    usuarios_collection = db_mongo['usuarios']
+    user = usuarios_collection.find_one({"telefono": telefono}, {"correo": 1, "_id": 0})
+    if user and "correo" in user:
+        return user["correo"]
+    return None
 
 #Consulta a la vista para obtener todos los camiones permitidos para un usuario
 def get_trucks_for_user(telefono):
