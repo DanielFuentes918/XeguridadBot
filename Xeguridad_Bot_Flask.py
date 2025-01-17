@@ -211,8 +211,7 @@ def manejar_mensaje_entrante(mensaje):
                 if "error" in result:
                     print(result["error"])
                 else:
-                    for truck in result:
-                        print(truck["truckPlate"], truck["subdivisionName"])
+                    print(result)
                 del esperando_plate_request[numero]
             elif esperando_placa.get(numero):
                 placa = cuerpo_mensaje.upper()
