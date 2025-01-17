@@ -116,11 +116,11 @@ def manejar_mensaje_entrante(mensaje):
 
     # Detectar tipo de mensaje y obtener el cuerpo del mensaje
     if mensaje['type'] == 'button':
-        cuerpo_mensaje = mensaje['button']['payload']
-    else:   
+        cuerpo_mensaje = mensaje['button']['payload'].strip()
+        es_boton = True
+    else:
         cuerpo_mensaje = mensaje.get('text', {}).get('body', '').strip()
-
-    print(f"Cuerpo del mensaje: {cuerpo_mensaje}")
+        es_boton = False
 
     # Manejar opción de "denuncia o reclamos"
     if cuerpo_mensaje.lower() == "denuncias o reclamos":
@@ -185,13 +185,16 @@ def manejar_mensaje_entrante(mensaje):
 
         if usuario_manager.usuarios_autenticados.get(numero):
             print("cuerpo_mensaje.strip():", cuerpo_mensaje.strip())
-            if cuerpo_mensaje.strip().lower() == "ubicación de una unidad":
+            if cuerpo_mensaje.lower() == "ubicación de una unidad" and es_boton:
                 esperando_unit_type[numero] = True
-                print(f"Usuario autenticado: {numero} puede solicitar ubucacion.")
+                print(f"Usuario autenticado: {numero} puede solicitar ubicación.")
+                rol = usuario_manager.rol_usuario(numero)  # Obtener el rol del usuario
                 if rol == "admin":
                     envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
                 elif rol == "usuario":
                     envioTemplateTxt(numero, config.UNIT_TYPE_USUARIO_TEMPLATE, [])
+            elif cuerpo_mensaje.lower() == "ubicación de una unidad" and not es_boton:
+                print(f"Comando 'ubicación de una unidad' ignorado porque no proviene de un botón.")
                 print(f"usuarios seleccionando unit type: {esperando_unit_type}")
             elif numero in esperando_unit_type:
                 if cuerpo_mensaje.strip().lower() == "vehículo":
