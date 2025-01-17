@@ -206,12 +206,16 @@ def manejar_mensaje_entrante(mensaje):
                 envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
                 esperando_placa[numero] = True
                 user_email = buscar_correo_por_telefono(numero)
-                print(user_email)
+                print(f"Correo encontrado: {user_email}")
+                
                 result = get_trucks_for_user(numero)
+                print(f"Resultado de camiones: {result}")  # Imprime todos los resultados
+                
                 if "error" in result:
                     print(result["error"])
                 else:
-                    print(result)
+                    for truck in result:
+                        print(f"Placa: {truck['truckPlate']}, Subdivisión: {truck['subdivisionName']}")
                 del esperando_plate_request[numero]
             elif esperando_placa.get(numero):
                 placa = cuerpo_mensaje.upper()
