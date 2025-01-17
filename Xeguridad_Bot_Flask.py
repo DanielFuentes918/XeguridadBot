@@ -375,29 +375,6 @@ def send_notification():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/all_truck_details', methods=['GET'])
-def get_all_truck_details():
-    """Ejemplo de ruta para obtener datos de la vista vwAllTruckDetails."""
-    try:
-        # Realiza la consulta
-        detalles_camiones = AllTruckDetails.query.all()
-        resultado = [
-            {
-                "assetsid": detalle.assetsid,
-                "moduleid": detalle.moduleid,
-                "truck_plate": detalle.truck_plate,
-                "brand": detalle.brand,
-                "color": detalle.color,
-                "model": detalle.model,
-                "subdivision": detalle.subdivision,
-            }
-            for detalle in detalles_camiones
-        ]
-        return jsonify(resultado), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-        
-
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=config.PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
 
