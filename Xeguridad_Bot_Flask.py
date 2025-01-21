@@ -196,18 +196,28 @@ def manejar_mensaje_entrante(mensaje):
             elif cuerpo_mensaje.lower() == "ubicación de una unidad" and not es_boton:
                 print(f"Comando 'ubicación de una unidad' ignorado porque no proviene de un botón.")
                 print(f"usuarios seleccionando unit type: {esperando_unit_type}")
-            elif numero in esperando_unit_type:
+            if numero in esperando_unit_type:
                 if cuerpo_mensaje.strip().lower() == "vehículo":
                     print(f"Usuario {numero} seleccionó vehículo.")
                     esperando_plate_request[numero] = True
                     del esperando_unit_type[numero]
-                    print(f"usuarios seleccionando plate request: {esperando_plate_request}")
                 elif cuerpo_mensaje.strip().lower() == "genset":
+                    print(f"Usuario {numero} seleccionó genset.")
                     esperando_genset_request[numero] = True
                     del esperando_unit_type[numero]
                 elif cuerpo_mensaje.strip().lower() == "chasis":
-                    esperando_chasis_request[numero] = True
-                    del esperando_unit_type[numero]
+                    # Verificar si el usuario tiene permisos para "chasis"
+                    if rol == "admin":
+                        print(f"Usuario {numero} seleccionó chasis.")
+                        esperando_chasis_request[numero] = True
+                        del esperando_unit_type[numero]
+                    else:
+                        # Mensaje de error para usuarios sin permisos
+                        print(f"Usuario {numero} intentó acceder a 'chasis' pero no tiene permisos.")
+                        envioTemplateTxt(numero, config.COMANDO_NO_RECIBIDO_TEMPLATE, [])
+                else:
+                    print(f"Comando no reconocido: {cuerpo_mensaje}")
+
 
             if numero in esperando_plate_request:
                 envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
