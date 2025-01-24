@@ -373,6 +373,32 @@ def manejar_mensaje_entrante(mensaje):
             print(f"Usuario {numero} no autenticado. Solicitando autenticación...")
             usuario_manager.iniciar_autenticacion(numero)
         return
+    
+    # Manejar "Volver al menú principal"
+    if cuerpo_mensaje.lower() == "volver al menú principal":
+        print(f"Usuario {numero} seleccionó 'Volver al menú principal'. Reiniciando flujo completo...")
+
+        # Limpiar todos los estados y flags asociados al usuario
+        esperando_denuncia.pop(numero, None)
+        esperando_placa.pop(numero, None)
+        esperando_unit_type.pop(numero, None)
+        esperando_plate_request.pop(numero, None)
+        esperando_genset_request.pop(numero, None)
+        esperando_genset.pop(numero, None)
+        esperando_chasis_request.pop(numero, None)
+        esperando_chasis.pop(numero, None)
+        volver_menu_xeguridad.pop(numero, None)
+        xeguridad_menu.pop(numero, None)
+        ultimos_mensajes.pop(numero, None)
+        empresa.pop(numero, None)
+        denuncia.pop(numero, None)
+        imagenes.pop(numero, None)
+        autenticado.pop(numero, None)
+
+        # Enviar la plantilla STARTER_MENU_TEMPLATE
+        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+        print(f"Flujo reiniciado y plantilla {config.STARTER_MENU_TEMPLATE} enviada al usuario {numero}.")
+        return
 
     # Fallback para mensajes no reconocidos
     if numero not in esperando_denuncia or not esperando_denuncia[numero]:
