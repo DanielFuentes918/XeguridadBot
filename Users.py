@@ -66,13 +66,12 @@ class UsuarioManager:
             if self.autenticar_usuario(numero, cuerpo_mensaje):  # Verifica las credenciales
                 print(f"Autenticación exitosa para {numero}")
                 self.usuarios_autenticados[numero] = datetime.now()  # Actualiza estado correctamente
-                print(f"Usuarios autenticados: {self.usuarios_autenticados}")  # Depuración
-                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar menú de Xeguridad
                 del self.usuarios_esperando_password[numero]
                 return True
             else:
                 print(f"Autenticación fallida para {numero}")
-                envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])
+                envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])  # Mensaje de fallo
                 del self.usuarios_esperando_password[numero]
         return False
 

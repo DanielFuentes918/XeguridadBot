@@ -143,7 +143,7 @@ def manejar_mensaje_entrante(mensaje):
     # Recepción de denuncia o reclamo
     if numero in esperando_denuncia and esperando_denuncia[numero]:
         if cuerpo_mensaje.lower() == "enviar":
-            if denuncia[numero] or imagenes[numero]:
+            if numero in denuncia and (denuncia[numero] or imagenes[numero]):
                 # Concatenar mensajes de denuncia
                 denuncia_concatenada = "\n".join(denuncia[numero])
                 enviar_queja_anonima(denuncia_concatenada, imagenes[numero], empresa[numero])
@@ -161,6 +161,8 @@ def manejar_mensaje_entrante(mensaje):
                 envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
                 print("No hay mensajes o imágenes para enviar.")
         else:
+            if numero not in denuncia:
+                denuncia[numero] = []
             denuncia[numero].append(cuerpo_mensaje)
             print(f"Mensaje agregado a la denuncia: {cuerpo_mensaje}")
         return
