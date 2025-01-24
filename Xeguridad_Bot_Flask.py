@@ -332,7 +332,21 @@ def manejar_mensaje_entrante(mensaje):
 
             if cuerpo_mensaje.strip().lower() == "volver al menú principal":
                 print(f"Usuario {numero} seleccionó volver al menú.")
-                esperando_denuncia[numero] = True
+                # Reiniciar todos los estados relacionados con este usuario
+                esperando_denuncia.pop(numero, None)
+                empresa.pop(numero, None)
+                denuncia.pop(numero, None)
+                imagenes.pop(numero, None)
+                esperando_placa.pop(numero, None)
+                esperando_unit_type.pop(numero, None)
+                esperando_plate_request.pop(numero, None)
+                esperando_genset_request.pop(numero, None)
+                esperando_genset.pop(numero, None)
+                esperando_chasis_request.pop(numero, None)
+                esperando_chasis.pop(numero, None)
+                xeguridad_menu.pop(numero, None)
+                volver_menu_xeguridad.pop(numero, None)
+                user_requests.pop(numero, None)
                 envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
                 return
             else:
