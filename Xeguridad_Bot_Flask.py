@@ -167,12 +167,7 @@ def manejar_mensaje_entrante(mensaje):
     
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request or numero in volver_menu_xeguridad or numero in xeguridad_menu:
-        denuncia[numero] = denuncia.get(numero, [])
-        empresa[numero] = empresa.get(numero, None)
-        xeguridad_menu[numero] = xeguridad_menu.get(numero, False)
-        esperando_placa[numero] = esperando_placa.get(numero, False)
-        esperando_unit_type[numero] = esperando_unit_type.get(numero, False)
-
+        xeguridad_menu[numero] = True
         if numero in usuario_manager.usuarios_autenticados:
             print(f"Usuario {numero} ya autenticado. Continuando flujo.")
         elif not usuario_manager.iniciar_autenticacion(numero):
