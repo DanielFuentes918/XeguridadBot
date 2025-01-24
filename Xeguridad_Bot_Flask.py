@@ -361,11 +361,9 @@ def manejar_mensaje_entrante(mensaje):
     # Detectar "Volver al menú"
     if cuerpo_mensaje.lower() == "volver al menú":
         print(f"Usuario {numero} seleccionó 'Volver al menú'. Reiniciando flujo...")
-        
-        # Validar si el usuario está autenticado
+
         if numero in usuario_manager.usuarios_autenticados:
-            # Limpiar todos los estados asociados al usuario
-            esperando_denuncia.pop(numero, None)
+            # Limpiar estados asociados al flujo de Xeguridad
             esperando_placa.pop(numero, None)
             esperando_unit_type.pop(numero, None)
             esperando_plate_request.pop(numero, None)
@@ -376,11 +374,11 @@ def manejar_mensaje_entrante(mensaje):
             volver_menu_xeguridad.pop(numero, None)
             xeguridad_menu.pop(numero, None)
 
-            # Enviar la plantilla xeguridad_menu
+            # Enviar la plantilla MENU_TEMPLATE_NAME
             envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
             print(f"Flujo reiniciado y plantilla {config.MENU_TEMPLATE_NAME} enviada al usuario {numero}.")
         else:
-            # Si no está autenticado, enviar mensaje de error o iniciar autenticación
+            # Solicitar autenticación si no está autenticado
             print(f"Usuario {numero} no autenticado. Solicitando autenticación...")
             usuario_manager.iniciar_autenticacion(numero)
         return
