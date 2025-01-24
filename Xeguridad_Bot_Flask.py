@@ -328,23 +328,34 @@ def manejar_mensaje_entrante(mensaje):
             else:
                 print(f"Usuario {numero} autenticado correctamente.")
 
-            if cuerpo_mensaje.strip().lower() == "volver al menú":
-                print(f"Usuario {numero} seleccionó volver al menú.")
-                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-                return
-            else:
-                print(f"Usuario {numero} no seleccionó volver al menú.")
-
-            if cuerpo_mensaje.strip().lower() == "volver al menú principal":
-                print(f"Usuario {numero} seleccionó volver al menú.")
-                esperando_denuncia[numero] = True
-                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-                return
-            else:
-                print(f"Usuario {numero} no seleccionó volver al menú.")
-
         else:
             print(f"Usuario {numero} en proceso de autenticación o fallido.")
+        return
+
+    # Detectar "Volver al menú principal"
+    if cuerpo_mensaje.lower() == "volver al menú principal":
+        print(f"Usuario {numero} seleccionó 'Volver al menú principal'. Reiniciando flujo completo...")
+
+        # Limpiar todos los estados y flags asociados al usuario
+        esperando_denuncia.pop(numero, None)
+        esperando_placa.pop(numero, None)
+        esperando_unit_type.pop(numero, None)
+        esperando_plate_request.pop(numero, None)
+        esperando_genset_request.pop(numero, None)
+        esperando_genset.pop(numero, None)
+        esperando_chasis_request.pop(numero, None)
+        esperando_chasis.pop(numero, None)
+        volver_menu_xeguridad.pop(numero, None)
+        xeguridad_menu.pop(numero, None)
+        ultimos_mensajes.pop(numero, None)
+        empresa.pop(numero, None)
+        denuncia.pop(numero, None)
+        imagenes.pop(numero, None)
+        autenticado.pop(numero, None)
+
+        # Enviar la plantilla STARTER_MENU_TEMPLATE
+        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+        print(f"Flujo reiniciado y plantilla {config.STARTER_MENU_TEMPLATE} enviada al usuario {numero}.")
         return
 
     # Detectar "Volver al menú"
