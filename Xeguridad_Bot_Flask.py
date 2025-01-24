@@ -86,6 +86,12 @@ def manejar_mensaje_entrante(mensaje):
         envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
         return
 
+    # Manejo de mensajes duplicados
+    if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
+        print(f"Mensaje duplicado detectado: {message_id}")
+        return
+    ultimos_mensajes[numero] = message_id
+
     # Manejar diferentes tipos de mensajes
     if mensaje['type'] == 'text':
         cuerpo_mensaje = mensaje['text']['body'].strip()
@@ -115,63 +121,6 @@ def manejar_mensaje_entrante(mensaje):
     else:
         cuerpo_mensaje = mensaje.get('text', {}).get('body', '').strip()
         es_boton = False
-
-    # Detectar "Volver al menú principal"
-    if cuerpo_mensaje.lower() == "volver al menú principal":
-        print(f"Usuario {numero} seleccionó 'Volver al menú principal'. Reiniciando flujo completo...")
-
-        # Limpiar todos los estados y flags asociados al usuario
-        esperando_denuncia.pop(numero, None)
-        esperando_placa.pop(numero, None)
-        esperando_unit_type.pop(numero, None)
-        esperando_plate_request.pop(numero, None)
-        esperando_genset_request.pop(numero, None)
-        esperando_genset.pop(numero, None)
-        esperando_chasis_request.pop(numero, None)
-        esperando_chasis.pop(numero, None)
-        volver_menu_xeguridad.pop(numero, None)
-        xeguridad_menu.pop(numero, None)
-        ultimos_mensajes.pop(numero, None)
-        empresa.pop(numero, None)
-        denuncia.pop(numero, None)
-        imagenes.pop(numero, None)
-        autenticado.pop(numero, None)
-
-        # Enviar la plantilla STARTER_MENU_TEMPLATE
-        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-        print(f"Flujo reiniciado y plantilla {config.STARTER_MENU_TEMPLATE} enviada al usuario {numero}.")
-        return
-
-    # Detectar "Volver al menú"
-    if cuerpo_mensaje.lower() == "volver al menú":
-        print(f"Usuario {numero} seleccionó 'Volver al menú'. Reiniciando flujo...")
-
-        if numero in usuario_manager.usuarios_autenticados:
-            # Limpiar estados asociados al flujo de Xeguridad
-            esperando_placa.pop(numero, None)
-            esperando_unit_type.pop(numero, None)
-            esperando_plate_request.pop(numero, None)
-            esperando_genset_request.pop(numero, None)
-            esperando_genset.pop(numero, None)
-            esperando_chasis_request.pop(numero, None)
-            esperando_chasis.pop(numero, None)
-            volver_menu_xeguridad.pop(numero, None)
-            xeguridad_menu.pop(numero, None)
-
-            # Enviar la plantilla MENU_TEMPLATE_NAME
-            envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-            print(f"Flujo reiniciado y plantilla {config.MENU_TEMPLATE_NAME} enviada al usuario {numero}.")
-        else:
-            # Solicitar autenticación si no está autenticado
-            print(f"Usuario {numero} no autenticado. Solicitando autenticación...")
-            usuario_manager.iniciar_autenticacion(numero)
-        return
-
-    # Manejo de mensajes duplicados
-    if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
-        print(f"Mensaje duplicado detectado: {message_id}")
-        return
-    ultimos_mensajes[numero] = message_id
 
     # Manejar opción de "denuncia o reclamos"
     if cuerpo_mensaje.lower() == "denuncias o reclamos":
@@ -379,35 +328,56 @@ def manejar_mensaje_entrante(mensaje):
             else:
                 print(f"Usuario {numero} autenticado correctamente.")
 
+            if cuerpo_mensaje.strip().lower() == "volver al menú":
+                print(f"Usuario {numero} seleccionó volver al menú.")
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+                return
+            else:
+                print(f"Usuario {numero} no seleccionó volver al menú.")
+
+            if cuerpo_mensaje.strip().lower() == "volver al menú principal":
+                print(f"Usuario {numero} seleccionó volver al menú.")
+                esperando_denuncia[numero] = True
+                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+                return
+            else:
+                print(f"Usuario {numero} no seleccionó volver al menú.")
+
         else:
             print(f"Usuario {numero} en proceso de autenticación o fallido.")
         return
 
-    # Detectar "Volver al menú principal"
-    if cuerpo_mensaje.lower() == "volver al menú principal":
-        print(f"Usuario {numero} seleccionó 'Volver al menú principal'. Reiniciando flujo completo...")
+    # Detectar "Volver al menú"
+    if cuerpo_mensaje.lower() == "volver al menú":
+        print(f"Usuario {numero} seleccionó 'Volver al menú'. Reiniciando flujo...")
+        
+        # Validar si el usuario está autenticado
+        if numero in usuario_manager.usuarios_autenticados:
+            # Limpiar todos los estados asociados al usuario
+            esperando_denuncia.pop(numero, None)
+            esperando_placa.pop(numero, None)
+            esperando_unit_type.pop(numero, None)
+            esperando_plate_request.pop(numero, None)
+            esperando_genset_request.pop(numero, None)
+            esperando_genset.pop(numero, None)
+            esperando_chasis_request.pop(numero, None)
+            esperando_chasis.pop(numero, None)
+            volver_menu_xeguridad.pop(numero, None)
+            xeguridad_menu.pop(numero, None)
 
-        # Limpiar todos los estados y flags asociados al usuario
-        esperando_denuncia.pop(numero, None)
-        esperando_placa.pop(numero, None)
-        esperando_unit_type.pop(numero, None)
-        esperando_plate_request.pop(numero, None)
-        esperando_genset_request.pop(numero, None)
-        esperando_genset.pop(numero, None)
-        esperando_chasis_request.pop(numero, None)
-        esperando_chasis.pop(numero, None)
-        volver_menu_xeguridad.pop(numero, None)
-        xeguridad_menu.pop(numero, None)
-        ultimos_mensajes.pop(numero, None)
-        empresa.pop(numero, None)
-        denuncia.pop(numero, None)
-        imagenes.pop(numero, None)
-        autenticado.pop(numero, None)
-
-        # Enviar la plantilla STARTER_MENU_TEMPLATE
-        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-        print(f"Flujo reiniciado y plantilla {config.STARTER_MENU_TEMPLATE} enviada al usuario {numero}.")
+            # Enviar la plantilla xeguridad_menu
+            envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+            print(f"Flujo reiniciado y plantilla {config.MENU_TEMPLATE_NAME} enviada al usuario {numero}.")
+        else:
+            # Si no está autenticado, enviar mensaje de error o iniciar autenticación
+            print(f"Usuario {numero} no autenticado. Solicitando autenticación...")
+            usuario_manager.iniciar_autenticacion(numero)
         return
+
+    # Fallback para mensajes no reconocidos
+    if numero not in esperando_denuncia or not esperando_denuncia[numero]:
+        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+        print("El mensaje no es una denuncia o reclamo.")
 
 @app.route('/')
 def home():
