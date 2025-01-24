@@ -167,7 +167,12 @@ def manejar_mensaje_entrante(mensaje):
     
     # Manejar opción de "Xeguridad"
     if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request or numero in volver_menu_xeguridad or numero in xeguridad_menu:
-        xeguridad_menu[numero] = True
+        denuncia[numero] = denuncia.get(numero, [])
+        empresa[numero] = empresa.get(numero, None)
+        xeguridad_menu[numero] = xeguridad_menu.get(numero, False)
+        esperando_placa[numero] = esperando_placa.get(numero, False)
+        esperando_unit_type[numero] = esperando_unit_type.get(numero, False)
+
         if numero in usuario_manager.usuarios_autenticados:
             print(f"Usuario {numero} ya autenticado. Continuando flujo.")
         elif not usuario_manager.iniciar_autenticacion(numero):
@@ -332,6 +337,7 @@ def manejar_mensaje_entrante(mensaje):
 
             if cuerpo_mensaje.strip().lower() == "volver al menú principal":
                 print(f"Usuario {numero} seleccionó volver al menú.")
+                esperando_denuncia[numero] = True
                 envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
                 return
             else:
@@ -339,6 +345,59 @@ def manejar_mensaje_entrante(mensaje):
 
         else:
             print(f"Usuario {numero} en proceso de autenticación o fallido.")
+        return
+
+    # Detectar "Volver al menú"
+    if cuerpo_mensaje.lower() == "volver al menú":
+        print(f"Usuario {numero} seleccionó 'Volver al menú'. Reiniciando flujo...")
+        
+        # Validar si el usuario está autenticado
+        if numero in usuario_manager.usuarios_autenticados:
+            # Limpiar todos los estados asociados al usuario
+            esperando_denuncia.pop(numero, None)
+            esperando_placa.pop(numero, None)
+            esperando_unit_type.pop(numero, None)
+            esperando_plate_request.pop(numero, None)
+            esperando_genset_request.pop(numero, None)
+            esperando_genset.pop(numero, None)
+            esperando_chasis_request.pop(numero, None)
+            esperando_chasis.pop(numero, None)
+            volver_menu_xeguridad.pop(numero, None)
+            xeguridad_menu.pop(numero, None)
+
+            # Enviar la plantilla xeguridad_menu
+            envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+            print(f"Flujo reiniciado y plantilla {config.MENU_TEMPLATE_NAME} enviada al usuario {numero}.")
+        else:
+            # Si no está autenticado, enviar mensaje de error o iniciar autenticación
+            print(f"Usuario {numero} no autenticado. Solicitando autenticación...")
+            usuario_manager.iniciar_autenticacion(numero)
+        return
+    
+    # Manejar "Volver al menú principal"
+    if cuerpo_mensaje.lower() == "volver al menú principal":
+        print(f"Usuario {numero} seleccionó 'Volver al menú principal'. Reiniciando flujo completo...")
+
+        # Limpiar todos los estados y flags asociados al usuario
+        esperando_denuncia.pop(numero, None)
+        esperando_placa.pop(numero, None)
+        esperando_unit_type.pop(numero, None)
+        esperando_plate_request.pop(numero, None)
+        esperando_genset_request.pop(numero, None)
+        esperando_genset.pop(numero, None)
+        esperando_chasis_request.pop(numero, None)
+        esperando_chasis.pop(numero, None)
+        volver_menu_xeguridad.pop(numero, None)
+        xeguridad_menu.pop(numero, None)
+        ultimos_mensajes.pop(numero, None)
+        empresa.pop(numero, None)
+        denuncia.pop(numero, None)
+        imagenes.pop(numero, None)
+        autenticado.pop(numero, None)
+
+        # Enviar la plantilla STARTER_MENU_TEMPLATE
+        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+        print(f"Flujo reiniciado y plantilla {config.STARTER_MENU_TEMPLATE} enviada al usuario {numero}.")
         return
 
     # Fallback para mensajes no reconocidos
