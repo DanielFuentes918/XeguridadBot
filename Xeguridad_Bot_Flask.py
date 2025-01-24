@@ -81,11 +81,6 @@ def manejar_mensaje_entrante(mensaje):
     message_id = mensaje.get('id')
     cuerpo_mensaje = ""
 
-    if cuerpo_mensaje.lower().lstrip() == "Volver a menú principal":
-        esperando_denuncia[numero] = True
-        envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-        return
-
     # Manejo de mensajes duplicados
     if numero in ultimos_mensajes and ultimos_mensajes[numero] == message_id:
         print(f"Mensaje duplicado detectado: {message_id}")
@@ -134,7 +129,7 @@ def manejar_mensaje_entrante(mensaje):
 
     # Manejar selección de compañía
     if numero in empresa and empresa[numero] is None:
-        if cuerpo_mensaje.lower() in ["exa s.a.", "conmoxa", "la mega", "trexa", "otra empresa del grupo", "volver a menú principal"]:
+        if cuerpo_mensaje.lower() in ["exa s.a.", "conmoxa", "la mega", "trexa", "otra empresa del grupo"]:
             empresa[numero] = cuerpo_mensaje.upper()
             print(f"Empresa seleccionada: {empresa[numero]}")
             envioTemplateTxt(numero, config.COMPLAINT_CLAIMS_TEMPLATE, [])  # Solicitar denuncia/reclamo
