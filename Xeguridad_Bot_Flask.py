@@ -392,7 +392,31 @@ def manejar_mensaje_entrante(mensaje):
         print(f"Usuario {numero} autenticado correctamente. Menú Xeguridad enviado.")
 
         return
+    
+    # Procesar las opciones seleccionadas dentro del menú de Xeguridad
+    if numero in xeguridad_menu:
+        print(f"Procesando opción dentro del menú de Xeguridad para {numero}.")
 
+        if cuerpo_mensaje.lower() == "ubicación de una unidad":
+            esperando_unit_type[numero] = True
+            rol = usuario_manager.rol_usuario(numero)
+            if rol == "admin":
+                envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
+            elif rol == "usuario":
+                envioTemplateTxt(numero, config.UNIT_TYPE_USUARIO_TEMPLATE, [])
+            print(f"Solicitud de ubicación de unidad enviada para {numero}.")
+            return
+
+        elif cuerpo_mensaje.lower() == "volver al menú principal":
+            print(f"Usuario {numero} seleccionó volver al menú principal.")
+            xeguridad_menu.pop(numero, None)
+            envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+            return
+
+        else:
+            print(f"Opción no válida seleccionada por {numero}: {cuerpo_mensaje}.")
+            envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+            return
     # Fallback para mensajes no reconocidos
     if numero not in esperando_denuncia or not esperando_denuncia[numero]:
         envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
