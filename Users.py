@@ -62,6 +62,13 @@ class UsuarioManager:
         return True
     
     def procesar_credenciales(self, numero, cuerpo_mensaje):
+
+        # Si el usuario ya está autenticado, no es necesario procesar credenciales
+        if numero in self.usuarios_autenticados:
+            print(f"Usuario {numero} ya autenticado. Omitiendo validación.")
+            envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+            return True
+        
         if numero in self.usuarios_esperando_password:
             if self.autenticar_usuario(numero, cuerpo_mensaje):  # Verifica las credenciales
                 print(f"Autenticación exitosa para {numero}")
