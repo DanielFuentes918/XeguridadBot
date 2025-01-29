@@ -168,215 +168,7 @@ def manejar_mensaje_entrante(mensaje):
         return
     
     # Manejar opción de "Xeguridad"
-    # if cuerpo_mensaje.lower() == "xeguridad" #or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request or numero in volver_menu_xeguridad or numero in xeguridad_menu:
-    #     print(f"Usuario {numero} seleccionó Xeguridad.")
-        
-    #     # Si el usuario no está autenticado, iniciar autenticación
-    #     if not usuario_manager.usuario_autenticado(numero):
-    #         print(f"Usuario {numero} no autenticado. Iniciando flujo de autenticación.")
-    #         usuario_manager.iniciar_autenticacion(numero)
-    #         return
-
-    #     # Usuario autenticado, enviar el menú principal de Xeguridad
-    #     envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-    #     xeguridad_menu[numero] = True
-    #     if numero in usuario_manager.usuarios_autenticados:
-    #         print(f"Usuario {numero} ya autenticado. Continuando flujo.")
-    #     elif not usuario_manager.iniciar_autenticacion(numero):
-    #         return  # Ya se envió la plantilla de autenticación, espera respuesta.
-
-    #     autenticado = usuario_manager.procesar_credenciales(numero, cuerpo_mensaje)
-    #     rol = usuario_manager.rol_usuario(numero)
-    #     print(f"Usuario autenticado: {autenticado}")
-    #     print(f"Usuarios autenticados: {usuario_manager.usuarios_autenticados}")
-
-    #     if usuario_manager.usuarios_autenticados.get(numero):
-    #         print("cuerpo_mensaje.strip():", cuerpo_mensaje.strip())
-    #         if cuerpo_mensaje.lower() == "ubicación de una unidad" and es_boton:
-    #             esperando_unit_type[numero] = True
-    #             print(f"Usuario autenticado: {numero} puede solicitar ubicación.")
-    #             rol = usuario_manager.rol_usuario(numero)  # Obtener el rol del usuario
-    #             if rol == "admin":
-    #                 envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
-    #             elif rol == "usuario":
-    #                 envioTemplateTxt(numero, config.UNIT_TYPE_USUARIO_TEMPLATE, [])
-    #         elif cuerpo_mensaje.lower() == "ubicación de una unidad" and not es_boton:
-    #             print(f"Comando 'ubicación de una unidad' ignorado porque no proviene de un botón.")
-    #             print(f"usuarios seleccionando unit type: {esperando_unit_type}")
-    #         if numero in esperando_unit_type:
-    #             if cuerpo_mensaje.strip().lower() == "vehículo":
-    #                 print(f"Usuario {numero} seleccionó vehículo.")
-    #                 esperando_plate_request[numero] = True
-    #                 del esperando_unit_type[numero]
-    #             elif cuerpo_mensaje.strip().lower() == "genset":
-    #                 print(f"Usuario {numero} seleccionó genset.")
-    #                 esperando_genset_request[numero] = True
-    #                 del esperando_unit_type[numero]
-    #             elif cuerpo_mensaje.strip().lower() == "chasis":
-    #                 # Verificar si el usuario tiene permisos para "chasis"
-    #                 if rol == "admin":
-    #                     print(f"Usuario {numero} seleccionó chasis.")
-    #                     esperando_chasis_request[numero] = True
-    #                     del esperando_unit_type[numero]
-    #                 else:
-    #                     # Mensaje de error para usuarios sin permisos
-    #                     print(f"Usuario {numero} intentó acceder a 'chasis' pero no tiene permisos.")
-    #                     envioTemplateTxt(numero, config.COMANDO_NO_RECIBIDO_TEMPLATE, [])
-    #             else:
-    #                 print(f"Comando no reconocido: {cuerpo_mensaje}")
-
-
-    #         if numero in esperando_plate_request:
-    #             envioTemplateTxt(numero, config.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME, [])
-    #             esperando_placa[numero] = True
-    #             user_email = buscar_correo_por_telefono(numero)
-    #             print(f"Correo encontrado: {user_email}")
-                
-    #             # Obtener los camiones permitidos para el usuario
-    #             trucks_list = get_trucks_for_user(numero)
-    #             print(f"Resultado de camiones: {trucks_list}")  # Imprime todos los resultados
-                
-    #             if "error" in trucks_list:
-    #                 print(trucks_list["error"])
-    #             else:
-    #                 # Mostrar las placas permitidas al usuario
-    #                 for truck in trucks_list:
-    #                     print(f"Placa: {truck['truckPlate']}, Subdivisión: {truck['subdivisionName']}")
-                
-    #             del esperando_plate_request[numero]
-
-    #         elif esperando_placa.get(numero):
-    #             placa = cuerpo_mensaje.upper()
-    #             print(f"Placa detectada: {placa}")
-                
-    #             # Buscar unitnumber filtrando por trucks_list
-    #             trucks_list = get_trucks_for_user(numero)  # Asegúrate de reutilizar la lista si ya se obtuvo
-    #             if "error" in trucks_list:
-    #                 print(f"No se encontraron camiones para el usuario: {trucks_list['error']}")
-    #                 envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, [])
-    #                 del esperando_placa[numero]
-    #                 return
-                
-    #             unitnumber = buscar_unitnumber_por_placa(placa, trucks_list)
-    #             if unitnumber:
-    #                 print(f"El unitnumber para la placa {placa} es {unitnumber}.")
-    #                 user_requests[numero] = {
-    #                     "placa": placa,
-    #                     "hora": datetime.now()
-    #                 }
-    #                 envioTemplateTxt(numero, config.ACTUAL_LOCATION_LOADING_TEMPLATE, [])
-    #                 if execute_crawler(unitnumber):
-    #                     print("Crawler ejecutado correctamente.")
-    #                     obtener_ultima_transmision(unitnumber, numero, user_requests)
-    #                 else:
-    #                     print("Error al ejecutar el crawler.")
-    #             else:
-    #                 print(f"No se encontró el unitnumber para la placa {placa} o no tiene permiso.")
-    #                 components = [
-    #                     {
-    #                         "type": "body",
-    #                         "parameters": [
-    #                             {
-    #                                 "type": "text",
-    #                                 "text": placa
-    #                             },
-    #                         ]
-    #                     }
-    #                 ]
-    #                 envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
-    #             del esperando_placa[numero]
-
-
-    #         if numero in esperando_genset_request:
-    #             envioTemplateTxt(numero, config.GENSET_REQUEST_TEMPLATE, [])
-    #             esperando_genset[numero] = True
-    #             del esperando_genset_request[numero]
-    #         elif esperando_genset.get(numero):
-    #             genset = cuerpo_mensaje.upper()
-    #             print(f"Genset detectado: {genset}")
-    #             unitnumber = buscar_unitnumber_por_genset(genset)
-    #             if unitnumber:
-    #                 print(f"El unitnumber para el genset {genset} es {unitnumber}.")
-    #                 user_requests[numero] = {
-    #                     "placa": genset,
-    #                     "hora": datetime.now()
-    #                 }
-    #                 envioTemplateTxt(numero, config.GENSET_ACTUAL_LOCATION_LOADING_TEMPLATE, [])
-    #                 if execute_crawler(unitnumber):
-    #                     print("Crawler ejecutado correctamente.")
-    #                     obtener_ultima_transmision_genset(unitnumber, numero, user_requests)
-    #                 else:
-    #                     print("Error al ejecutar el crawler.")
-    #             else:
-    #                 print(f"No se encontró el unitnumber para el genset {genset}.")
-    #                 components = [
-    #                     {
-    #                         "type": "body",
-    #                         "parameters": [
-    #                             {
-    #                                 "type": "text",
-    #                                 "text": genset
-    #                             },
-    #                         ]
-    #                     }
-    #                 ]
-    #                 envioTemplateTxt(numero, config.PLACA_NO_ENCONTRADA_TEMPLATE, components)
-    #             del esperando_genset[numero]
-            
-    #         if numero in esperando_chasis_request:
-    #             envioTemplateTxt(numero, config.CHASIS_REQUEST_TEMPLATE, [])
-    #             esperando_chasis[numero] = True
-    #             del esperando_chasis_request[numero]
-    #         elif esperando_chasis.get(numero):
-    #             chasis= cuerpo_mensaje.upper()
-    #             # Eviar la ubicación
-    #             enviar_ubicacion_tile_sync(chasis, numero, config.TILE_USER, config.TILE_PASSWORD)
-    #             del esperando_chasis[numero]
-    #         else:
-    #             print(f"Usuario {numero} autenticado correctamente.")
-
-    #         if cuerpo_mensaje.strip().lower() == "volver al menú":
-    #             print(f"Usuario {numero} seleccionó volver al menú.")
-    #             envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-    #             return
-    #         else:
-    #             print(f"Usuario {numero} no seleccionó volver al menú.")
-
-    #         if cuerpo_mensaje.strip().lower() == "volver al menú principal":
-    #             print(f"Usuario {numero} seleccionó volver al menú.")
-    #             # Reiniciar todos los estados relacionados con este usuario
-    #             esperando_denuncia.pop(numero, None)
-    #             empresa.pop(numero, None)
-    #             denuncia.pop(numero, None)
-    #             imagenes.pop(numero, None)
-    #             esperando_placa.pop(numero, None)
-    #             esperando_unit_type.pop(numero, None)
-    #             esperando_plate_request.pop(numero, None)
-    #             esperando_genset_request.pop(numero, None)
-    #             esperando_genset.pop(numero, None)
-    #             esperando_chasis_request.pop(numero, None)
-    #             esperando_chasis.pop(numero, None)
-    #             xeguridad_menu.pop(numero, None)
-    #             volver_menu_xeguridad.pop(numero, None)
-    #             user_requests.pop(numero, None)
-    #             envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-    #             return
-    #         else:
-    #             print(f"Usuario {numero} no seleccionó volver al menú.")
-
-    #     else:
-    #         print(f"Usuario {numero} en proceso de autenticación o fallido.")
-    #     return
-
-    if cuerpo_mensaje.lower() == "xeguridad":
-        print(f"Usuario {numero} seleccionó Xeguridad.")
-        if not usuario_manager.usuario_autenticado(numero):
-            print(f"Usuario {numero} no autenticado. Iniciando flujo de autenticación.")
-            usuario_manager.iniciar_autenticacion(numero)
-            return
-
-        # Usuario autenticado, enviar el menú principal de Xeguridad
-        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
+    if cuerpo_mensaje.lower() == "xeguridad" or numero in usuario_manager.usuarios_esperando_password or numero in usuario_manager.usuarios_autenticados or numero in esperando_placa or numero in esperando_unit_type or numero in esperando_plate_request or numero in volver_menu_xeguridad or numero in xeguridad_menu:
         xeguridad_menu[numero] = True
         if numero in usuario_manager.usuarios_autenticados:
             print(f"Usuario {numero} ya autenticado. Continuando flujo.")
@@ -539,53 +331,33 @@ def manejar_mensaje_entrante(mensaje):
                 return
             else:
                 print(f"Usuario {numero} no seleccionó volver al menú.")
-        
-        # Reiniciar estados no relacionados
-        estados_a_reiniciar = [
-            esperando_denuncia, empresa, denuncia, imagenes, esperando_placa,
-            esperando_unit_type, esperando_plate_request, esperando_genset_request,
-            esperando_genset, esperando_chasis_request, esperando_chasis
-        ]
-        for estado in estados_a_reiniciar:
-            estado.pop(numero, None)
-        
-        # Si el usuario no está autenticado, iniciar autenticación
-        if not usuario_manager.usuario_autenticado(numero):
-            print(f"Usuario {numero} no autenticado. Iniciando flujo de autenticación.")
-            usuario_manager.iniciar_autenticacion(numero)
-            return
 
-        # Usuario autenticado, enviar el menú principal de Xeguridad
-        envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-        xeguridad_menu[numero] = True
-        print(f"Usuario {numero} autenticado correctamente. Menú Xeguridad enviado.")
-
-        return
-    
-    # Procesar las opciones seleccionadas dentro del menú de Xeguridad
-    if numero in xeguridad_menu:
-        print(f"Procesando opción dentro del menú de Xeguridad para {numero}.")
-
-        if cuerpo_mensaje.lower() == "ubicación de una unidad":
-            esperando_unit_type[numero] = True
-            rol = usuario_manager.rol_usuario(numero)
-            if rol == "admin":
-                envioTemplateTxt(numero, config.UNIT_TYPE_TEMPLATE, [])
-            elif rol == "usuario":
-                envioTemplateTxt(numero, config.UNIT_TYPE_USUARIO_TEMPLATE, [])
-            print(f"Solicitud de ubicación de unidad enviada para {numero}.")
-            return
-
-        elif cuerpo_mensaje.lower() == "volver al menú principal":
-            print(f"Usuario {numero} seleccionó volver al menú principal.")
-            xeguridad_menu.pop(numero, None)
-            envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
-            return
+            if cuerpo_mensaje.strip().lower() == "volver al menú principal":
+                print(f"Usuario {numero} seleccionó volver al menú.")
+                # Reiniciar todos los estados relacionados con este usuario
+                esperando_denuncia.pop(numero, None)
+                empresa.pop(numero, None)
+                denuncia.pop(numero, None)
+                imagenes.pop(numero, None)
+                esperando_placa.pop(numero, None)
+                esperando_unit_type.pop(numero, None)
+                esperando_plate_request.pop(numero, None)
+                esperando_genset_request.pop(numero, None)
+                esperando_genset.pop(numero, None)
+                esperando_chasis_request.pop(numero, None)
+                esperando_chasis.pop(numero, None)
+                xeguridad_menu.pop(numero, None)
+                volver_menu_xeguridad.pop(numero, None)
+                user_requests.pop(numero, None)
+                envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
+                return
+            else:
+                print(f"Usuario {numero} no seleccionó volver al menú.")
 
         else:
-            print(f"Opción no válida seleccionada por {numero}: {cuerpo_mensaje}.")
-            envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-            return
+            print(f"Usuario {numero} en proceso de autenticación o fallido.")
+        return
+
     # Fallback para mensajes no reconocidos
     if numero not in esperando_denuncia or not esperando_denuncia[numero]:
         envioTemplateTxt(numero, config.STARTER_MENU_TEMPLATE, [])
@@ -619,4 +391,3 @@ def send_notification():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=config.PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
-

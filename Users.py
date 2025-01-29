@@ -62,28 +62,17 @@ class UsuarioManager:
         return True
     
     def procesar_credenciales(self, numero, cuerpo_mensaje):
-        # Si el usuario ya está autenticado, no es necesario procesar credenciales
-        if numero in self.usuarios_autenticados:
-            print(f"Usuario {numero} ya autenticado. Omitiendo validación.")
-            envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])
-            return True
-
-        # Verificar si el usuario está en proceso de autenticación
         if numero in self.usuarios_esperando_password:
-            if self.autenticar_usuario(numero, cuerpo_mensaje):  # Credenciales correctas
+            if self.autenticar_usuario(numero, cuerpo_mensaje):  # Verifica las credenciales
                 print(f"Autenticación exitosa para {numero}")
-                self.usuarios_autenticados[numero] = datetime.now()
-                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Menú principal de Xeguridad
+                self.usuarios_autenticados[numero] = datetime.now()  # Actualiza estado correctamente
+                envioTemplateTxt(numero, config.MENU_TEMPLATE_NAME, [])  # Enviar menú de Xeguridad
                 del self.usuarios_esperando_password[numero]
                 return True
             else:
                 print(f"Autenticación fallida para {numero}")
-                envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])  # Plantilla de error
+                envioTemplateTxt(numero, config.AUTH_FAILED_TEMPLATE, [])  # Mensaje de fallo
                 del self.usuarios_esperando_password[numero]
-                return False
-
-        # Si el usuario no está en proceso de autenticación, retornar False
-        print(f"Usuario {numero} no está en proceso de autenticación.")
         return False
 
     def usuario_autenticado(self, numero):
@@ -99,6 +88,3 @@ class UsuarioManager:
         """Obtiene el rol de un usuario."""
         usuario = self.collection.find_one({'telefono': numero})
         return usuario['rol']
-
-
-
