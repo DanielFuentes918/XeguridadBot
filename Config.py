@@ -21,12 +21,14 @@ class Config:
         self.BASE_DATOS_MONGO = "XeguridadBotDB"
         self.AUTH_DB = "admin"
         self.PORT = os.getenv("PORT")
+        self.TILE_USER = os.getenv("TILE_USER")
+        self.TILE_PASSWORD = os.getenv("TILE_PASSWORD")
 
         # Plantillas
         self.STARTER_MENU_TEMPLATE = "start_menu"
         self.AUTH_TEMPLATE = "auth_request"
         self.AUTH_FAILED_TEMPLATE = "auth_failed"
-        self.MENU_TEMPLATE_NAME = "xeguridad_menu"
+        self.MENU_TEMPLATE_NAME = "xeguridad_menu2"
         self.SOLICITUD_UNIDAD_COMANDOS_TEMPLATE_NAME = "plate_number__request"
         self.CARGANDO_COMANDOS_TEMPLATE_NAME = "lt_command__loading"
         self.RESPUESTA_COMANDOS_TEMPLATE = "lt_command__response"
@@ -36,6 +38,21 @@ class Config:
         self.COMPLAINT_CLAIMS_COPY_TEMPLATE = "complaint_claims_copy"
         self.COMPLAINT_CLAIMS_NOTIFICATION_TEMPLATE = "complaint_claims_notification"
         self.COMPANY_SELECTION_TEMPLATE = "company_selection"
+        self.UNIT_TYPE_TEMPLATE = "unit_type"
+        self.GENSET_REQUEST_TEMPLATE = "genset_request"
+        self.CHASIS_REQUEST_TEMPLATE = "chasis_request"
+        self.TILE_LOCATION_TEMPLATE = "tile_location"
+        self.ACTUAL_LOCATION_TEMPLATE = "actual_location"
+        self.ACTUAL_LOCATION_LOADING_TEMPLATE = "actual_location_loading"
+        self.ACTUAL_LOCATION_FAILED_TEMPLATE = "actual_location_failed"
+        self.GENSET_ACTUAL_LOCATION_TEMPLATE = "genset_actual_location"
+        self.GENSET_ACTUAL_LOCATION_LOADING_TEMPLATE = "genset_actual_location_loading"
+        self.GENSET_ACTUAL_LOCATION_FAILED_TEMPLATE = "genset_actual_location_failed"
+        self.UNIT_TYPE_USUARIO_TEMPLATE = "unit_type_usuario"
+
+        #Conexion a base de datos MySQL
+        self.SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
+        self.SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     def mongo_uri(self):
         return f"mongodb://{self.USUARIO_MONGO}:{self.PASSWORD_MONGO_ESCAPADA}@localhost:27017/{self.BASE_DATOS_MONGO}?authSource={self.AUTH_DB}"
