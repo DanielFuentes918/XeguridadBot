@@ -10,6 +10,7 @@ from XeguridadCrawler import execute_crawler
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 from models.AllTruckDetails import db, AllTruckDetails
+from XeguridadCrawlerNewGPS import execute_crawler_new_gps
 
 config = Config()
 
@@ -388,6 +389,76 @@ def send_notification():
             return jsonify({"status": "Mensaje enviado exitosamente"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    ##Logica Crawler New GPS
+    # Mapas de conversión
+TYPEUNIT_MAP = {
+    "Helios Adv": 6, "Helios Basic": 7, "Helios M": 45, "Helios Pro": 42, "Helios TT": 8,
+    "Kylos": 17, "Kylos Air": 13, "Kylos Air 24g": 30, "Kylos Compact": 18, "Kylos CropX": 34,
+    "Kylos Forever": 12, "Kylos M/Connect": 40, "Lokies": 37, "Tetis": 10, "Tetis R": 11,
+    "Watchlock": 15, "Watchlock Cube": 35, "Watchlock Pro": 16, "Zeppos": 24
+}
+
+ICON_MAP = {f"icon_car{i}.png": i for i in range(20)}
+
+SUBDIVISION_PREFIX = {
+    "Particulares Puerto Cortés": "P-PCO-",
+    "Particulares Puerto Cortés 2": "P-PC2O-",
+    "Particulares Puerto Cortés 3": "P-PC3O-",
+    "Particulares San Pedro": "P-SPS-"
+}
+
+@app.route("activar_gps", methods=["POST"])
+def activar_gps():
+    try:
+        data = request.get_json()
+
+        # Mapear campos desde Notion
+        unitnumber = data.get("Número de serie de GPS")
+        placa = data.get("Placa")
+        tipo_gps = data.get("Tipo de GPS")
+        tipo_unidad = data.get("Tipo de unidad")
+        phonenumber = data.get("Línea telefónica")
+        subdivision = data.get("Subdivisión")
+
+        # Validaciones básicas
+        if not all([unitnumber, placa, tipo_gps, tipo_unidad, phonenumber, subdivision]):
+            return jsonify({"status": "error", "message": "Faltan campos requeridos."}), 400
+
+        # Transformaciones
+        typeunit = TYPEUNIT_MAP.get(tipo_gps)
+        icon = ICON_MAP.get(tipo_unidad)
+        prefix = SUBDIVISION_PREFIX.get(subdivision, "")
+        unitname = f"{prefix}{placa}"
+
+        if typeunit is None:
+            return jsonify({"status": "error", "message": f"Tipo de GPS desconocido: {tipo_gps}"}), 400
+        if icon is None:
+            return jsonify({"status": "error", "message": f"Tipo de unidad desconocido: {tipo_unidad}"}), 400
+
+        print("🟢 Parámetros finales para el scraper:")
+        print("unitnumber:", unitnumber)
+        print("unitname:", unitname)
+        print("typeunit:", typeunit)
+        print("phonenumber:", phonenumber)
+        print("subdivision:", subdivision)
+        print("icon:", icon)
+
+        # Ejecutar el scraper
+        execute_crawler(
+            unitnumber=unitnumber,
+            unitname=unitname,
+            typeunit=typeunit,
+            phonenumber=phonenumber,
+            subdivision=subdivision,
+            icon=icon
+        )
+
+        return jsonify({"status": "ok", "unitname": unitname}), 200
+
+    except Exception as e:
+        print("[ERROR]", e)
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=config.PORT)  # Ejecutar la aplicación en el puerto segun la variable de entorno del ambiente
