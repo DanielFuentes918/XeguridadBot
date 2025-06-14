@@ -260,10 +260,10 @@ if __name__ == "__main__":
         execute_crawler_new_gps(
             unitnumber,
             unitname,
-            int(typeunit),
+            typeunit,
             phonenumber,
             subdivision,
-            int(icon)
+            icon
         )
     else:
         print("Uso: python webscraper.py <unitnumber> <unitname> <typeunit> <phonenumber> <subdivision> <icon>")
