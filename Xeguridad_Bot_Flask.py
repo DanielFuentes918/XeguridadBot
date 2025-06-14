@@ -408,7 +408,7 @@ SUBDIVISION_PREFIX = {
     "Particulares San Pedro": "P-SPS-"
 }
 
-@app.route("activar_gps", methods=["POST"])
+@app.route("/activar_gps", methods=["POST"])
 def activar_gps():
     try:
         data = request.get_json()
