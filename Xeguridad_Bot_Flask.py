@@ -445,7 +445,7 @@ def activar_gps():
         print("icon:", icon)
 
         # Ejecutar el scraper
-        execute_crawler(
+        execute_crawler_new_gps(
             unitnumber=unitnumber,
             unitname=unitname,
             typeunit=typeunit,
