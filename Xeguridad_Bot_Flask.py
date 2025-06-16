@@ -390,8 +390,8 @@ def send_notification():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-    ##Logica Crawler New GPS
-    # Mapas de conversión
+##Logica Crawler New GPS
+# Mapas de conversión
 TYPEUNIT_MAP = {
     "Helios Adv": 6, "Helios Basic": 7, "Helios M": 45, "Helios Pro": 42, "Helios TT": 8,
     "Kylos": 17, "Kylos Air": 13, "Kylos Air 24g": 30, "Kylos Compact": 18, "Kylos CropX": 34,
@@ -403,8 +403,8 @@ ICON_MAP = {f"icon_car{i}.png": i for i in range(20)}
 
 SUBDIVISION_PREFIX = {
     "Particulares Puerto Cortés": "P-PCO-",
-    "Particulares Puerto Cortés 2": "P-PC2O-",
-    "Particulares Puerto Cortés 3": "P-PC3O-",
+    "Particulares Puerto Cortés 2": "P-PCO2-",
+    "Particulares Puerto Cortés 3": "P-PCO3-",
     "Particulares San Pedro": "P-SPS-"
 }
 
