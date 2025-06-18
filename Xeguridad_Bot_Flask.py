@@ -399,7 +399,7 @@ TYPEUNIT_MAP = {
     "Watchlock": 15, "Watchlock Cube": 35, "Watchlock Pro": 16, "Zeppos": 24
 }
 
-ICON_MAP = {f"icon_car{i}.png": i for i in range(20)}
+ICON_MAP = {"Carro":0, "Camión":8, "Camioncito":8, "Genset":17}
 
 SUBDIVISION_PREFIX = {
     "Particulares Puerto Cortés": "P-PCO-",
