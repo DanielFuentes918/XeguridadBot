@@ -1,3 +1,4 @@
+from Config import Config
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -8,6 +9,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
 import time
+
+config = Config()
 
 def execute_crawler_new_gps(unitnumber, unitname, typeunit, phonenumber, subdivision, icon):
     print("Iniciando ejecución del WebScraper...")
@@ -28,8 +31,8 @@ def execute_crawler_new_gps(unitnumber, unitname, typeunit, phonenumber, subdivi
     try:
         driver.get('https://mongol.brono.com/mongol/fiona/index.php')
         wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'loginwindow')))
-        driver.find_element(By.ID, 'user2').send_keys('dhnexasa')
-        driver.find_element(By.ID, 'p2').send_keys('dhnexasa2022/487-')
+        driver.find_element(By.ID, 'user2').send_keys(config.XEGURIDAD_USERNAME)
+        driver.find_element(By.ID, 'p2').send_keys(config.XEGURIDAD_PASSWORD)
         driver.find_element(By.CLASS_NAME, 'loginButton').click()
         wait.until(EC.url_contains('index.php?m=home'))
         print("✔ Login exitoso")

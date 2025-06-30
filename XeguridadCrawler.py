@@ -1,3 +1,4 @@
+from Config import Config
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -6,6 +7,8 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.action_chains import ActionChains
 import time
+
+config = Config()
 
 def execute_crawler(unitnumber):
     # Configuración del webdriver
@@ -43,12 +46,8 @@ def execute_crawler(unitnumber):
         print("Campos de inicio de sesión limpiados")
 
         # Ingresar las credenciales de inicio de sesión
-        username = 'dhnexasa'
-        password = 'dhnexasa2022/487-'
-        username_input.send_keys(username)
-        password_input.send_keys(password)
-        print(f"Usuario ingresado: {username}")
-        print(f"Contraseña ingresada: {password}")
+        username_input.send_keys(config.XEGURIDAD_USERNAME)
+        password_input.send_keys(config.XEGURIDAD_PASSWORD)
 
         # Enviar el formulario de inicio de sesión
         login_button = driver.find_element(By.CLASS_NAME, 'loginButton')
