@@ -12,11 +12,11 @@ config = Config()
 load_dotenv()
 
 # Configuración del servidor SMTP
-SMTP_SERVER = 'mail.exasa.net'  # Cambia esto a tu servidor SMTP
-SMTP_PORT = 465 # Puerto seguro para el servidor SMTP
+SMTP_SERVER = 'mail.exasa.net'
+SMTP_PORT = 465
 EMAIL_USER = config.EMAIL
 EMAIL_DESTINATION = config.EMAIL_DESTINATION
-EMAIL_PASSWORD = config.EMAIL_PASSWORD # Usa variables de entorno para la seguridad
+EMAIL_PASSWORD = config.EMAIL_PASSWORD
 
 # Función para enviar el correo de queja
 def enviar_queja_anonima(denuncia, archivos=[], empresa=""):
