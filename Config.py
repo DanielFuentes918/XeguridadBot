@@ -8,7 +8,7 @@ class Config:
         
         load_dotenv()
         # Varaibles de entorno
-        self.VERIFY_TOKEN = "9189189189"
+        self.VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
         self.WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL")
         self.WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
         self.NAMESPACE = os.getenv("NAMESPACE")
