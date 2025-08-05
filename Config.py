@@ -23,6 +23,8 @@ class Config:
         self.PORT = os.getenv("PORT")
         self.TILE_USER = os.getenv("TILE_USER")
         self.TILE_PASSWORD = os.getenv("TILE_PASSWORD")
+        self.EMAIL = os.getenv("EMAIL")
+        self.EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
         # Plantillas
         self.STARTER_MENU_TEMPLATE = "start_menu"
