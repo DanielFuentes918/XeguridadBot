@@ -8,7 +8,7 @@ class Config:
         
         load_dotenv()
         # Varaibles de entorno
-        self.VERIFY_TOKEN = "9189189189"
+        self.VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
         self.WHATSAPP_API_URL = os.getenv("WHATSAPP_API_URL")
         self.WHATSAPP_API_TOKEN = os.getenv("WHATSAPP_API_TOKEN")
         self.NAMESPACE = os.getenv("NAMESPACE")
@@ -23,6 +23,9 @@ class Config:
         self.PORT = os.getenv("PORT")
         self.TILE_USER = os.getenv("TILE_USER")
         self.TILE_PASSWORD = os.getenv("TILE_PASSWORD")
+        self.EMAIL = os.getenv("EMAIL")
+        self.EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+        self.EMAIL_DESTINATION = os.getenv("EMAIL_DESTINATION")
 
         # Plantillas
         self.STARTER_MENU_TEMPLATE = "start_menu"
