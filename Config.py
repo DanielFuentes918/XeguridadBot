@@ -25,6 +25,7 @@ class Config:
         self.TILE_PASSWORD = os.getenv("TILE_PASSWORD")
         self.EMAIL = os.getenv("EMAIL")
         self.EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+        self.EMAIL_DESTINATION = os.getenv("EMAIL_DESTINATION")
 
         # Plantillas
         self.STARTER_MENU_TEMPLATE = "start_menu"
